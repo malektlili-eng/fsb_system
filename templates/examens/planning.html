@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% block title %}Planning Examens — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-calendar-check"></i>{% endblock %}
+{% block page_title %}Planning des Examens{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Planning des Examens</h1>
+    <p class="sub">
+      {% if session %}
+      {{ session.nom }} — {{ plannings_count }} examen(s) planifié(s)
+      {% else %}
+      Sélectionnez une session
+      {% endif %}
+    </p>
+  </div>
+  <a href="{% url 'examens:sessions' %}" class="btn-ghost-fsb btn-sm">
+    <i class="fas fa-arrow-left"></i> Sessions
+  </a>
+</div>
+
+<div class="row g-3">
+
+  <!-- ══ FORMULAIRE GAUCHE ══ -->
+  <div class="col-lg-4">
+    <div class="card-fsb" style="position:sticky;top:80px">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-plus-circle"></i> Planifier un Examen</div>
+      </div>
+      <div class="card-fsb-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label class="form-label">Session <span style="color:#e11d48">*</span></label>
+            <select name="session" class="form-select" required>
+              <option value="">-- Choisir --</option>
+              {% for s in sessions %}
+              <option value="{{ s.pk }}" {% if session and session.pk == s.pk %}selected{% endif %}>
+                {{ s.nom }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Matière <span style="color:#e11d48">*</span></label>
+            <select name="matiere" class="form-select" required>
+              <option value="">-- Choisir --</option>
+              {% for m in matieres %}
+              <option value="{{ m.pk }}">{{ m.nom }} ({{ m.code }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Classe concernée</label>
+            <select name="classe" class="form-select">
+              <option value="">-- Toutes / Non spécifiée --</option>
+              {% for cl in classes %}
+              <option value="{{ cl.pk }}">{{ cl.nom }} ({{ cl.filiere.code }})</option>
+              {% endfor %}
+            </select>
+            <div style="font-size:0.72rem;color:#94a3b8;margin-top:3px">
+              <i class="fas fa-info-circle me-1"></i>
+              Le système vérifiera qu'elle n'a pas d'autre examen au même créneau.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Salle</label>
+            <select name="salle" class="form-select">
+              <option value="">-- Non assignée --</option>
+              {% for s in salles %}
+              <option value="{{ s.pk }}">{{ s.nom }} ({{ s.capacite }} places)</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Date <span style="color:#e11d48">*</span></label>
+            <input type="date" name="date" class="form-control" required {% if session %}
+              min="{{ session.date_debut|date:'Y-m-d' }}" max="{{ session.date_fin|date:'Y-m-d' }}" {% endif %}>
+            {% if session %}
+            <div style="font-size:0.71rem;color:#94a3b8;margin-top:3px">
+              Entre {{ session.date_debut|date:"d/m/Y" }} et {{ session.date_fin|date:"d/m/Y" }}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="row g-2 form-group">
+            <div class="col-6">
+              <label class="form-label">Début <span style="color:#e11d48">*</span></label>
+              <input type="time" name="heure_debut" class="form-control" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Fin <span style="color:#e11d48">*</span></label>
+              <input type="time" name="heure_fin" class="form-control" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary-fsb w-100" style="justify-content:center">
+            <i class="fas fa-save"></i> Planifier
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TABLEAU PLANNING DROITE ══ -->
+  <div class="col-lg-8">
+
+    <!-- Filtre session -->
+    <form method="get" style="margin-bottom:14px">
+      <div class="filter-bar">
+        <select name="session" class="form-select" style="max-width:300px">
+          <option value="">-- Choisir une session --</option>
+          {% for s in sessions %}
+          <option value="{{ s.pk }}" {% if session and session.pk == s.pk %}selected{% endif %}>
+            {{ s.nom }}
+          </option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn-primary-fsb btn-sm">
+          <i class="fas fa-filter"></i> Afficher
+        </button>
+      </div>
+    </form>
+
+    {% if session %}
+
+    {% if planning_par_jour %}
+
+    <!-- Planning par jour -->
+    {% for date, examens in planning_par_jour.items %}
+    <div class="card-fsb fu mb-3">
+
+      <!-- En-tête du jour -->
+      <div style="background:linear-gradient(135deg,#0b1e3d,#1a3f7a);
+                      padding:13px 18px;display:flex;align-items:center;gap:12px">
+        <div style="width:44px;height:44px;border-radius:10px;
+                        background:rgba(255,255,255,0.12);
+                        display:flex;align-items:center;justify-content:center;
+                        flex-shrink:0">
+          <div style="text-align:center;line-height:1.1">
+            <div style="font-size:1.1rem;font-weight:800;color:white">
+              {{ date|date:"d" }}
+            </div>
+            <div style="font-size:0.65rem;color:rgba(255,255,255,0.6);text-transform:uppercase">
+              {{ date|date:"M" }}
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.95rem;font-weight:800;color:white">
+            {{ date|date:"l d F Y" }}
+          </div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.55);margin-top:1px">
+            {{ examens|length }} examen(s) ce jour
+          </div>
+        </div>
+        <span style="margin-left:auto;background:rgba(255,255,255,0.15);
+                         color:white;padding:3px 10px;border-radius:99px;
+                         font-size:0.72rem;font-weight:700">
+          {{ examens|length }} exam.
+        </span>
+      </div>
+
+      <!-- Tableau des examens du jour -->
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:separate;border-spacing:0">
+          <thead>
+            <tr style="background:#f0f5ff">
+              <th style="padding:9px 14px;font-size:0.71rem;font-weight:700;
+                             letter-spacing:0.06em;text-transform:uppercase;color:#475569;
+                             border-bottom:2px solid #e2eaf6">Horaire</th>
+              <th style="padding:9px 14px;font-size:0.71rem;font-weight:700;
+                             letter-spacing:0.06em;text-transform:uppercase;color:#475569;
+                             border-bottom:2px solid #e2eaf6">Matière</th>
+              <th style="padding:9px 14px;font-size:0.71rem;font-weight:700;
+                             letter-spacing:0.06em;text-transform:uppercase;color:#475569;
+                             border-bottom:2px solid #e2eaf6">Classe</th>
+              <th style="padding:9px 14px;font-size:0.71rem;font-weight:700;
+                             letter-spacing:0.06em;text-transform:uppercase;color:#475569;
+                             border-bottom:2px solid #e2eaf6">Salle</th>
+              <th style="padding:9px 14px;font-size:0.71rem;font-weight:700;
+                             letter-spacing:0.06em;text-transform:uppercase;color:#475569;
+                             border-bottom:2px solid #e2eaf6">Durée</th>
+              <th style="padding:9px 14px;font-size:0.71rem;font-weight:700;
+                             letter-spacing:0.06em;text-transform:uppercase;color:#475569;
+                             border-bottom:2px solid #e2eaf6">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for exam in examens %}
+            <tr style="transition:background 0.2s" onmouseover="this.style.background='#f5f8ff'"
+              onmouseout="this.style.background='white'">
+
+              <!-- Horaire -->
+              <td style="padding:12px 14px;border-bottom:1px solid #f0f5f9;
+                             vertical-align:middle">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:4px;height:36px;border-radius:99px;
+                                  background:linear-gradient(180deg,#2563eb,#60a5fa);
+                                  flex-shrink:0"></div>
+                  <div>
+                    <div style="font-weight:800;font-size:0.9rem;color:#0b1e3d">
+                      {{ exam.heure_debut|time:"H:i" }}
+                    </div>
+                    <div style="font-size:0.72rem;color:#94a3b8">
+                      → {{ exam.heure_fin|time:"H:i" }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Matière -->
+              <td style="padding:12px 14px;border-bottom:1px solid #f0f5f9;
+                             vertical-align:middle">
+                <div style="font-weight:700;color:#0b1e3d;font-size:0.88rem">
+                  {{ exam.matiere.nom }}
+                </div>
+                <div style="font-size:0.7rem;color:#94a3b8;margin-top:1px">
+                  {{ exam.matiere.code }}
+                </div>
+              </td>
+
+              <!-- Classe -->
+              <td style="padding:12px 14px;border-bottom:1px solid #f0f5f9;
+                             vertical-align:middle">
+                {% if exam.classe %}
+                <div style="background:#eff6ff;border:1px solid #bfdbfe;
+                                border-radius:8px;padding:6px 10px;display:inline-block">
+                  <div style="font-weight:700;font-size:0.83rem;color:#1d4ed8">
+                    {{ exam.classe.nom }}
+                  </div>
+                  <div style="font-size:0.68rem;color:#3b82f6">
+                    {{ exam.classe.filiere.code }}
+                  </div>
+                </div>
+                {% else %}
+                <span style="color:#94a3b8;font-size:0.82rem">—</span>
+                {% endif %}
+              </td>
+
+              <!-- Salle -->
+              <td style="padding:12px 14px;border-bottom:1px solid #f0f5f9;
+                             vertical-align:middle">
+                {% if exam.salle %}
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div style="width:28px;height:28px;border-radius:7px;
+                                  background:linear-gradient(135deg,#064e3b,#059669);
+                                  display:flex;align-items:center;justify-content:center;
+                                  color:white;font-size:0.7rem">
+                    <i class="fas fa-door-open"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:700;font-size:0.83rem;color:#0b1e3d">
+                      {{ exam.salle.nom }}
+                    </div>
+                    <div style="font-size:0.68rem;color:#94a3b8">
+                      {{ exam.salle.capacite }} places
+                    </div>
+                  </div>
+                </div>
+                {% else %}
+                <span style="color:#94a3b8;font-size:0.82rem">Non assignée</span>
+                {% endif %}
+              </td>
+
+              <!-- Durée -->
+              <td style="padding:12px 14px;border-bottom:1px solid #f0f5f9;
+                             vertical-align:middle">
+                <span style="background:#fef9c3;color:#854d0e;padding:4px 10px;
+                                 border-radius:99px;font-size:0.77rem;font-weight:700">
+                  {{ exam.heure_debut|time:"H:i" }} – {{ exam.heure_fin|time:"H:i" }}
+                </span>
+              </td>
+
+              <!-- Actions -->
+              <td style="padding:12px 14px;border-bottom:1px solid #f0f5f9;
+                             vertical-align:middle">
+                <a href="{% url 'examens:supprimer_planning' exam.pk %}?session={{ session.pk }}"
+                  class="btn-icon ic-red" title="Supprimer"
+                  onclick="return confirm('Supprimer cet examen du planning ?')">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="card-fsb fu">
+      <div class="card-fsb-body">
+        <div class="empty-state" style="padding:52px">
+          <div class="empty-icon"><i class="fas fa-calendar"></i></div>
+          <h5>Aucun examen planifié</h5>
+          <p>Utilisez le formulaire à gauche pour planifier des examens.</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="card-fsb fu">
+      <div class="card-fsb-body">
+        <div class="empty-state" style="padding:52px">
+          <div class="empty-icon"><i class="fas fa-filter"></i></div>
+          <h5>Sélectionnez une session</h5>
+          <p>Choisissez une session dans le filtre ci-dessus pour afficher son planning.</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

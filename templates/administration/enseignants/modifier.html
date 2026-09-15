@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Modifier Enseignant — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-user-edit"></i>{% endblock %}
+{% block page_title %}Modifier l'Enseignant{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Modifier : {{ enseignant.prenom }} {{ enseignant.nom }}</h1>
+    <p class="sub">Matricule {{ enseignant.matricule }}</p>
+  </div>
+  <a href="{% url 'administration:detail_enseignant' enseignant.pk %}"
+     class="btn-ghost-fsb btn-sm">
+    <i class="fas fa-arrow-left"></i> Retour
+  </a>
+</div>
+
+<div class="card-fsb fu" style="max-width:700px">
+  <div class="card-fsb-header">
+    <div class="header-left"><i class="fas fa-edit"></i> Informations de l'Enseignant</div>
+  </div>
+  <div class="card-fsb-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-6 form-group">
+          <label class="form-label">Prénom <span style="color:#e11d48">*</span></label>
+          <input type="text" name="prenom" class="form-control"
+                 value="{{ enseignant.prenom }}" required>
+        </div>
+        <div class="col-md-6 form-group">
+          <label class="form-label">Nom <span style="color:#e11d48">*</span></label>
+          <input type="text" name="nom" class="form-control"
+                 value="{{ enseignant.nom }}" required>
+        </div>
+        <div class="col-md-6 form-group">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control"
+                 value="{{ enseignant.email }}">
+        </div>
+        <div class="col-md-6 form-group">
+          <label class="form-label">Téléphone</label>
+          <input type="text" name="telephone" class="form-control"
+                 value="{{ enseignant.telephone }}">
+        </div>
+        <div class="col-md-6 form-group">
+          <label class="form-label">Département</label>
+          <select name="departement" class="form-select">
+            <option value="">-- Non assigné --</option>
+            {% for d in departements %}
+            <option value="{{ d.pk }}"
+              {% if enseignant.departement and enseignant.departement.pk == d.pk %}selected{% endif %}>
+              {{ d }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6 form-group">
+          <label class="form-label">Grade</label>
+          <select name="grade" class="form-select">
+            {% for g in grades %}
+            <option value="{{ g.0 }}"
+              {% if enseignant.grade == g.0 %}selected{% endif %}>
+              {{ g.1 }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-12 form-group">
+          <label class="form-label">Spécialité</label>
+          <input type="text" name="specialite" class="form-control"
+                 value="{{ enseignant.specialite }}">
+        </div>
+        <div class="col-12 form-group">
+          <div style="display:flex;align-items:center;gap:10px;
+                      background:#f8faff;padding:12px;border-radius:9px;
+                      border:1.5px solid #e2eaf6">
+            <input type="checkbox" name="actif" id="actif"
+                   {% if enseignant.actif %}checked{% endif %}
+                   style="width:16px;height:16px;cursor:pointer">
+            <label for="actif" style="cursor:pointer;margin:0;font-weight:600;
+                                       font-size:0.86rem;color:#334155">
+              Enseignant actif (visible dans les listes)
+            </label>
+          </div>
+        </div>
+        <div class="col-12" style="margin-top:6px">
+          <button type="submit" class="btn-primary-fsb">
+            <i class="fas fa-save"></i> Enregistrer les Modifications
+          </button>
+          <a href="{% url 'administration:detail_enseignant' enseignant.pk %}"
+             class="btn-ghost-fsb" style="margin-left:10px">
+            Annuler
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

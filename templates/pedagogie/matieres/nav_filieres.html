@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% block title %}{{ dept.get_nom_display }} — Filières{% endblock %}
+{% block page_icon %}<i class="fas fa-book-open"></i>{% endblock %}
+{% block page_title %}Matières — {{ dept.get_nom_display }}{% endblock %}
+
+{% block content %}
+<style>
+    .label-badge {
+        padding: 6px 18px;
+        border-radius: 99px;
+        font-weight: 800;
+        font-size: 0.82rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    /* Variantes */
+    .badge-licence {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-master {
+        background: #ede9fe;
+        color: #5b21b6;
+    }
+
+    .badge-doctorat {
+        background: #cffafe;
+        color: #0e7490;
+    }
+
+    .badge-cpi {
+        background: #fef9c3;
+        color: #854d0e;
+    }
+
+    .badge-default {
+        background: #f3e8ff;
+        color: #6b21a8;
+    }
+</style>
+<!-- Breadcrumb -->
+<nav style="margin-bottom:18px;font-size:0.83rem;color:#94a3b8">
+    <a href="{% url 'pedagogie:matieres' %}" style="color:#2563eb;text-decoration:none;font-weight:600">
+        <i class="fas fa-book-open me-1"></i>Matières
+    </a>
+    <span style="margin:0 8px">›</span>
+    <span style="color:#0b1e3d;font-weight:700">{{ dept.get_nom_display }}</span>
+</nav>
+
+<div class="page-header">
+    <div>
+        <h1>
+            {% if dept.nom == 'informatique' %}💻
+            {% elif dept.nom == 'mathematiques' %}📐
+            {% elif dept.nom == 'physique' %}🔭
+            {% elif dept.nom == 'chimie' %}⚗️
+            {% elif dept.nom == 'sciences_vie' %}🔬
+            {% else %}🌍{% endif %}
+            {{ dept.get_nom_display }}
+        </h1>
+        <p class="sub">Sélectionnez une filière</p>
+    </div>
+    <a href="{% url 'pedagogie:ajouter_matiere' %}?dept={{ dept.pk }}" class="btn-primary-fsb">
+        <i class="fas fa-plus"></i> Ajouter une Matière
+    </a>
+</div>
+
+{% for label, filieres in groupes.items %}
+<div class="mb-4 fu fu{{ forloop.counter }}">
+
+    <!-- Séparateur avec label type formation -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="height:2px;flex:1;background:linear-gradient(90deg,#2563eb,transparent)"></div>
+        <div class="label-badge 
+    {% if 'Licence' in label %}badge-licence
+    {% elif 'Master' in label %}badge-master
+    {% elif 'Doctorat' in label %}badge-doctorat
+    {% elif 'CPI' in label %}badge-cpi
+    {% else %}badge-default{% endif %}">
+            {{ label }}
+        </div>
+
+        <div style="height:2px;flex:1;background:linear-gradient(90deg,transparent,#2563eb)"></div>
+    </div>
+
+    <div class="row g-3">
+        {% for item in filieres %}
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url 'pedagogie:matieres_liste' dept.pk item.filiere.pk %}"
+                style="text-decoration:none;display:block">
+                <div style="background:white;border:1.5px solid #e2eaf6;border-radius:14px;
+                    padding:16px 18px;transition:all 0.22s;cursor:pointer"
+                    onmouseover="this.style.borderColor='#2563eb';this.style.background='#eff6ff';this.style.transform='translateY(-2px)'"
+                    onmouseout="this.style.borderColor='#e2eaf6';this.style.background='white';this.style.transform='translateY(0)'">
+
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                        <div style="width:38px;height:38px;border-radius:9px;
+                        background:linear-gradient(135deg,#1e3a8a,#2563eb);
+                        display:flex;align-items:center;justify-content:center;
+                        color:white;font-size:0.9rem;flex-shrink:0">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div style="min-width:0">
+                            <div style="font-weight:700;font-size:0.87rem;color:#0b1e3d;
+                          line-height:1.3">{{ item.filiere.nom }}</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px">
+                                {{ item.filiere.code }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;
+                      padding-top:10px;border-top:1px solid #f0f5f9">
+                        <div style="display:flex;align-items:center;gap:5px">
+                            <div style="width:8px;height:8px;border-radius:50%;background:#2563eb"></div>
+                            <span style="font-size:0.78rem;font-weight:700;color:#2563eb">
+                                {{ item.nb_matieres }} matière(s)
+                            </span>
+                        </div>
+                        <i class="fas fa-arrow-right" style="color:#bfdbfe;font-size:0.82rem"></i>
+                    </div>
+
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% empty %}
+<div class="card-fsb">
+    <div class="card-fsb-body">
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h5>Aucune filière dans ce département</h5>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

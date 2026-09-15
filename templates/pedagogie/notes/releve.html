@@ -1,0 +1,375 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Relevé de Notes — {{ etudiant.get_full_name }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .badge {
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 8px 16px;
+      border-radius: 99px;
+    }
+
+    .badge-admis {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-ajourne {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .note {
+      font-weight: 800;
+    }
+
+    .note-success {
+      color: #166534;
+    }
+
+    .note-fail {
+      color: #991b1b;
+    }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+    }
+
+    .badge-admis {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-ajourne {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #f0f5fb;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center
+    }
+
+    .no-print {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px
+    }
+
+    .btn {
+      padding: 9px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .btn-dark {
+      background: #0b1e3d;
+      color: white
+    }
+
+    .btn-back {
+      background: white;
+      color: #0b1e3d;
+      border: 1.5px solid #e2eaf6
+    }
+
+    .doc {
+      width: 210mm;
+      background: white;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12)
+    }
+
+    .top-bar {
+      height: 6px;
+      background: linear-gradient(90deg, #0b1e3d, #2563eb, #0b1e3d)
+    }
+
+    .header {
+      padding: 24px 36px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e2eaf6
+    }
+
+    .inst-name {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0b1e3d
+    }
+
+    .inst-sub {
+      font-size: 0.72rem;
+      color: #64748b
+    }
+
+    .title-sec {
+      text-align: center;
+      padding: 24px;
+      border-bottom: 1px solid #e2eaf6
+    }
+
+    .title-main {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #0b1e3d;
+      letter-spacing: 0.04em
+    }
+
+    .body-sec {
+      padding: 24px 36px
+    }
+
+    .info-row {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 20px
+    }
+
+    .info-item label {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase
+    }
+
+    .info-item p {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0b1e3d;
+      margin-top: 2px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px
+    }
+
+    thead th {
+      background: #f0f5ff;
+      padding: 9px 14px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #475569;
+      border-bottom: 2px solid #e2eaf6;
+      text-align: left
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #f0f5f9;
+      font-size: 0.88rem
+    }
+
+    .moy-box {
+      background: #f0f5ff;
+      border-radius: 10px;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px
+    }
+
+    .moy-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #2563eb
+    }
+
+    .footer-sec {
+      padding: 20px 36px 28px;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #e2eaf6
+    }
+
+    .sig-label {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-bottom: 40px
+    }
+
+    .sig-line {
+      width: 160px;
+      height: 1px;
+      background: #0b1e3d;
+      margin-bottom: 5px
+    }
+
+    .sig-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #0b1e3d
+    }
+
+    .qr-block {
+      text-align: center
+    }
+
+    .qr-block img {
+      width: 80px;
+      height: 80px;
+      border: 1px solid #e2eaf6;
+      border-radius: 6px
+    }
+
+    .bottom-bar {
+      height: 4px;
+      background: linear-gradient(90deg, #0b1e3d, #2563eb, #0b1e3d)
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0
+      }
+
+      .no-print {
+        display: none !important
+      }
+
+      .doc {
+        box-shadow: none;
+        width: 100%
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="no-print">
+    <button onclick="window.print()" class="btn btn-dark">🖨️ Imprimer</button>
+    <a href="javascript:history.back()" class="btn btn-back">← Retour</a>
+  </div>
+  <div class="doc">
+    <div class="top-bar"></div>
+    <div class="header">
+      <div>
+        <div class="logo"><img src="{% static 'images/logo-fsb.jpg' %}" alt="Logo FSB" width="75" height="75" style="border-radius: 12px; object-fit: cover;"></div>
+        <div class="inst-name">Faculté des Sciences de Bizerte</div>
+        <div class="inst-sub">Université de Carthage — كلية العلوم ببنزرت</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:0.72rem;color:#94a3b8">Ref : FSB-RN-{{ etudiant.numero_etudiant }}-S{{ semestre }}</div>
+        <div style="font-size:0.8rem;font-weight:700;color:#0b1e3d">{% now "d/m/Y" %}</div>
+      </div>
+    </div>
+    <div class="title-sec">
+      <div style="font-size:0.68rem;color:#94a3b8;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:5px">
+        Document Officiel</div>
+      <div class="title-main">RELEVÉ DE NOTES</div>
+      <div style="font-size:0.82rem;color:#64748b;margin-top:4px">Semestre {{ semestre }} — {{ annee }}</div>
+    </div>
+    <div class="body-sec">
+      <div class="info-row">
+        <div class="info-item"><label>Nom & Prénom</label>
+          <p>{{ etudiant.nom|upper }} {{ etudiant.prenom }}</p>
+        </div>
+        <div class="info-item"><label>N° Étudiant</label>
+          <p>{{ etudiant.numero_etudiant }}</p>
+        </div>
+        <div class="info-item"><label>Filière</label>
+          <p>{{ etudiant.filiere }}</p>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Matière</th>
+            <th>Type</th>
+            <th>Note /20</th>
+            <th>Résultat</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for n in notes %}
+          <tr>
+            <td><code
+                style="background:#f0f5ff;color:#1d4ed8;padding:2px 7px;border-radius:5px">{{ n.matiere.code }}</code>
+            </td>
+            <td style="font-weight:600">{{ n.matiere.nom }}</td>
+            <td><span style="background:#f1f5f9;padding:2px 8px;border-radius:99px;font-size:0.75rem">{{
+                n.get_type_note_display }}</span></td>
+            <td class="note {% if n.note >= 10 %}note-success{% else %}note-fail{% endif %}">
+              {{ n.note }}
+            </td>
+            <td>
+              <span class="badge {% if n.note >= 10 %}badge-admis{% else %}badge-ajourne{% endif %}">
+                {% if n.note >= 10 %}Admis{% else %}Ajourné{% endif %}
+              </span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" style="text-align:center;color:#94a3b8;padding:16px">Aucune note enregistrée pour ce
+              semestre.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if moyenne %}
+      <div class="moy-box">
+        <div>
+          <div style="font-size:0.72rem;color:#94a3b8;font-weight:600;text-transform:uppercase">Moyenne Générale</div>
+          <div class="moy-val">{{ moyenne.moyenne }}/20</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:4px">Mention</div>
+          <div style="font-size:1rem;font-weight:800;color:#0b1e3d">{{ moyenne.get_mention_display }}</div>
+        </div>
+        <div style="text-align:right">
+          <span class="badge {% if moyenne.admis %}badge-admis{% else %}badge-ajourne{% endif %}">
+            {% if moyenne.admis %}✅ Admis{% else %}❌ Ajourné{% endif %}
+          </span>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="footer-sec">
+      <div>
+        <div class="sig-label">Le Responsable de Scolarité</div>
+        <div class="sig-line"></div>
+        <div class="sig-name">Cachet & Signature</div>
+      </div>
+      <div class="qr-block">
+        <div style="font-size:0.67rem;color:#94a3b8">Vérification</div>
+        <div
+          style="width:70px;height:70px;border:2px solid #e2eaf6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.5rem">
+          🎓</div>
+      </div>
+    </div>
+    <div class="bottom-bar"></div>
+  </div>
+</body>
+
+</html>

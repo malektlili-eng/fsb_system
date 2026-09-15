@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title %}{% if modifier %}Modifier{% else %}Ajouter{% endif %} une séance — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-calendar-plus"></i>{% endblock %}
+{% block page_title %}{% if modifier %}Modifier la séance{% else %}Ajouter une séance{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-lg-8">
+<div class="card-fsb">
+  <div class="card-fsb-header">
+    <div class="header-left">
+      <i class="fas fa-clock"></i>
+      {% if modifier %}Modifier la séance{% else %}Nouvelle séance à l'emploi du temps{% endif %}
+    </div>
+  </div>
+  <div class="card-fsb-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row g-3">
+
+        <div class="col-md-6">
+          <label class="form-label">Matière *</label>
+          <select name="matiere" class="form-select" required>
+            <option value="">— Choisir —</option>
+            {% for m in matieres %}
+            <option value="{{ m.pk }}" {% if seance and seance.matiere_id == m.pk %}selected{% endif %}>
+              {{ m.code }} — {{ m.nom }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Type de séance *</label>
+          <select name="type_seance" class="form-select" required>
+            <option value="cours" {% if seance and seance.type_seance == 'cours' %}selected{% endif %}>Cours</option>
+            <option value="td"    {% if seance and seance.type_seance == 'td' %}selected{% endif %}>TD</option>
+            <option value="tp"    {% if seance and seance.type_seance == 'tp' %}selected{% endif %}>TP</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Enseignant</label>
+          <select name="enseignant" class="form-select">
+            <option value="">— Aucun —</option>
+            {% for e in enseignants %}
+            <option value="{{ e.pk }}" {% if seance and seance.enseignant_id == e.pk %}selected{% endif %}>
+              {{ e.get_full_name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Salle</label>
+          <select name="salle" class="form-select">
+            <option value="">— Aucune —</option>
+            {% for s in salles %}
+            <option value="{{ s.pk }}" {% if seance and seance.salle_id == s.pk %}selected{% endif %}>
+              {{ s.nom }} ({{ s.capacite }} pl.)
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Classe</label>
+          <select name="classe" class="form-select">
+            <option value="">— Aucune —</option>
+            {% for cl in classes %}
+            <option value="{{ cl.pk }}" {% if seance and seance.classe_id == cl.pk %}selected{% endif %}>
+              {{ cl.nom }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Jour *</label>
+          <select name="jour" class="form-select" required>
+            {% for num, nom in jour_choices %}
+            <option value="{{ num }}" {% if seance and seance.jour == num %}selected{% endif %}>{{ nom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Heure début *</label>
+          <input type="time" name="heure_debut" class="form-control" required
+            value="{% if seance %}{{ seance.heure_debut|time:'H:i' }}{% else %}08:00{% endif %}">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Heure fin *</label>
+          <input type="time" name="heure_fin" class="form-control" required
+            value="{% if seance %}{{ seance.heure_fin|time:'H:i' }}{% else %}10:00{% endif %}">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Semestre</label>
+          <select name="semestre" class="form-select">
+            <option value="1" {% if not seance or seance.semestre == 1 %}selected{% endif %}>Semestre 1</option>
+            <option value="2" {% if seance and seance.semestre == 2 %}selected{% endif %}>Semestre 2</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Année universitaire</label>
+          <input type="text" name="annee" class="form-control"
+            value="{% if seance %}{{ seance.annee_universitaire }}{% else %}2024-2025{% endif %}"
+            pattern="\d{4}-\d{4}">
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+      <div class="d-flex gap-2 justify-content-end">
+        <a href="{% url 'pedagogie:emploi_du_temps' %}" class="btn-ghost-fsb">Annuler</a>
+        <button type="submit" class="btn-primary-fsb">
+          <i class="fas fa-save"></i>
+          {% if modifier %}Enregistrer{% else %}Ajouter la séance{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Enseignants — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-chalkboard-teacher"></i>{% endblock %}
+{% block page_title %}Gestion des Enseignants{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Enseignants</h1>
+    <p class="sub">{{ enseignants.count }} enseignant(s) enregistré(s)</p>
+  </div>
+  <a href="{% url 'administration:ajouter_enseignant' %}" class="btn-primary-fsb">
+    <i class="fas fa-user-plus"></i> Ajouter
+  </a>
+</div>
+
+<div class="card-fsb fu">
+  <div class="card-fsb-header">
+    <div class="header-left"><i class="fas fa-list"></i> Liste des Enseignants</div>
+    <span class="badge-pill b-blue">{{ enseignants.count }}</span>
+  </div>
+  <div class="card-fsb-body" style="padding:0">
+    <div class="table-responsive">
+      <table class="table-fsb">
+        <thead>
+          <tr>
+            <th>Matricule</th>
+            <th>Nom & Prénom</th>
+            <th>Grade</th>
+            <th>Département</th>
+            <th>Spécialité</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ens in enseignants %}
+          <tr>
+            <td>
+              <code style="background:#f0f5ff;color:#1d4ed8;padding:3px 8px;border-radius:6px;font-size:0.81rem">
+                {{ ens.matricule }}
+              </code>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:9px">
+                <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#0c4a6e,#0284c7);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.75rem;flex-shrink:0">
+                  {{ ens.user.first_name|first|upper }}{{ ens.user.last_name|first|upper }}
+                </div>
+                <div>
+                  <div style="font-weight:700;color:#0b1e3d">{{ ens.user.last_name }} {{ ens.user.first_name }}</div>
+                  <div style="font-size:0.71rem;color:#94a3b8">{{ ens.user.email }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge-pill
+                {% if ens.grade == 'professeur' %}b-purple
+                {% elif ens.grade == 'maitre_conf' %}b-blue
+                {% elif ens.grade == 'maitre_assistant' %}b-cyan
+                {% else %}b-gray{% endif %}">
+                {{ ens.get_grade_display }}
+              </span>
+            </td>
+            <td style="font-size:0.83rem;color:#334155">{{ ens.departement }}</td>
+            <td style="font-size:0.83rem;color:#64748b">{{ ens.specialite }}</td>
+            <td>
+              <a href="{% url 'administration:detail_enseignant' ens.pk %}" class="btn-icon ic-blue" title="Voir la fiche">
+                <i class="fas fa-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6">
+            <div class="empty-state">
+              <div class="empty-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+              <h5>Aucun enseignant trouvé</h5>
+              <p><a href="{% url 'administration:ajouter_enseignant' %}" style="color:#2563eb">Ajouter le premier enseignant</a></p>
+            </div>
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

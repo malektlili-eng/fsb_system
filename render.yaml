@@ -1,0 +1,96 @@
+# render.yaml — Déploiement en un clic sur Render (https://render.com)
+# ═══════════════════════════════════════════════════════════════════
+# Provisionne l'application FSB (web + PostgreSQL + Key Value/Redis).
+#
+# DÉPLOIEMENT EN UN CLIC
+#   Bouton « Deploy to Render » du README, ou :
+#   render.com → New → Blueprint → sélectionner ce dépôt.
+#
+# CE QUE CE BLUEPRINT GARANTIT
+#   Le déploiement est AUTONOME : il migre, sème les données de
+#   démonstration ET construit l'index vectoriel dans la même phase de
+#   build. Un examinateur qui ouvre l'URL trouve une application peuplée
+#   sur laquelle il peut se connecter immédiatement — pas un formulaire
+#   de connexion vide.
+#
+#   AUCUN SECRET N'EST REQUIS pour que la démo fonctionne. Sans
+#   GROQ_API_KEY, LLM_FALLBACK_OFFLINE fait basculer la génération sur
+#   OfflineProvider (déterministe, sans réseau) : le retrieval, la
+#   sélection d'outils, le contrôle RBAC et le streaming SSE — tout ce
+#   que ce dépôt implémente réellement — restent observables.
+#
+# NOTE SUR LES OFFRES GRATUITES
+#   Les instances gratuites s'endorment après ~15 min d'inactivité : le
+#   premier chargement peut prendre ~50 s. Les bases gratuites expirent
+#   après 30 jours. Pour une URL destinée à être cliquée pendant des
+#   mois, prévoir le plan payant le plus bas.
+# ═══════════════════════════════════════════════════════════════════
+
+databases:
+  - name: fsb-postgres
+    plan: free
+    databaseName: fsb_db
+    user: fsb_user
+
+services:
+  # ─── Application web (Django + Gunicorn) ──────────────────────────
+  - type: web
+    name: fsb-system
+    runtime: python
+    plan: free
+    # migrate → seed → index : l'ordre compte. L'index est construit
+    # après le seeding car il peut indexer des fiches d'entités issues
+    # de la base en plus du corpus documentaire.
+    buildCommand: >-
+      pip install -r requirements/production.txt &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate --no-input &&
+      python manage.py init_data --quiet &&
+      python manage.py build_rag_index
+    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120
+    healthCheckPath: /accounts/login/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fsb-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: fsb-redis
+          property: connectionString
+      # Clé LLM facultative : la démo fonctionne sans.
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: LLM_PROVIDER
+        value: groq
+      # Repli déterministe si GROQ_API_KEY est absente. Mettre "False"
+      # en production réelle : mieux vaut échouer bruyamment que servir
+      # du déterministe sans que ça se voie.
+      - key: LLM_FALLBACK_OFFLINE
+        value: "True"
+      # Mot de passe du compte de démonstration, généré par Render : une
+      # instance publique ne doit pas exposer un mot de passe en clair
+      # dans le dépôt. Le relever dans le dashboard après déploiement.
+      - key: DEMO_ADMIN_PASSWORD
+        generateValue: true
+      - key: RAG_EMBEDDING_BACKEND
+        value: tfidf
+      - key: PYTHON_VERSION
+        value: "3.12"
+
+  # ─── Cache (Render Key Value, compatible Redis) ───────────────────
+  - type: redis
+    name: fsb-redis
+    plan: free
+    ipAllowList: []

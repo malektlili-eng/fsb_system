@@ -1,0 +1,1114 @@
+{
+  "generated_at": "2026-09-14 19:20:36",
+  "main": {
+    "backend": "tfidf-char35",
+    "n_chunks": 34,
+    "n_queries": 30,
+    "aggregated": {
+      "hit@4": 0.7778,
+      "recall@4": 0.7593,
+      "precision@4": 0.2593,
+      "mrr": 0.7778,
+      "ndcg@4": 0.7634
+    },
+    "correct_rejection_rate": 0.6667,
+    "latency_ms": {
+      "p50": 0.99,
+      "p95": 1.07
+    },
+    "details": [
+      {
+        "query": "Combien d'absences non justifiées entraînent la défaillance ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "faq_scolarite::001::2db4aa49cf",
+            "section": "Foire aux questions — Scolarité > Absences",
+            "score": 0.7082,
+            "relevant": true
+          },
+          {
+            "chunk_id": "reglement_etudes::005::a77bb06d2c",
+            "section": "Règlement des études > Article 4 — Régime des absences",
+            "score": 0.358,
+            "relevant": true
+          },
+          {
+            "chunk_id": "reglement_etudes::004::b2c5621a5b",
+            "section": "Règlement des études > Article 4 — Régime des absences",
+            "score": 0.3183,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.75,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Quelle est la pondération entre contrôle continu et examen final ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "reglement_etudes::001::382e0c8212",
+            "section": "Règlement des études > Article 2 — Contrôle des connaissances",
+            "score": 0.4828,
+            "relevant": true
+          },
+          {
+            "chunk_id": "faq_scolarite::000::2351e916c5",
+            "section": "Foire aux questions — Scolarité > Notes et moyennes",
+            "score": 0.3407,
+            "relevant": true
+          },
+          {
+            "chunk_id": "reglement_etudes::002::15707f8aa9",
+            "section": "Règlement des études > Article 3 — Session de rattrapage",
+            "score": 0.2014,
+            "relevant": false
+          },
+          {
+            "chunk_id": "reglement_etudes::003::aedb9fc603",
+            "section": "Règlement des études > Article 3 — Session de rattrapage",
+            "score": 0.2009,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.5,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Quelle est la durée minimale du stage de licence ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "stages_diplomes::000::f333796c4b",
+            "section": "Stages et diplômes > Stage obligatoire de fin d'études",
+            "score": 0.4242,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Quel est le délai pour justifier une absence ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "faq_scolarite::001::2db4aa49cf",
+            "section": "Foire aux questions — Scolarité > Absences",
+            "score": 0.4329,
+            "relevant": true
+          },
+          {
+            "chunk_id": "reglement_etudes::004::b2c5621a5b",
+            "section": "Règlement des études > Article 4 — Régime des absences",
+            "score": 0.3331,
+            "relevant": true
+          },
+          {
+            "chunk_id": "reglement_etudes::005::a77bb06d2c",
+            "section": "Règlement des études > Article 4 — Régime des absences",
+            "score": 0.321,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.75,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Combien de crédits faut-il pour valider un semestre ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "reglement_etudes::000::484a0bbf1b",
+            "section": "Règlement des études > Article 1 — Régime des études",
+            "score": 0.3197,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Quelles sont les mentions du diplôme et leurs seuils ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "stages_diplomes::003::d26e8a8a60",
+            "section": "Stages et diplômes > Conditions de délivrance du diplôme",
+            "score": 0.2194,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Quel est le format du numéro étudiant ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "procedures_inscription::004::8f37097f20",
+            "section": "Procédures d'inscription > Numéro étudiant et carte",
+            "score": 0.3436,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Quand se déroulent les examens de la session principale ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "organisation_examens::000::ad0b8f6f5b",
+            "section": "Organisation des examens > Calendrier des sessions",
+            "score": 0.4577,
+            "relevant": true
+          },
+          {
+            "chunk_id": "reglement_etudes::003::aedb9fc603",
+            "section": "Règlement des études > Article 3 — Session de rattrapage",
+            "score": 0.4146,
+            "relevant": false
+          },
+          {
+            "chunk_id": "reglement_etudes::002::15707f8aa9",
+            "section": "Règlement des études > Article 3 — Session de rattrapage",
+            "score": 0.3491,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Combien de surveillants par salle d'examen ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "organisation_examens::003::d6d080bd05",
+            "section": "Organisation des examens > Surveillance et procès-verbal",
+            "score": 0.3354,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Quels rôles peuvent planifier un examen via l'agent IA ?",
+        "category": "factuelle",
+        "retrieved": [
+          {
+            "chunk_id": "roles_permissions::002::a3e71c1596",
+            "section": "Rôles et permissions du système > Permissions de l'agent IA",
+            "score": 0.2743,
+            "relevant": true
+          },
+          {
+            "chunk_id": "organisation_examens::001::c08b340ebb",
+            "section": "Organisation des examens > Planification et salles",
+            "score": 0.2167,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Un étudiant recalé peut-il repasser ses épreuves ratées ?",
+        "category": "reformulée",
+        "retrieved": [
+          {
+            "chunk_id": "organisation_examens::001::c08b340ebb",
+            "section": "Organisation des examens > Planification et salles",
+            "score": 0.2321,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 0.0,
+          "recall@4": 0.0,
+          "precision@4": 0.0,
+          "mrr": 0.0,
+          "ndcg@4": 0.0
+        }
+      },
+      {
+        "query": "Que risque un tricheur pendant une épreuve ?",
+        "category": "reformulée",
+        "retrieved": [
+          {
+            "chunk_id": "organisation_examens::002::369c5fdbb1",
+            "section": "Organisation des examens > Déroulement des épreuves",
+            "score": 0.2311,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 0.0,
+          "recall@4": 0.0,
+          "precision@4": 0.0,
+          "mrr": 0.0,
+          "ndcg@4": 0.0
+        }
+      },
+      {
+        "query": "Peut-on refaire deux fois la même année d'études ?",
+        "category": "reformulée",
+        "retrieved": [
+          {
+            "chunk_id": "procedures_inscription::002::f9108ca831",
+            "section": "Procédures d'inscription > Réinscription et redoublement",
+            "score": 0.222,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Arriver en retard le jour d'une épreuve, c'est encore possible d'entrer ?",
+        "category": "reformulée",
+        "retrieved": [],
+        "metrics": {
+          "hit@4": 0.0,
+          "recall@4": 0.0,
+          "precision@4": 0.0,
+          "mrr": 0.0,
+          "ndcg@4": 0.0
+        }
+      },
+      {
+        "query": "Je ne suis pas d'accord avec ma note, quels sont mes recours ?",
+        "category": "reformulée",
+        "retrieved": [],
+        "metrics": {
+          "hit@4": 0.0,
+          "recall@4": 0.0,
+          "precision@4": 0.0,
+          "mrr": 0.0,
+          "ndcg@4": 0.0
+        }
+      },
+      {
+        "query": "Qui supervise le stagiaire pendant son projet en entreprise ?",
+        "category": "reformulée",
+        "retrieved": [],
+        "metrics": {
+          "hit@4": 0.0,
+          "recall@4": 0.0,
+          "precision@4": 0.0,
+          "mrr": 0.0,
+          "ndcg@4": 0.0
+        }
+      },
+      {
+        "query": "Le doyen a-t-il accès à toutes les données ?",
+        "category": "reformulée",
+        "retrieved": [
+          {
+            "chunk_id": "roles_permissions::001::1a91a450d5",
+            "section": "Rôles et permissions du système > Hiérarchie des rôles",
+            "score": 0.2796,
+            "relevant": true
+          },
+          {
+            "chunk_id": "roles_permissions::003::1730473577",
+            "section": "Rôles et permissions du système > Protection des données personnelles",
+            "score": 0.2159,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 0.5,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 0.6131471927654584
+        }
+      },
+      {
+        "query": "Perdre sa carte d'étudiant, ça coûte combien ?",
+        "category": "reformulée",
+        "retrieved": [],
+        "metrics": {
+          "hit@4": 0.0,
+          "recall@4": 0.0,
+          "precision@4": 0.0,
+          "mrr": 0.0,
+          "ndcg@4": 0.0
+        }
+      },
+      {
+        "query": "Mes coordonnées personnelles sont-elles visibles par le chatbot ?",
+        "category": "reformulée",
+        "retrieved": [
+          {
+            "chunk_id": "roles_permissions::003::1730473577",
+            "section": "Rôles et permissions du système > Protection des données personnelles",
+            "score": 0.3146,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Le jury peut-il arrondir ma moyenne ?",
+        "category": "reformulée",
+        "retrieved": [
+          {
+            "chunk_id": "reglement_etudes::007::7380d2efed",
+            "section": "Règlement des études > Article 6 — Jury et délibérations",
+            "score": 0.2981,
+            "relevant": true
+          },
+          {
+            "chunk_id": "faq_scolarite::000::2351e916c5",
+            "section": "Foire aux questions — Scolarité > Notes et moyennes",
+            "score": 0.2295,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Comment déposer une demande de stage ?",
+        "category": "procédurale",
+        "retrieved": [
+          {
+            "chunk_id": "stages_diplomes::001::16b58ce2ba",
+            "section": "Stages et diplômes > Demande de stage",
+            "score": 0.3159,
+            "relevant": true
+          },
+          {
+            "chunk_id": "faq_scolarite::002::b189057c10",
+            "section": "Foire aux questions — Scolarité > Documents administratifs",
+            "score": 0.2477,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Comment s'inscrire administrativement et quelles pièces fournir ?",
+        "category": "procédurale",
+        "retrieved": [
+          {
+            "chunk_id": "procedures_inscription::000::928c04c9c0",
+            "section": "Procédures d'inscription > Inscription administrative",
+            "score": 0.301,
+            "relevant": true
+          },
+          {
+            "chunk_id": "faq_scolarite::003::28b27de738",
+            "section": "Foire aux questions — Scolarité > Documents administratifs",
+            "score": 0.2865,
+            "relevant": false
+          },
+          {
+            "chunk_id": "faq_scolarite::002::b189057c10",
+            "section": "Foire aux questions — Scolarité > Documents administratifs",
+            "score": 0.2774,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Comment obtenir une attestation de réussite ?",
+        "category": "procédurale",
+        "retrieved": [
+          {
+            "chunk_id": "faq_scolarite::003::28b27de738",
+            "section": "Foire aux questions — Scolarité > Documents administratifs",
+            "score": 0.583,
+            "relevant": true
+          },
+          {
+            "chunk_id": "faq_scolarite::002::b189057c10",
+            "section": "Foire aux questions — Scolarité > Documents administratifs",
+            "score": 0.5815,
+            "relevant": true
+          },
+          {
+            "chunk_id": "stages_diplomes::004::3837faf947",
+            "section": "Stages et diplômes > Attestations et retrait du diplôme",
+            "score": 0.2394,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.75,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Comment retirer son diplôme officiel ?",
+        "category": "procédurale",
+        "retrieved": [
+          {
+            "chunk_id": "stages_diplomes::004::3837faf947",
+            "section": "Stages et diplômes > Attestations et retrait du diplôme",
+            "score": 0.3226,
+            "relevant": true
+          },
+          {
+            "chunk_id": "faq_scolarite::002::b189057c10",
+            "section": "Foire aux questions — Scolarité > Documents administratifs",
+            "score": 0.2425,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Comment demander une bourse d'études ?",
+        "category": "procédurale",
+        "retrieved": [
+          {
+            "chunk_id": "faq_scolarite::005::7f74a1f985",
+            "section": "Foire aux questions — Scolarité > Bourses et aides",
+            "score": 0.3009,
+            "relevant": true
+          },
+          {
+            "chunk_id": "faq_scolarite::002::b189057c10",
+            "section": "Foire aux questions — Scolarité > Documents administratifs",
+            "score": 0.2321,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Comment changer ses matières optionnelles après la rentrée ?",
+        "category": "procédurale",
+        "retrieved": [
+          {
+            "chunk_id": "procedures_inscription::001::ee366713d4",
+            "section": "Procédures d'inscription > Inscription pédagogique",
+            "score": 0.3583,
+            "relevant": true
+          },
+          {
+            "chunk_id": "faq_scolarite::000::2351e916c5",
+            "section": "Foire aux questions — Scolarité > Notes et moyennes",
+            "score": 0.2084,
+            "relevant": false
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Comment se passe la soutenance du rapport de stage ?",
+        "category": "procédurale",
+        "retrieved": [
+          {
+            "chunk_id": "stages_diplomes::002::7bcb972115",
+            "section": "Stages et diplômes > Encadrement et soutenance",
+            "score": 0.4654,
+            "relevant": true
+          }
+        ],
+        "metrics": {
+          "hit@4": 1.0,
+          "recall@4": 1.0,
+          "precision@4": 0.25,
+          "mrr": 1.0,
+          "ndcg@4": 1.0
+        }
+      },
+      {
+        "query": "Quel est le menu du restaurant universitaire cette semaine ?",
+        "category": "hors-corpus",
+        "retrieved": [
+          {
+            "chunk_id": "faq_scolarite::005::7f74a1f985",
+            "section": "Foire aux questions — Scolarité > Bourses et aides",
+            "score": 0.2469,
+            "relevant": false
+          },
+          {
+            "chunk_id": "reglement_etudes::000::484a0bbf1b",
+            "section": "Règlement des études > Article 1 — Régime des études",
+            "score": 0.2088,
+            "relevant": false
+          }
+        ],
+        "correct_rejection": false
+      },
+      {
+        "query": "Quels sont les horaires de la piscine du campus ?",
+        "category": "hors-corpus",
+        "retrieved": [],
+        "correct_rejection": true
+      },
+      {
+        "query": "Comment configurer un serveur Minecraft ?",
+        "category": "hors-corpus",
+        "retrieved": [],
+        "correct_rejection": true
+      }
+    ]
+  },
+  "precision_ceiling": {
+    "max_precision": 0.3426,
+    "mean_relevant_per_query": 1.37,
+    "median_relevant_per_query": 1,
+    "queries_with_single_relevant": 20,
+    "n_queries": 27
+  },
+  "by_category": {
+    "factuelle": {
+      "hit@4": 1.0,
+      "recall@4": 1.0,
+      "precision@4": 0.375,
+      "mrr": 1.0,
+      "ndcg@4": 1.0
+    },
+    "reformulée": {
+      "hit@4": 0.4,
+      "recall@4": 0.35,
+      "precision@4": 0.1,
+      "mrr": 0.4,
+      "ndcg@4": 0.3613
+    },
+    "procédurale": {
+      "hit@4": 1.0,
+      "recall@4": 1.0,
+      "precision@4": 0.3214,
+      "mrr": 1.0,
+      "ndcg@4": 1.0
+    }
+  },
+  "ablations": [
+    {
+      "ablation": "A1_chunk_size",
+      "config": "300 caractères",
+      "n_chunks": 61,
+      "hit@4": 0.7778,
+      "recall@4": 0.6457,
+      "precision@4": 0.3889,
+      "mrr": 0.7593,
+      "ndcg@4": 0.6755,
+      "correct_rejection_rate": 0.6667,
+      "reformulee_recall": 0.2833
+    },
+    {
+      "ablation": "A1_chunk_size",
+      "config": "450 caractères (défaut)",
+      "n_chunks": 34,
+      "hit@4": 0.7778,
+      "recall@4": 0.7593,
+      "precision@4": 0.2593,
+      "mrr": 0.7778,
+      "ndcg@4": 0.7634,
+      "correct_rejection_rate": 0.6667,
+      "reformulee_recall": 0.35
+    },
+    {
+      "ablation": "A1_chunk_size",
+      "config": "900 caractères",
+      "n_chunks": 30,
+      "hit@4": 0.7778,
+      "recall@4": 0.7778,
+      "precision@4": 0.2315,
+      "mrr": 0.7778,
+      "ndcg@4": 0.7778,
+      "correct_rejection_rate": 0.6667,
+      "reformulee_recall": 0.4
+    },
+    {
+      "ablation": "A2_overlap",
+      "config": "0 phrase(s)",
+      "n_chunks": 33,
+      "hit@4": 0.7778,
+      "recall@4": 0.7469,
+      "precision@4": 0.2315,
+      "mrr": 0.7778,
+      "ndcg@4": 0.7548,
+      "correct_rejection_rate": 0.6667,
+      "reformulee_recall": 0.35
+    },
+    {
+      "ablation": "A2_overlap",
+      "config": "1 phrase(s) (défaut)",
+      "n_chunks": 34,
+      "hit@4": 0.7778,
+      "recall@4": 0.7593,
+      "precision@4": 0.2593,
+      "mrr": 0.7778,
+      "ndcg@4": 0.7634,
+      "correct_rejection_rate": 0.6667,
+      "reformulee_recall": 0.35
+    },
+    {
+      "ablation": "A3_lexical_alpha",
+      "config": "α = 0.0",
+      "n_chunks": 34,
+      "hit@4": 0.7037,
+      "recall@4": 0.6852,
+      "precision@4": 0.2407,
+      "mrr": 0.7037,
+      "ndcg@4": 0.6894,
+      "correct_rejection_rate": 0.6667,
+      "reformulee_recall": 0.25
+    },
+    {
+      "ablation": "A3_lexical_alpha",
+      "config": "α = 0.25 (défaut)",
+      "n_chunks": 34,
+      "hit@4": 0.7778,
+      "recall@4": 0.7593,
+      "precision@4": 0.2593,
+      "mrr": 0.7778,
+      "ndcg@4": 0.7634,
+      "correct_rejection_rate": 0.6667,
+      "reformulee_recall": 0.35
+    },
+    {
+      "ablation": "A3_lexical_alpha",
+      "config": "α = 0.5",
+      "n_chunks": 34,
+      "hit@4": 0.7778,
+      "recall@4": 0.7593,
+      "precision@4": 0.2593,
+      "mrr": 0.7778,
+      "ndcg@4": 0.7634,
+      "correct_rejection_rate": 0.6667,
+      "reformulee_recall": 0.35
+    },
+    {
+      "ablation": "A4_backend",
+      "config": "spacy-fr-core-news-md-idf @ seuil défaut 0.2",
+      "n_chunks": 34,
+      "hit@4": 0.7037,
+      "recall@4": 0.6605,
+      "precision@4": 0.2222,
+      "mrr": 0.6111,
+      "ndcg@4": 0.6021,
+      "correct_rejection_rate": 0.0,
+      "reformulee_recall": 0.45
+    },
+    {
+      "ablation": "A4_backend",
+      "config": "spacy-fr-core-news-md-idf @ seuil recalibré 0.72",
+      "n_chunks": 34,
+      "hit@4": 0.4815,
+      "recall@4": 0.4568,
+      "precision@4": 0.1667,
+      "mrr": 0.4444,
+      "ndcg@4": 0.4299,
+      "correct_rejection_rate": 1.0,
+      "reformulee_recall": 0.1
+    },
+    {
+      "ablation": "A4_backend",
+      "config": "hybrid-spacy+tfidf-w0.5 @ seuil défaut 0.2",
+      "n_chunks": 34,
+      "hit@4": 0.8519,
+      "recall@4": 0.8333,
+      "precision@4": 0.2778,
+      "mrr": 0.8148,
+      "ndcg@4": 0.8102,
+      "correct_rejection_rate": 0.0,
+      "reformulee_recall": 0.55
+    },
+    {
+      "ablation": "A4_backend",
+      "config": "hybrid-spacy+tfidf-w0.5 @ seuil recalibré 0.42",
+      "n_chunks": 34,
+      "hit@4": 0.7778,
+      "recall@4": 0.7593,
+      "precision@4": 0.2593,
+      "mrr": 0.7593,
+      "ndcg@4": 0.7498,
+      "correct_rejection_rate": 1.0,
+      "reformulee_recall": 0.35
+    },
+    {
+      "ablation": "A5_svd_lsa",
+      "config": "TF-IDF + TruncatedSVD 256 (retiré : lisse les similarités, le rejet hors-corpus s'effondre)",
+      "n_chunks": 34,
+      "hit@4": 0.9259,
+      "recall@4": 0.8889,
+      "precision@4": 0.2963,
+      "mrr": 0.8735,
+      "ndcg@4": 0.8648,
+      "correct_rejection_rate": 0.0,
+      "reformulee_recall": 0.7
+    }
+  ],
+  "ablation_variants_unavailable": [
+    {
+      "backend": "SentenceTransformerBackend",
+      "reason": "sentence-transformers n'est pas installé. Installez-le (pip install sentence-transformers) ou utilisez TfidfBackend."
+    }
+  ],
+  "scaling": {
+    "n_real_chunks": 34,
+    "method": "Le corpus réel est conservé intact (les chunks pertinents sont identiques à toutes les tailles) ; seuls des distracteurs non pertinents sont ajoutés. Deux régimes : RÉALISTE (autres sujets) et ADVERSARIAL (recombinaison du corpus, pire cas).",
+    "regimes": {
+      "realistic": [
+        {
+          "n_chunks": 34,
+          "n_distractors": 0,
+          "build_ms": 28.3,
+          "index_mb": 0.15,
+          "index_dim": 6449,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 1.02,
+            "p95": 1.117,
+            "p99": 1.146,
+            "max": 1.232
+          },
+          "quality": {
+            "hit@4": 0.7778,
+            "recall@4": 0.7593,
+            "precision@4": 0.2593,
+            "mrr": 0.7778,
+            "ndcg@4": 0.7634
+          }
+        },
+        {
+          "n_chunks": 500,
+          "n_distractors": 466,
+          "build_ms": 283.5,
+          "index_mb": 0.92,
+          "index_dim": 7145,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 1.369,
+            "p95": 1.463,
+            "p99": 1.504,
+            "max": 1.611
+          },
+          "quality": {
+            "hit@4": 0.8148,
+            "recall@4": 0.7963,
+            "precision@4": 0.2685,
+            "mrr": 0.8148,
+            "ndcg@4": 0.8005
+          }
+        },
+        {
+          "n_chunks": 2000,
+          "n_distractors": 1966,
+          "build_ms": 1126.9,
+          "index_mb": 3.38,
+          "index_dim": 7958,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 2.286,
+            "p95": 2.486,
+            "p99": 2.596,
+            "max": 2.858
+          },
+          "quality": {
+            "hit@4": 0.8148,
+            "recall@4": 0.7963,
+            "precision@4": 0.2685,
+            "mrr": 0.8148,
+            "ndcg@4": 0.8005
+          }
+        },
+        {
+          "n_chunks": 5000,
+          "n_distractors": 4966,
+          "build_ms": 2752.6,
+          "index_mb": 8.31,
+          "index_dim": 9490,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 3.977,
+            "p95": 4.354,
+            "p99": 4.837,
+            "max": 11.33
+          },
+          "quality": {
+            "hit@4": 0.8148,
+            "recall@4": 0.7963,
+            "precision@4": 0.2685,
+            "mrr": 0.8148,
+            "ndcg@4": 0.8005
+          }
+        },
+        {
+          "n_chunks": 10000,
+          "n_distractors": 9966,
+          "build_ms": 5534.3,
+          "index_mb": 16.51,
+          "index_dim": 12045,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 6.754,
+            "p95": 7.371,
+            "p99": 7.568,
+            "max": 7.777
+          },
+          "quality": {
+            "hit@4": 0.8148,
+            "recall@4": 0.7963,
+            "precision@4": 0.2685,
+            "mrr": 0.8148,
+            "ndcg@4": 0.8005
+          }
+        },
+        {
+          "n_chunks": 20000,
+          "n_distractors": 19966,
+          "build_ms": 11595.8,
+          "index_mb": 32.93,
+          "index_dim": 15159,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 11.882,
+            "p95": 12.58,
+            "p99": 12.917,
+            "max": 13.12
+          },
+          "quality": {
+            "hit@4": 0.8148,
+            "recall@4": 0.7963,
+            "precision@4": 0.2685,
+            "mrr": 0.8148,
+            "ndcg@4": 0.8005
+          }
+        }
+      ],
+      "adversarial": [
+        {
+          "n_chunks": 34,
+          "n_distractors": 0,
+          "build_ms": 35.2,
+          "index_mb": 0.15,
+          "index_dim": 6449,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 0.898,
+            "p95": 0.993,
+            "p99": 1.076,
+            "max": 1.239
+          },
+          "quality": {
+            "hit@4": 0.7778,
+            "recall@4": 0.7593,
+            "precision@4": 0.2593,
+            "mrr": 0.7778,
+            "ndcg@4": 0.7634
+          }
+        },
+        {
+          "n_chunks": 500,
+          "n_distractors": 466,
+          "build_ms": 322.6,
+          "index_mb": 2.75,
+          "index_dim": 6785,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 2.416,
+            "p95": 3.116,
+            "p99": 3.832,
+            "max": 4.001
+          },
+          "quality": {
+            "hit@4": 0.6296,
+            "recall@4": 0.5617,
+            "precision@4": 0.1759,
+            "mrr": 0.5123,
+            "ndcg@4": 0.4879
+          }
+        },
+        {
+          "n_chunks": 2000,
+          "n_distractors": 1966,
+          "build_ms": 1316.5,
+          "index_mb": 11.09,
+          "index_dim": 7598,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 6.084,
+            "p95": 7.189,
+            "p99": 7.586,
+            "max": 7.667
+          },
+          "quality": {
+            "hit@4": 0.4074,
+            "recall@4": 0.3457,
+            "precision@4": 0.1111,
+            "mrr": 0.321,
+            "ndcg@4": 0.3
+          }
+        },
+        {
+          "n_chunks": 5000,
+          "n_distractors": 4966,
+          "build_ms": 3290.8,
+          "index_mb": 27.77,
+          "index_dim": 9130,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 13.117,
+            "p95": 14.697,
+            "p99": 15.053,
+            "max": 15.811
+          },
+          "quality": {
+            "hit@4": 0.3333,
+            "recall@4": 0.284,
+            "precision@4": 0.0833,
+            "mrr": 0.2222,
+            "ndcg@4": 0.2256
+          }
+        },
+        {
+          "n_chunks": 10000,
+          "n_distractors": 9966,
+          "build_ms": 7560.0,
+          "index_mb": 55.52,
+          "index_dim": 11685,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 26.186,
+            "p95": 30.513,
+            "p99": 32.837,
+            "max": 33.732
+          },
+          "quality": {
+            "hit@4": 0.2593,
+            "recall@4": 0.2346,
+            "precision@4": 0.0648,
+            "mrr": 0.1605,
+            "ndcg@4": 0.1764
+          }
+        },
+        {
+          "n_chunks": 20000,
+          "n_distractors": 19966,
+          "build_ms": 16187.3,
+          "index_mb": 111.06,
+          "index_dim": 14799,
+          "sparse": true,
+          "latency_ms": {
+            "p50": 52.451,
+            "p95": 61.695,
+            "p99": 69.715,
+            "max": 82.089
+          },
+          "quality": {
+            "hit@4": 0.1481,
+            "recall@4": 0.1481,
+            "precision@4": 0.037,
+            "mrr": 0.0988,
+            "ndcg@4": 0.1111
+          }
+        }
+      ]
+    }
+  }
+}

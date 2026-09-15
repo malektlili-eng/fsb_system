@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+{% block title %}Fiche Étudiant — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-id-card"></i>{% endblock %}
+{% block page_title %}Fiche Étudiant{% endblock %}
+{% block content %}
+
+<style>
+    .note-text {
+        font-weight: 800;
+        font-size: 1rem;
+    }
+
+    .note-max {
+        font-size: 0.7rem;
+        opacity: 0.6;
+    }
+
+    .note-success {
+        color: #166534;
+        /* vert */
+    }
+
+    .note-fail {
+        color: #991b1b;
+        /* rouge */
+    }
+</style>
+<div class="page-header">
+    <div>
+        <h1>{{ et.prenom }} {{ et.nom }}</h1>
+        <p class="sub">N° {{ et.numero_etudiant }}</p>
+    </div>
+    <div style="display:flex;gap:8px">
+        <a href="{% url 'administration:modifier_etudiant' etudiant.pk %}" class="btn-outline-fsb btn-sm">
+            <i class="fas fa-edit"></i> Modifier
+        </a>
+        <a href="{% url 'administration:releve_notes' etudiant.pk %}" class="btn-primary-fsb btn-sm">
+            <i class="fas fa-file-alt"></i> Relevé de Notes
+        </a>
+        <a href="{% url 'administration:liste_etudiants' %}" class="btn-ghost-fsb btn-sm">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+
+    <!-- Fiche identité -->
+    <div class="col-lg-4">
+        <div class="card-fsb fu">
+            <div class="card-fsb-body" style="text-align:center;padding:28px">
+                <div style="width:80px;height:80px;border-radius:20px;
+                    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+                    display:flex;align-items:center;justify-content:center;
+                    color:white;font-size:2rem;font-weight:800;margin:0 auto 16px">
+                    {{ etudiant.prenom|first|upper }}{{ etudiant.nom|first|upper }}
+                </div>
+                <div style="font-size:1.1rem;font-weight:800;color:#0b1e3d">
+                    {{ etudiant.prenom }} {{ etudiant.nom }}
+                </div>
+                <div style="font-size:0.8rem;color:#94a3b8;margin-top:4px">
+                    {{ etudiant.numero_etudiant }}
+                </div>
+                <div style="margin-top:10px">
+                    <span class="badge-pill
+            {% if etudiant.statut == 'inscrit' %}b-green
+            {% elif etudiant.statut == 'diplome' %}b-blue
+            {% elif etudiant.statut == 'suspendu' %}b-red
+            {% else %}b-gray{% endif %}">
+                        {{ etudiant.get_statut_display }}
+                    </span>
+                </div>
+                <hr style="margin:18px 0;border-color:#e2eaf6">
+                <div style="text-align:left;font-size:0.84rem">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:9px">
+                        <span style="color:#94a3b8">Filière</span>
+                        <span style="font-weight:600;color:#334155">{{ etudiant.filiere|default:"—" }}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:9px">
+                        <span style="color:#94a3b8">CIN</span>
+                        <span style="font-weight:600;color:#334155">{{ etudiant.cin|default:"—" }}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:9px">
+                        <span style="color:#94a3b8">Email</span>
+                        <span style="font-weight:600;color:#334155;font-size:0.78rem">
+                            {{ etudiant.email|default:"—" }}
+                        </span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:9px">
+                        <span style="color:#94a3b8">Téléphone</span>
+                        <span style="font-weight:600;color:#334155">{{ etudiant.telephone|default:"—" }}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:9px">
+                        <span style="color:#94a3b8">Né(e) le</span>
+                        <span style="font-weight:600;color:#334155">
+                            {{ etudiant.date_naissance|default:"—" }}
+                        </span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between">
+                        <span style="color:#94a3b8">Inscrit en</span>
+                        <span style="font-weight:600;color:#334155">{{ etudiant.annee_inscription }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes + Absences + Stages -->
+    <div class="col-lg-8">
+
+        <!-- Notes -->
+        <div class="card-fsb fu fu2 mb-3">
+            <div class="card-fsb-header">
+                <div class="header-left"><i class="fas fa-clipboard-list"></i> Notes</div>
+                <!-- <div style="display:flex;gap:6px;align-items:center">
+                    <span class="badge-pill b-blue">{{ notes.count }}</span>
+                    <a href="{% url 'pedagogie:notes' %}?etudiant={{ etudiant.pk }}" class="btn-primary-fsb btn-xs">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </a>
+                </div> -->
+            </div>
+            <div class="card-fsb-body" style="padding:0">
+                <div class="table-responsive">
+                    <table class="table-fsb">
+                        <thead>
+                            <tr>
+                                <th>Matière</th>
+                                <th>Type</th>
+                                <th>Note</th>
+                                <th>Semestre</th>
+                                <th>Année</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for n in notes %}
+                            <tr>
+                                <td style="font-weight:600;color:#0b1e3d">{{ n.matiere.nom }}</td>
+                                <td><span class="badge-pill b-gray">{{ n.get_type_note_display }}</span></td>
+                                <td>
+                                    <span
+                                        class="note-text {% if n.note >= 10 %}note-success{% else %}note-fail{% endif %}">
+                                        {{ n.note }}
+                                        <span class="note-max">/20</span>
+                                    </span>
+
+                                </td>
+                                <td><span class="badge-pill b-blue">S{{ n.semestre }}</span></td>
+                                <td style="color:#94a3b8;font-size:0.81rem">{{ n.annee_universitaire }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5">
+                                    <div class="empty-state" style="padding:20px">
+                                        <div class="empty-icon">📊</div>
+                                        <p>Aucune note enregistrée.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Absences -->
+        <div class="card-fsb fu fu3 mb-3">
+            <div class="card-fsb-header">
+                <div class="header-left"><i class="fas fa-user-times"></i> Absences</div>
+                <!-- <div style="display:flex;gap:6px;align-items:center">
+                    <span class="badge-pill b-red">{{ absences.count }}</span>
+                    <a href="{% url 'pedagogie:absences' %}" class="btn-primary-fsb btn-xs">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </a>
+                </div> -->
+            </div>
+            <div class="card-fsb-body" style="padding:0">
+                <div class="table-responsive">
+                    <table class="table-fsb">
+                        <thead>
+                            <tr>
+                                <th>Matière</th>
+                                <th>Date</th>
+                                <th>Justifiée</th>
+                                <th>Motif</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for abs in absences %}
+                            <tr>
+                                <td style="font-weight:600">{{ abs.seance.matiere.nom }}</td>
+                                <td style="color:#94a3b8">{{ abs.date }}</td>
+                                <td>
+                                    <span class="badge-pill {% if abs.justifiee %}b-green{% else %}b-red{% endif %}">
+                                        {% if abs.justifiee %}Justifiée{% else %}Non justifiée{% endif %}
+                                    </span>
+                                </td>
+                                <td style="font-size:0.81rem;color:#64748b">{{ abs.motif|default:"—" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state" style="padding:16px">
+                                        <div class="empty-icon">✅</div>
+                                        <p>Aucune absence.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stages -->
+        <div class="card-fsb fu fu4">
+            <div class="card-fsb-header">
+                <div class="header-left"><i class="fas fa-briefcase"></i> Stages</div>
+                <!-- <div style="display:flex;gap:6px;align-items:center">
+                    <span class="badge-pill b-purple">{{ stages.count }}</span>
+                    <a href="{% url 'stages:demandes' %}" class="btn-primary-fsb btn-xs">
+
+                        <i class="fas fa-plus"></i> Ajouter
+                    </a>
+                </div> -->
+            </div>
+            <div class="card-fsb-body" style="padding:0">
+                <div class="table-responsive">
+                    <table class="table-fsb">
+                        <thead>
+                            <tr>
+                                <th>Sujet</th>
+                                <th>Entreprise</th>
+                                <th>Période</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for s in stages %}
+                            <tr>
+                                <td style="font-weight:600;font-size:0.84rem">
+                                    {{ s.sujet|truncatechars:40 }}
+                                </td>
+                                <td style="color:#64748b;font-size:0.83rem">{{ s.entreprise }}</td>
+                                <td style="font-size:0.78rem;color:#94a3b8">
+                                    {{ s.date_debut }} → {{ s.date_fin }}
+                                </td>
+                                <td>
+                                    <span class="badge-pill
+                    {% if s.statut == 'valide' %}b-green
+                    {% elif s.statut == 'refuse' %}b-red
+                    {% elif s.statut == 'en_cours' %}b-blue
+                    {% elif s.statut == 'termine' %}b-purple
+                    {% else %}b-yellow{% endif %}">
+                                        {{ s.get_statut_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state" style="padding:16px">
+                                        <div class="empty-icon">💼</div>
+                                        <p>Aucun stage enregistré.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

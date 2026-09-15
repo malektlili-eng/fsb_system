@@ -1,0 +1,439 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attestation d'Inscription — FSB</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', 'Times New Roman', serif;
+      background: #f0f5fb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Boutons (pas imprimés) */
+    .no-print {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .btn-print {
+      padding: 10px 22px;
+      background: #0b1e3d;
+      color: white;
+      border: none;
+      border-radius: 9px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .btn-back {
+      padding: 10px 22px;
+      background: white;
+      color: #0b1e3d;
+      border: 1.5px solid #e2eaf6;
+      border-radius: 9px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    /* Document */
+    .attestation {
+      width: 210mm;
+      min-height: 297mm;
+      background: white;
+      border: 1px solid #e2eaf6;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Bordure décorative */
+    .attestation::before {
+      content: '';
+      position: absolute;
+      inset: 10px;
+      border: 2px solid rgba(11, 30, 61, 0.08);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    /* Bande couleur haut */
+    .top-bar {
+      height: 8px;
+      background: linear-gradient(90deg, #0b1e3d, #2563eb, #0b1e3d);
+    }
+
+    /* En-tête institution */
+    .header-institution {
+      padding: 28px 40px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e2eaf6;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-circle {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0b1e3d, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .inst-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0b1e3d;
+    }
+
+    .inst-sub {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .inst-ar {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 1px;
+    }
+
+    .header-right {
+      text-align: right;
+    }
+
+    .ref-num {
+      font-size: 0.78rem;
+      color: #94a3b8;
+    }
+
+    .ref-val {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #0b1e3d;
+    }
+
+    /* Titre attestation */
+    .title-section {
+      text-align: center;
+      padding: 32px 40px 24px;
+      border-bottom: 1px solid #e2eaf6;
+    }
+
+    .title-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .title-main {
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: #0b1e3d;
+      letter-spacing: 0.03em;
+    }
+
+    .title-sub {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    .title-deco {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #0b1e3d, #2563eb);
+      margin: 12px auto 0;
+      border-radius: 99px;
+    }
+
+    /* Corps */
+    .body-section {
+      padding: 32px 40px;
+    }
+
+    .intro-text {
+      font-size: 0.92rem;
+      color: #334155;
+      line-height: 1.8;
+      margin-bottom: 24px;
+      text-align: justify;
+    }
+
+    .intro-text strong {
+      color: #0b1e3d;
+    }
+
+    /* Bloc infos étudiant */
+    .info-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 28px;
+      border: 1px solid #e2eaf6;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .info-table tr:nth-child(odd) td {
+      background: #f8faff;
+    }
+
+    .info-table td {
+      padding: 11px 16px;
+      font-size: 0.87rem;
+      border-bottom: 1px solid #e2eaf6;
+    }
+
+    .info-table td:first-child {
+      font-weight: 700;
+      color: #64748b;
+      width: 40%;
+      border-right: 1px solid #e2eaf6;
+    }
+
+    .info-table td:last-child {
+      color: #0b1e3d;
+      font-weight: 600;
+    }
+
+    .info-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Mention -->
+  .mention-box {
+    background: linear-gradient(135deg, #f0f5ff, #e8f5e9);
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px; padding: 16px 20px;
+    margin-bottom: 28px; text-align: center;
+  }
+  .mention-text {
+    font-size: 0.9rem; color: #1d4ed8; font-weight: 600; line-height: 1.7;
+  }
+
+  /* Signature et QR -->
+  .footer-section {
+    padding: 24px 40px 32px;
+    display: flex; align-items: flex-end;
+    justify-content: space-between;
+    border-top: 1px solid #e2eaf6;
+  }
+  .signature-block { }
+  .sig-city { font-size: 0.82rem; color: #64748b; margin-bottom: 4px; }
+  .sig-label { font-size: 0.82rem; color: #64748b; margin-bottom: 48px; }
+  .sig-line {
+    width: 180px; height: 1px; background: #0b1e3d;
+    margin-bottom: 6px;
+  }
+  .sig-name { font-size: 0.82rem; font-weight: 700; color: #0b1e3d; }
+  .sig-title { font-size: 0.72rem; color: #94a3b8; }
+
+  .qr-block { text-align: center; }
+  .qr-block img { width: 100px; height: 100px; border: 2px solid #e2eaf6; border-radius: 8px; }
+  .qr-label { font-size: 0.67rem; color: #94a3b8; margin-top: 5px; }
+
+  /* Bande bas */
+    .bottom-bar {
+      height: 6px;
+      background: linear-gradient(90deg, #0b1e3d, #2563eb, #0b1e3d);
+    }
+
+    /* IMPRESSION */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .no-print {
+        display: none !important;
+      }
+
+      .attestation {
+        width: 100%;
+        min-height: 100vh;
+        border: none;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Boutons hors impression -->
+  <div class="no-print">
+    <button onclick="window.print()" class="btn-print">
+      🖨️ Imprimer / Télécharger PDF
+    </button>
+    <a href="{% url 'administration:inscriptions' %}" class="btn-back">
+      ← Retour aux inscriptions
+    </a>
+  </div>
+
+  <!-- Document officiel -->
+  <div class="attestation">
+
+    <div class="top-bar"></div>
+
+    <!-- En-tête -->
+    <div class="header-institution">
+      <div class="header-left">
+        <div class="logo-circle"> <img src="{% static 'images/logo-fsb.jpg' %}" alt="Logo FSB" width="75" height="75"
+            style="border-radius: 12px; object-fit: cover;">
+        </div>
+        <div>
+          <div class="inst-name">Faculté des Sciences de Bizerte</div>
+          <div class="inst-sub">Université de Carthage — République Tunisienne</div>
+          <div class="inst-ar">كلية العلوم ببنزرت — جامعة قرطاج</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="ref-num">Référence</div>
+        <div class="ref-val">FSB-ATT-{{ ins.etudiant.numero_etudiant }}-{{ ins.annee_universitaire }}</div>
+        <div class="ref-num" style="margin-top:6px">Délivrée le</div>
+        <div class="ref-val">{% now "d/m/Y" %}</div>
+      </div>
+    </div>
+
+    <!-- Titre -->
+    <div class="title-section">
+      <div class="title-label">Document Officiel</div>
+      <div class="title-main">ATTESTATION D'INSCRIPTION</div>
+      <div class="title-sub">Année Universitaire {{ ins.annee_universitaire }}</div>
+      <div class="title-deco"></div>
+    </div>
+
+    <!-- Corps -->
+    <div class="body-section">
+      <p class="intro-text">
+        Le responsable du Service de Scolarité de la Faculté des Sciences de Bizerte,
+        Université de Carthage, certifie que l'étudiant(e) dont les informations figurent
+        ci-dessous est régulièrement inscrit(e) au sein de notre établissement pour
+        l'année universitaire <strong>{{ ins.annee_universitaire }}</strong>.
+      </p>
+
+      <table class="info-table">
+        <tr>
+          <td>Nom et Prénom</td>
+          <td style="font-size:1rem">
+            <strong>{{ ins.etudiant.nom|upper }} {{ ins.etudiant.prenom }}</strong>
+          </td>
+        </tr>
+        <tr>
+          <td>Numéro Étudiant</td>
+          <td>{{ ins.etudiant.numero_etudiant }}</td>
+        </tr>
+        <tr>
+          <td>CIN</td>
+          <td>{{ ins.etudiant.cin|default:"—" }}</td>
+        </tr>
+        <tr>
+          <td>Filière</td>
+          <td>{{ ins.filiere.nom }}</td>
+        </tr>
+        <tr>
+          <td>Département</td>
+          <td>{{ ins.filiere.departement.get_nom_display }}</td>
+        </tr>
+        <tr>
+          <td>Niveau</td>
+          <td>{{ ins.filiere.get_niveau_display }}</td>
+        </tr>
+        <tr>
+          <td>Année Universitaire</td>
+          <td>{{ ins.annee_universitaire }}</td>
+        </tr>
+        <tr>
+          <td>Date d'Inscription</td>
+          <td>{{ ins.date_inscription|date:"d/m/Y" }}</td>
+        </tr>
+        <tr>
+          <td>Statut</td>
+          <td>
+            <span style="background:#dcfce7;color:#166534;padding:3px 10px;
+                       border-radius:99px;font-size:0.82rem;font-weight:700">
+              ✅ {{ ins.get_statut_display }}
+            </span>
+          </td>
+        </tr>
+        {% if ins.valide_par %}
+        <tr>
+          <td>Validé par</td>
+          <td>{{ ins.valide_par }}</td>
+        </tr>
+        {% endif %}
+      </table>
+
+      <div class="mention-box">
+        <div class="mention-text">
+          La présente attestation est délivrée à l'intéressé(e) pour servir et valoir
+          ce que de droit, notamment pour les organismes administratifs, bancaires
+          et tout autre établissement en ayant besoin.
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer : Signature + QR -->
+    <div class="footer-section">
+      <div class="signature-block">
+        <div class="sig-city">Bizerte, le {% now "d/m/Y" %}</div>
+        <div class="sig-label">Le Responsable de Scolarité</div>
+        <div class="sig-line"></div>
+        <div class="sig-name">Service Scolarité — FSB</div>
+        <div class="sig-title">Cachet et Signature</div>
+      </div>
+
+      <div class="qr-block">
+        <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR Code vérification">
+        <div class="qr-label">Scanner pour vérifier l'authenticité</div>
+      </div>
+    </div>
+
+    <div class="bottom-bar"></div>
+  </div>
+
+</body>
+
+</html>

@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block title %}{{ dept.get_nom_display }} — Filières{% endblock %}
+{% block page_icon %}<i class="fas fa-graduation-cap"></i>{% endblock %}
+{% block page_title %}{{ dept.get_nom_display }} — Filières{% endblock %}
+
+{% block content %}
+
+<style>
+    .groupe-badge {
+        padding: 6px 18px;
+        border-radius: 99px;
+        font-weight: 800;
+        font-size: 0.82rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .badge-licence {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .badge-master {
+        background: #ede9fe;
+        color: #5b21b6;
+    }
+
+    .badge-doctorat {
+        background: #cffafe;
+        color: #0e7490;
+    }
+
+    .badge-cpi {
+        background: #fef9c3;
+        color: #854d0e;
+    }
+
+    .badge-autre {
+        background: #f3e8ff;
+        color: #6b21a8;
+    }
+
+    .groupe-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    /* Dégradés par type */
+    .icon-licence {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    }
+
+    .icon-master {
+        background: linear-gradient(135deg, #3b0764, #7c3aed);
+    }
+
+    .icon-doctorat {
+        background: linear-gradient(135deg, #0c4a6e, #0284c7);
+    }
+
+    .icon-cpi {
+        background: linear-gradient(135deg, #78350f, #d97706);
+    }
+
+    .icon-autre {
+        background: linear-gradient(135deg, #4c1d95, #7c3aed);
+    }
+</style>
+<!-- Breadcrumb -->
+<nav style="margin-bottom:18px;font-size:0.83rem;color:#94a3b8">
+    <a href="{% url 'administration:liste_etudiants' %}" style="color:#2563eb;text-decoration:none;font-weight:600">
+        <i class="fas fa-user-graduate me-1"></i>Étudiants
+    </a>
+    <span style="margin:0 8px">›</span>
+    <span style="color:#0b1e3d;font-weight:700">{{ dept.get_nom_display }}</span>
+</nav>
+
+<div class="page-header">
+    <div>
+        <h1>
+            {% if dept.nom == 'informatique' %}💻
+            {% elif dept.nom == 'mathematiques' %}📐
+            {% elif dept.nom == 'physique' %}🔭
+            {% elif dept.nom == 'chimie' %}⚗️
+            {% elif dept.nom == 'biologie' %}🔬
+            {% else %}🌍{% endif %}
+            {{ dept.get_nom_display }}
+        </h1>
+        <p class="sub">Sélectionnez une filière</p>
+    </div>
+</div>
+
+{% for groupe in groupes %}
+<div class="mb-4 fu fu{{ forloop.counter }}">
+
+    <!-- Titre du groupe (Licences, Masters...) -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="height:2px;flex:1;background:linear-gradient(90deg,#2563eb,transparent)"></div>
+        <div class="groupe-badge 
+            {% if groupe.type == 'licence' %}badge-licence
+            {% elif groupe.type == 'master' %}badge-master
+            {% elif groupe.type == 'doctorat' %}badge-doctorat
+            {% elif groupe.type == 'cpi' %}badge-cpi
+            {% else %}badge-autre{% endif %}">
+            {{ groupe.label }}
+        </div>
+
+        <div style="height:2px;flex:1;background:linear-gradient(90deg,transparent,#2563eb)"></div>
+    </div>
+
+    <div class="row g-3">
+        {% for item in groupe.filieres %}
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url 'administration:etudiants_classes' dept.pk item.filiere.pk %}"
+                style="text-decoration:none;display:block">
+                <div style="background:white;border:1.5px solid #e2eaf6;border-radius:14px;
+                    padding:16px 18px;transition:all 0.22s;cursor:pointer"
+                    onmouseover="this.style.borderColor='#2563eb';this.style.background='#eff6ff';this.style.transform='translateY(-2px)'"
+                    onmouseout="this.style.borderColor='#e2eaf6';this.style.background='white';this.style.transform='translateY(0)'">
+
+                    <div style="display:flex;align-items:flex-start;gap:12px">
+                        <div class="groupe-icon 
+            {% if groupe.type == 'licence' %}icon-licence
+            {% elif groupe.type == 'master' %}icon-master
+            {% elif groupe.type == 'doctorat' %}icon-doctorat
+            {% elif groupe.type == 'cpi' %}icon-cpi
+            {% else %}icon-autre{% endif %}">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+
+                        <div style="flex:1;min-width:0">
+                            <div style="font-weight:700;font-size:0.87rem;color:#0b1e3d;
+                          line-height:1.3;margin-bottom:4px">
+                                {{ item.filiere.nom }}
+                            </div>
+                            <div style="font-size:0.71rem;color:#94a3b8">
+                                {{ item.filiere.code }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:10px;margin-top:12px;
+                      padding-top:10px;border-top:1px solid #f0f5f9">
+                        <div style="flex:1;text-align:center">
+                            <div style="font-size:1.1rem;font-weight:800;color:#2563eb">
+                                {{ item.nb_etudiants }}
+                            </div>
+                            <div style="font-size:0.68rem;color:#94a3b8">Étudiants</div>
+                        </div>
+                        <div style="flex:1;text-align:center">
+                            <div style="font-size:1.1rem;font-weight:800;color:#7c3aed">
+                                {{ item.nb_classes }}
+                            </div>
+                            <div style="font-size:0.68rem;color:#94a3b8">Classes</div>
+                        </div>
+                        <div style="flex:1;text-align:center">
+                            <i class="fas fa-arrow-right" style="color:#bfdbfe;font-size:0.85rem;line-height:2.2"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% empty %}
+<div class="card-fsb">
+    <div class="card-fsb-body">
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h5>Aucune filière dans ce département</h5>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

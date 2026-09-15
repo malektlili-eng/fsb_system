@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% block page_icon %}<i class="fas fa-user-times"></i>{% endblock %}
+{% block page_title %}Absences — {{ classe.nom }}{% endblock %}
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<style>
+.row-elimine {
+    background: #fff5f5;
+}
+
+.note-cell {
+    font-weight: 800;
+}
+
+/* Couleur si éliminé */
+.note-elimine {
+    color: #dc2626;
+}
+
+/* Couleur par défaut */
+.note-normal {
+    color: #0b1e3d;
+}
+</style>
+<nav style="margin-bottom:16px;font-size:0.83rem;color:#94a3b8">
+  <a href="{% url 'pedagogie:absences' %}" style="color:#2563eb;text-decoration:none;font-weight:600">Absences</a>
+  <span style="margin:0 8px">›</span>
+  <a href="{% url 'pedagogie:absences_filieres' dept.pk %}" style="color:#2563eb;text-decoration:none;font-weight:600">{{ dept.get_nom_display }}</a>
+  <span style="margin:0 8px">›</span>
+  <span style="color:#0b1e3d;font-weight:700">{{ classe.nom }}</span>
+</nav>
+
+<div class="page-header">
+  <div><h1>{{ classe.nom }}</h1><p class="sub">Rapport d'absences — lecture seule</p></div>
+  <div style="background:#fef9c3;color:#854d0e;padding:8px 14px;border-radius:8px;font-size:0.8rem;font-weight:600">
+    <i class="fas fa-eye me-1"></i> Lecture seule
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3 fu fu1">
+    <div class="stat-card sc-blue"><div class="stat-num">{{ data_etudiants|length }}</div><div class="stat-label">Étudiants</div><i class="fas fa-users stat-icon"></i></div>
+  </div>
+  <div class="col-md-3 fu fu2">
+    <div class="stat-card sc-rose" style="background:linear-gradient(135deg,#881337,#e11d48)">
+      <div class="stat-num">{{ nb_elimines }}</div><div class="stat-label">Éliminés (>25%)</div>
+      <i class="fas fa-ban stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 fu fu3">
+    <div class="stat-card sc-emerald"><div class="stat-num">{{ nb_ok }}</div><div class="stat-label">Non éliminés</div><i class="fas fa-check stat-icon"></i></div>
+  </div>
+  <div class="col-md-3 fu fu4">
+    <div class="stat-card sc-amber">
+      <div class="stat-num">{% if data_etudiants|length > 0 %}{{ nb_elimines|floatformat:0 }}%{% else %}0%{% endif %}</div>
+      <div class="stat-label">Taux élimination</div>
+      <i class="fas fa-percent stat-icon"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-3 mb-4">
+  <div class="col-md-5 fu fu1">
+    <div class="card-fsb">
+      <div class="card-fsb-header"><div class="header-left"><i class="fas fa-chart-pie"></i> Élimination</div></div>
+      <div class="card-fsb-body" style="padding:20px;display:flex;justify-content:center">
+        <canvas id="chartElim" style="max-width:220px;max-height:220px"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7 fu fu2">
+    <div class="card-fsb">
+      <div class="card-fsb-header"><div class="header-left"><i class="fas fa-chart-bar"></i> Absences par matière</div></div>
+      <div class="card-fsb-body" style="padding:20px">
+        <canvas id="chartMat" style="max-height:220px"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tableau -->
+<div class="card-fsb fu fu3">
+  <div class="card-fsb-header"><div class="header-left"><i class="fas fa-list"></i> Détail par Étudiant</div></div>
+  <div class="card-fsb-body" style="padding:0;overflow-x:auto">
+    <table class="table-fsb">
+      <thead>
+        <tr>
+          <th>Étudiant</th>
+          {% for d in data_etudiants|first %}{% endfor %}
+          {% if data_etudiants %}
+            {% for a in data_etudiants.0.absences %}
+            <th style="font-size:0.68rem;max-width:80px">{{ a.matiere.nom|truncatechars:15 }}</th>
+            {% endfor %}
+          {% endif %}
+          <th>Total</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in data_etudiants %}
+        <tr class="{% if d.elimine %}row-elimine{% endif %}">
+          <td>
+            <div style="font-weight:700;color:#0b1e3d">{{ d.etudiant.nom }} {{ d.etudiant.prenom }}</div>
+            <div style="font-size:0.7rem;color:#94a3b8">{{ d.etudiant.numero_etudiant }}</div>
+          </td>
+          {% for a in d.absences %}
+          <td style="text-align:center;vertical-align:middle">
+            {% if a.elimine %}
+            <span style="background:#fee2e2;color:#991b1b;padding:2px 7px;border-radius:99px;font-size:0.77rem;font-weight:700">
+              {{ a.nb_absences }}h ⚠️
+            </span>
+            {% elif a.nb_absences > 0 %}
+            <span style="background:#fef9c3;color:#854d0e;padding:2px 7px;border-radius:99px;font-size:0.77rem">
+              {{ a.nb_absences }}h
+            </span>
+            {% else %}
+            <span style="color:#94a3b8;font-size:0.77rem">0h</span>
+            {% endif %}
+            {% if a.pct > 0 %}
+            <div style="font-size:0.62rem;color:#94a3b8">{{ a.pct }}%</div>
+            {% endif %}
+          </td>
+          {% endfor %}
+          <td class="note-cell {% if d.elimine %}note-elimine{% else %}note-normal{% endif %}">
+    {{ d.value }}
+            {{ d.total_abs }}h
+          </td>
+          <td>
+            {% if d.elimine %}
+            <span class="badge-pill b-red">Éliminé</span>
+            {% else %}
+            <span class="badge-pill b-green">OK</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="10"><div class="empty-state" style="padding:30px"><div class="empty-icon"><i class="fas fa-check"></i></div><p>Aucune absence.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ abs_par_matiere|json_script:"absParMatiere" }}
+{{ labels_etudiants|json_script:"labelsEt" }}
+{{ data_totaux|json_script:"dataTotaux" }}
+
+<script>
+const absParMatiere = JSON.parse(document.getElementById('absParMatiere').textContent);
+const labelsEt      = JSON.parse(document.getElementById('labelsEt').textContent);
+const dataTotaux    = JSON.parse(document.getElementById('dataTotaux').textContent);
+
+// Pie chart élimination
+new Chart(document.getElementById('chartElim'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Non éliminés','Éliminés'],
+    datasets: [{
+      data: [{{ nb_ok }}, {{ nb_elimines }}],
+      backgroundColor: ['#16a34a','#dc2626'],
+      borderWidth: 0
+    }]
+  },
+  options: {
+    plugins: { legend: { position: 'bottom' } },
+    cutout: '65%'
+  }
+});
+
+// Bar chart matières
+new Chart(document.getElementById('chartMat'), {
+  type: 'bar',
+  data: {
+    labels: absParMatiere.map(x => x.matiere),
+    datasets: [{
+      label: 'Absences (h)',
+      data: absParMatiere.map(x => x.nb),
+      backgroundColor: '#2563eb',
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true } }
+  }
+});
+</script>
+{% endblock %}

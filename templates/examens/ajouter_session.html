@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Nouvelle Session — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-plus-circle"></i>{% endblock %}
+{% block page_title %}Nouvelle Session d'Examen{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div><h1>Nouvelle Session</h1><p class="sub">Planifier une session d'examens</p></div>
+  <a href="{% url 'examens:sessions' %}" class="btn-ghost-fsb btn-sm"><i class="fas fa-arrow-left"></i> Retour</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="card-fsb fu">
+      <div class="card-fsb-header"><div class="header-left"><i class="fas fa-graduation-cap"></i> Détails de la Session</div></div>
+      <div class="card-fsb-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12 form-group">
+              <label class="form-label">Nom de la session <span style="color:#e11d48">*</span></label>
+              <input type="text" name="nom" class="form-control" placeholder="Ex: Session Principale S1 2024-2025" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Type <span style="color:#e11d48">*</span></label>
+              <select name="type_session" class="form-select" required>
+                <option value="principale">Principale</option>
+                <option value="rattrapage">Rattrapage</option>
+              </select>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Semestre <span style="color:#e11d48">*</span></label>
+              <select name="semestre" class="form-select" required>
+                <option value="1">Semestre 1</option>
+                <option value="2">Semestre 2</option>
+              </select>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Année Universitaire</label>
+              <input type="text" name="annee_univ" class="form-control" value="2024-2025">
+            </div>
+            <div class="col-md-6"></div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Date de début <span style="color:#e11d48">*</span></label>
+              <input type="date" name="date_debut" class="form-control" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Date de fin <span style="color:#e11d48">*</span></label>
+              <input type="date" name="date_fin" class="form-control" required>
+            </div>
+            <div class="col-12" style="margin-top:6px">
+              <button type="submit" class="btn-primary-fsb"><i class="fas fa-save"></i> Créer la Session</button>
+              <a href="{% url 'examens:sessions' %}" class="btn-ghost-fsb" style="margin-left:10px">Annuler</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card-fsb fu fu2">
+      <div class="card-fsb-header"><div class="header-left"><i class="fas fa-calendar-alt"></i> Calendrier FSB</div></div>
+      <div class="card-fsb-body">
+        <div style="font-size:0.83rem;color:#64748b;line-height:2">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f5f9">
+            <span>Session Principale S1</span><span class="badge-pill b-blue">Janvier</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f5f9">
+            <span>Rattrapage S1</span><span class="badge-pill b-yellow">Février</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f5f9">
+            <span>Session Principale S2</span><span class="badge-pill b-blue">Juin</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0">
+            <span>Rattrapage S2</span><span class="badge-pill b-yellow">Juillet</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

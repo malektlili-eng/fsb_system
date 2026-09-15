@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}Modifier Étudiant — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-user-edit"></i>{% endblock %}
+{% block page_title %}Modifier l'Étudiant{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Modifier : {{ etudiant.prenom }} {{ etudiant.nom }}</h1>
+    <p class="sub">N° {{ etudiant.numero_etudiant }}</p>
+  </div>
+  <a href="{% url 'administration:detail_etudiant' etudiant.pk %}"
+     class="btn-ghost-fsb btn-sm">
+    <i class="fas fa-arrow-left"></i> Retour
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card-fsb fu">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-edit"></i> Informations de l'Étudiant</div>
+      </div>
+      <div class="card-fsb-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6 form-group">
+              <label class="form-label">Prénom <span style="color:#e11d48">*</span></label>
+              <input type="text" name="prenom" class="form-control"
+                     value="{{ etudiant.prenom }}" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Nom <span style="color:#e11d48">*</span></label>
+              <input type="text" name="nom" class="form-control"
+                     value="{{ etudiant.nom }}" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">CIN</label>
+              <input type="text" name="cin" class="form-control"
+                     value="{{ etudiant.cin }}">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control"
+                     value="{{ etudiant.email }}">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Téléphone</label>
+              <input type="text" name="telephone" class="form-control"
+                     value="{{ etudiant.telephone }}">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Date de Naissance</label>
+              <input type="date" name="date_naissance" class="form-control"
+                     value="{{ etudiant.date_naissance|default:'' }}">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Filière</label>
+              <select name="filiere" class="form-select">
+                <option value="">-- Non assignée --</option>
+                {% for f in filieres %}
+                <option value="{{ f.pk }}"
+                  {% if etudiant.filiere and etudiant.filiere.pk == f.pk %}selected{% endif %}>
+                  {{ f }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Statut</label>
+              <select name="statut" class="form-select">
+                <option value="inscrit"   {% if etudiant.statut == 'inscrit' %}selected{% endif %}>Inscrit</option>
+                <option value="suspendu"  {% if etudiant.statut == 'suspendu' %}selected{% endif %}>Suspendu</option>
+                <option value="diplome"   {% if etudiant.statut == 'diplome' %}selected{% endif %}>Diplômé</option>
+                <option value="abandonne" {% if etudiant.statut == 'abandonne' %}selected{% endif %}>Abandonné</option>
+              </select>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Année d'Inscription</label>
+              <input type="number" name="annee_inscription" class="form-control"
+                     value="{{ etudiant.annee_inscription }}" min="2000" max="2099">
+            </div>
+            <div class="col-12 form-group">
+              <label class="form-label">Adresse</label>
+              <textarea name="adresse" class="form-control"
+                        rows="2">{{ etudiant.adresse }}</textarea>
+            </div>
+            <div class="col-12" style="margin-top:6px">
+              <button type="submit" class="btn-primary-fsb">
+                <i class="fas fa-save"></i> Enregistrer les Modifications
+              </button>
+              <a href="{% url 'administration:detail_etudiant' etudiant.pk %}"
+                 class="btn-ghost-fsb" style="margin-left:10px">
+                Annuler
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card-fsb fu fu2">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-info-circle"></i> Informations</div>
+      </div>
+      <div class="card-fsb-body">
+        <div style="font-size:0.82rem;color:#64748b;line-height:1.9">
+          <p>
+            <i class="fas fa-hashtag me-2" style="color:#2563eb"></i>
+            N° Étudiant : <strong style="color:#0b1e3d">{{ etudiant.numero_etudiant }}</strong>
+          </p>
+          <p>
+            <i class="fas fa-calendar me-2" style="color:#059669"></i>
+            Inscrit en <strong style="color:#0b1e3d">{{ etudiant.annee_inscription }}</strong>
+          </p>
+          <p>
+            <i class="fas fa-shield-alt me-2" style="color:#d97706"></i>
+            Modifié par l'agent admin. L'étudiant n'a pas de compte sur cette plateforme.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

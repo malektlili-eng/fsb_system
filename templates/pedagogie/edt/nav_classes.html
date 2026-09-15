@@ -1,0 +1,983 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block page_icon %}<i class="fas fa-calendar-week"></i>{% endblock %}
+{% block page_title %}Emploi du temps — {{ filiere.nom }}{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ── BREADCRUMB ──────────────────────────────────────── */
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  font-size: 0.82rem;
+  flex-wrap: wrap;
+}
+.breadcrumb-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  transition: background .15s, border-color .15s;
+}
+.breadcrumb-link:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+.breadcrumb-sep {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  font-weight: 300;
+}
+.breadcrumb-current {
+  color: #0f172a;
+  font-weight: 700;
+  padding: 4px 10px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+/* ── PAGE HEADER ─────────────────────────────────────── */
+.edt-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.edt-page-header-left {}
+
+.edt-page-header h1 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+.edt-page-header .sub {
+  font-size: 0.83rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.edt-dept-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 99px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── STATS BANNER ────────────────────────────────────── */
+.edt-stats-banner {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  flex: 1;
+  min-width: 130px;
+}
+.stat-pill-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.stat-pill-icon.blue   { background: #eff6ff; color: #2563eb; }
+.stat-pill-icon.green  { background: #f0fdf4; color: #16a34a; }
+.stat-pill-icon.orange { background: #fff7ed; color: #c2410c; }
+.stat-pill-icon.purple { background: #faf5ff; color: #7c3aed; }
+
+.stat-pill-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+.stat-pill-lbl {
+  font-size: 0.70rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── SECTION TITLE ───────────────────────────────────── */
+.section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #f1f5f9;
+}
+
+/* ── CLASS CARDS ─────────────────────────────────────── */
+.classe-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+.classe-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(37,99,235,.12);
+  border-color: #93c5fd;
+}
+
+.classe-card-top {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  padding: 20px 22px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.classe-card-top::before {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+}
+.classe-card-top::after {
+  content: '';
+  position: absolute;
+  bottom: -10px; left: 30px;
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+
+.classe-card-nom {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+.classe-card-meta {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,.65);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.classe-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.classe-card-body {
+  padding: 16px 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.seances-row {
+  display: flex;
+  gap: 8px;
+}
+
+.seance-stat {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 10px 12px;
+  text-align: center;
+}
+.seance-stat-val {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+.seance-stat-lbl {
+  font-size: 0.66rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.type-pills {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.type-pill {
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.type-pill.cours  { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.type-pill.td     { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.type-pill.tp     { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+.type-pill.vide   { background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0; }
+
+.classe-card-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.btn-voir-edt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #2563eb;
+  color: white;
+  border-radius: 8px;
+  font-size: 0.77rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+}
+.btn-voir-edt:hover {
+  background: #1d4ed8;
+  color: white;
+  transform: translateX(2px);
+}
+.btn-voir-edt i { font-size: 0.7rem; }
+
+.btn-fill-edt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: white;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 0.77rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.btn-fill-edt:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+/* ── EMPTY STATE ─────────────────────────────────────── */
+.empty-state-box {
+  background: white;
+  border: 2px dashed #e2e8f0;
+  border-radius: 16px;
+  padding: 60px 30px;
+  text-align: center;
+}
+.empty-state-icon {
+  font-size: 2.5rem;
+  color: #cbd5e1;
+  margin-bottom: 14px;
+}
+.empty-state-box h5 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 6px;
+}
+.empty-state-box p {
+  font-size: 0.83rem;
+  color: #94a3b8;
+}
+
+/* ── MODAL REMPLIR EDT ───────────────────────────────── */
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.45);
+  backdrop-filter: blur(4px);
+  z-index: 1040;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop-custom.show {
+  display: flex;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 24px 80px rgba(0,0,0,.18);
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn .25s ease both;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(20px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header-custom {
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  background: white;
+  border-radius: 18px 18px 0 0;
+  z-index: 1;
+}
+.modal-header-custom h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+.modal-header-custom .modal-classe-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #2563eb;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.modal-close {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  transition: background .15s, color .15s;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+
+.modal-body-custom {
+  padding: 22px 26px;
+}
+
+/* Form grid */
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.form-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+.form-full { grid-column: 1 / -1; }
+
+.form-group-custom { display: flex; flex-direction: column; gap: 5px; }
+.form-label-custom {
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.form-control-custom {
+  padding: 9px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #0f172a;
+  background: #fff;
+  transition: border-color .15s, box-shadow .15s;
+  font-family: inherit;
+  width: 100%;
+}
+.form-control-custom:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+}
+
+/* Type séance toggle */
+.type-toggle {
+  display: flex;
+  gap: 6px;
+}
+.type-toggle-btn {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+  position: relative;
+}
+.type-toggle-btn input[type="radio"] {
+  position: absolute; opacity: 0; width: 0; height: 0;
+}
+.type-toggle-btn.selected-cours  { background: #eff6ff; color: #2563eb; border-color: #93c5fd; }
+.type-toggle-btn.selected-td     { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
+.type-toggle-btn.selected-tp     { background: #fff7ed; color: #c2410c; border-color: #fdba74; }
+
+.modal-footer-custom {
+  padding: 18px 26px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-cancel {
+  padding: 9px 20px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-cancel:hover { background: #f8fafc; }
+
+.btn-submit-modal {
+  padding: 9px 22px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: background .15s, transform .1s;
+}
+.btn-submit-modal:hover { background: #1d4ed8; transform: translateY(-1px); }
+
+/* Séparateur de section modale */
+.modal-section-sep {
+  margin: 18px 0 14px;
+  font-size: 0.70rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-section-sep::before,
+.modal-section-sep::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #f1f5f9;
+}
+
+/* Annee univ info */
+.annee-info-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.annee-info-box i { color: #2563eb; }
+
+/* Animations entrée cartes */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.classe-card-wrap {
+  animation: fadeUp .4s ease both;
+}
+.classe-card-wrap:nth-child(1) { animation-delay: .05s; }
+.classe-card-wrap:nth-child(2) { animation-delay: .10s; }
+.classe-card-wrap:nth-child(3) { animation-delay: .15s; }
+.classe-card-wrap:nth-child(4) { animation-delay: .20s; }
+.classe-card-wrap:nth-child(5) { animation-delay: .25s; }
+.classe-card-wrap:nth-child(6) { animation-delay: .30s; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── BREADCRUMB ──────────────────────────────────────────── -->
+<nav class="breadcrumb-nav">
+  <a href="{% url 'pedagogie:emploi_du_temps' %}" class="breadcrumb-link">
+    <i class="fas fa-calendar-week"></i> Emploi du temps
+  </a>
+  <span class="breadcrumb-sep">›</span>
+  <a href="{% url 'pedagogie:edt_filieres' dept.pk %}" class="breadcrumb-link">
+    <i class="fas fa-building"></i> {{ dept.get_nom_display }}
+  </a>
+  <span class="breadcrumb-sep">›</span>
+  <span class="breadcrumb-current">
+    <i class="fas fa-graduation-cap" style="font-size:.75rem;margin-right:4px;color:#64748b"></i>
+    {{ filiere.nom }}
+  </span>
+</nav>
+
+<!-- ── PAGE HEADER ─────────────────────────────────────────── -->
+<div class="edt-page-header">
+  <div class="edt-page-header-left">
+    <h1>{{ filiere.nom }}</h1>
+    <p class="sub">Sélectionnez une classe pour consulter ou remplir son emploi du temps</p>
+    <div class="edt-dept-badge">
+      <i class="fas fa-building" style="font-size:.65rem"></i>
+      {{ dept.get_nom_display }} · {{ filiere.code }}
+    </div>
+  </div>
+</div>
+
+<!-- ── STATS BANNER ────────────────────────────────────────── -->
+<div class="edt-stats-banner">
+  <div class="stat-pill">
+    <div class="stat-pill-icon blue"><i class="fas fa-door-open"></i></div>
+    <div>
+      <div class="stat-pill-val">{{ cl_data|length }}</div>
+      <div class="stat-pill-lbl">Classes</div>
+    </div>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-pill-icon green"><i class="fas fa-clock"></i></div>
+    <div>
+      <div class="stat-pill-val">{% with total=0 %}{% for item in cl_data %}{% with total=total|add:item.nb_seances %}{% endwith %}{% endfor %}{{ cl_data|length }}{% endwith %}</div>
+      <div class="stat-pill-lbl">Séances totales</div>
+    </div>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-pill-icon orange"><i class="fas fa-chalkboard-teacher"></i></div>
+    <div>
+      <div class="stat-pill-val">{{ filiere.niveau }}</div>
+      <div class="stat-pill-lbl">Niveau</div>
+    </div>
+  </div>
+  <div class="stat-pill">
+    <div class="stat-pill-icon purple"><i class="fas fa-calendar-alt"></i></div>
+    <div>
+      <div class="stat-pill-val">2024-2025</div>
+      <div class="stat-pill-lbl">Année univ.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CLASSES GRID ────────────────────────────────────────── -->
+<div class="section-title"><i class="fas fa-door-open"></i> Classes disponibles</div>
+
+<div class="row g-3">
+  {% for item in cl_data %}
+  <div class="col-xl-4 col-md-6 classe-card-wrap">
+    <div class="classe-card">
+
+      <!-- En-tête colorée -->
+      <div class="classe-card-top">
+        <div class="classe-card-nom">{{ item.classe.nom }}</div>
+        <div class="classe-card-meta">
+          <span><i class="fas fa-layer-group"></i> {{ item.classe.get_niveau_display }}</span>
+          <span><i class="fas fa-calendar"></i> {{ item.classe.annee_universitaire }}</span>
+          {% if item.classe.capacite %}
+          <span><i class="fas fa-users"></i> {{ item.classe.capacite }} places</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Statistiques séances -->
+      <div class="classe-card-body">
+        <div class="seances-row">
+          <div class="seance-stat">
+            <div class="seance-stat-val">{{ item.nb_seances }}</div>
+            <div class="seance-stat-lbl">Séances</div>
+          </div>
+          <div class="seance-stat">
+            <div class="seance-stat-val">{{ item.nb_seances|floatformat:0 }}</div>
+            <div class="seance-stat-lbl">Total heures</div>
+          </div>
+          <div class="seance-stat">
+            <div class="seance-stat-val">
+              {% if item.nb_seances == 0 %}
+                <span style="color:#f97316;font-size:1rem">⚠</span>
+              {% elif item.nb_seances < 5 %}
+                <span style="color:#f59e0b;font-size:1rem">◑</span>
+              {% else %}
+                <span style="color:#22c55e;font-size:1rem">✓</span>
+              {% endif %}
+            </div>
+            <div class="seance-stat-lbl">Statut</div>
+          </div>
+        </div>
+
+        <!-- Types de séances -->
+        <div>
+          <div style="font-size:0.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">
+            Types de séances
+          </div>
+          <div class="type-pills">
+            {% if item.nb_cours %}
+              <span class="type-pill cours"><i class="fas fa-chalkboard-teacher" style="font-size:.6rem"></i> {{ item.nb_cours }} Cours</span>
+            {% endif %}
+            {% if item.nb_td %}
+              <span class="type-pill td"><i class="fas fa-users" style="font-size:.6rem"></i> {{ item.nb_td }} TD</span>
+            {% endif %}
+            {% if item.nb_tp %}
+              <span class="type-pill tp"><i class="fas fa-flask" style="font-size:.6rem"></i> {{ item.nb_tp }} TP</span>
+            {% endif %}
+            {% if not item.nb_cours and not item.nb_td and not item.nb_tp %}
+              <span class="type-pill vide">Aucune séance planifiée</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer avec actions -->
+      <div class="classe-card-footer">
+        <button
+          class="btn-fill-edt"
+          onclick="openModal('{{ item.classe.pk }}', '{{ item.classe.nom }}')"
+          title="Ajouter une séance"
+        >
+          <i class="fas fa-plus"></i> Ajouter séance
+        </button>
+        <a href="{% url 'pedagogie:edt_classe' item.classe.pk %}" class="btn-voir-edt">
+          Voir EDT <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="empty-state-box">
+      <div class="empty-state-icon"><i class="fas fa-door-open"></i></div>
+      <h5>Aucune classe dans cette filière</h5>
+      <p>Créez des classes depuis le module Administration pour pouvoir gérer leur emploi du temps.</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL — Ajouter une séance EDT
+════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop-custom" id="edtModal" onclick="handleBackdropClick(event)">
+  <div class="modal-box" id="edtModalBox">
+
+    <div class="modal-header-custom">
+      <div>
+        <h3><i class="fas fa-plus-circle" style="color:#2563eb;margin-right:6px"></i>Ajouter une séance</h3>
+        <span class="modal-classe-badge" id="modalClasseBadge">
+          <i class="fas fa-door-open" style="font-size:.65rem"></i>
+          <span id="modalClasseLabel">—</span>
+        </span>
+      </div>
+      <button class="modal-close" onclick="closeModal()" title="Fermer">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form method="POST" action="{% url 'pedagogie:ajouter_seance' %}" id="edtForm">
+      {% csrf_token %}
+      <input type="hidden" name="classe" id="modalClasseId">
+      <input type="hidden" name="annee_univ" value="2024-2025">
+
+      <div class="modal-body-custom">
+
+        <!-- Matière + Enseignant -->
+        <div class="modal-section-sep">Contenu pédagogique</div>
+        <div class="form-grid-2">
+          <div class="form-group-custom form-full">
+            <label class="form-label-custom" for="modal_matiere">
+              <i class="fas fa-book" style="color:#2563eb;font-size:.65rem"></i> Matière *
+            </label>
+            <select class="form-control-custom" name="matiere" id="modal_matiere" required>
+              <option value="">— Choisir la matière —</option>
+              {% for item in cl_data %}
+                {% for seance in item.classe.seances.all %}
+                  {# On ne peut pas lister les matières ici, sera chargé via JS #}
+                {% endfor %}
+              {% endfor %}
+              <!-- Les options sont injectées dynamiquement via JS -->
+            </select>
+          </div>
+          <div class="form-group-custom form-full">
+            <label class="form-label-custom" for="modal_enseignant">
+              <i class="fas fa-chalkboard-teacher" style="color:#16a34a;font-size:.65rem"></i> Enseignant
+            </label>
+            <select class="form-control-custom" name="enseignant" id="modal_enseignant">
+              <option value="">— Choisir l'enseignant —</option>
+              {% for ens in enseignants %}
+              <option value="{{ ens.pk }}">{{ ens.get_grade_display }} {{ ens.prenom }} {{ ens.nom }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Type de séance -->
+        <div class="modal-section-sep">Type de séance</div>
+        <div class="type-toggle" id="typeToggle">
+          <label class="type-toggle-btn" id="btn-cours">
+            <input type="radio" name="type_seance" value="cours" onchange="selectType('cours')">
+            <i class="fas fa-chalkboard-teacher"></i> Cours
+          </label>
+          <label class="type-toggle-btn" id="btn-td">
+            <input type="radio" name="type_seance" value="td" onchange="selectType('td')">
+            <i class="fas fa-users"></i> TD
+          </label>
+          <label class="type-toggle-btn" id="btn-tp">
+            <input type="radio" name="type_seance" value="tp" onchange="selectType('tp')">
+            <i class="fas fa-flask"></i> TP
+          </label>
+        </div>
+
+        <!-- Jour + Semestre -->
+        <div class="modal-section-sep">Planification</div>
+        <div class="form-grid-2">
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="modal_jour">
+              <i class="fas fa-calendar-day" style="color:#7c3aed;font-size:.65rem"></i> Jour *
+            </label>
+            <select class="form-control-custom" name="jour" id="modal_jour" required>
+              <option value="">— Choisir —</option>
+              <option value="1">Lundi</option>
+              <option value="2">Mardi</option>
+              <option value="3">Mercredi</option>
+              <option value="4">Jeudi</option>
+              <option value="5">Vendredi</option>
+              <option value="6">Samedi</option>
+            </select>
+          </div>
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="modal_semestre">
+              <i class="fas fa-calendar-alt" style="color:#c2410c;font-size:.65rem"></i> Semestre *
+            </label>
+            <select class="form-control-custom" name="semestre" id="modal_semestre" required>
+              <option value="1">Semestre 1</option>
+              <option value="2">Semestre 2</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Horaires -->
+        <div class="form-grid-3" style="margin-top:14px">
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="modal_hdeb">
+              <i class="fas fa-clock" style="color:#0891b2;font-size:.65rem"></i> Début *
+            </label>
+            <select class="form-control-custom" name="heure_debut" id="modal_hdeb" required onchange="autoFillEnd()">
+              <option value="">—</option>
+              <option value="08:00">08:00</option>
+              <option value="09:30">09:30</option>
+              <option value="11:00">11:00</option>
+              <option value="13:30">13:30</option>
+              <option value="15:00">15:00</option>
+              <option value="16:30">16:30</option>
+            </select>
+          </div>
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="modal_hfin">
+              <i class="fas fa-clock" style="color:#0891b2;font-size:.65rem"></i> Fin *
+            </label>
+            <select class="form-control-custom" name="heure_fin" id="modal_hfin" required>
+              <option value="">—</option>
+              <option value="09:30">09:30</option>
+              <option value="11:00">11:00</option>
+              <option value="12:30">12:30</option>
+              <option value="15:00">15:00</option>
+              <option value="16:30">16:30</option>
+              <option value="18:00">18:00</option>
+            </select>
+          </div>
+          <div class="form-group-custom">
+            <label class="form-label-custom" for="modal_salle">
+              <i class="fas fa-map-marker-alt" style="color:#dc2626;font-size:.65rem"></i> Salle
+            </label>
+            <select class="form-control-custom" name="salle" id="modal_salle">
+              <option value="">— Choisir —</option>
+              {% for s in salles %}
+              <option value="{{ s.pk }}">{{ s.nom }} ({{ s.capacite }})</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Info année -->
+        <div class="annee-info-box" style="margin-top:16px">
+          <i class="fas fa-info-circle"></i>
+          Séance rattachée à l'année universitaire <strong>2024-2025</strong>.
+          Un contrôle de conflit salle et enseignant est effectué automatiquement.
+        </div>
+
+      </div><!-- /modal-body -->
+
+      <div class="modal-footer-custom">
+        <button type="button" class="btn-cancel" onclick="closeModal()">
+          Annuler
+        </button>
+        <button type="submit" class="btn-submit-modal">
+          <i class="fas fa-plus"></i> Ajouter la séance
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+// ── MATIÈRES PAR CLASSE ───────────────────────────────────────
+// Injectées depuis Django (évite une requête AJAX)
+const MATIERES_BY_CLASSE = {
+  {% for item in cl_data %}
+  "{{ item.classe.pk }}": [
+    {% for m in item.matieres %}
+    { id: "{{ m.pk }}", nom: "{{ m.nom }}", code: "{{ m.code }}" }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ]{% if not forloop.last %},{% endif %}
+  {% endfor %}
+};
+
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(classeId, classeNom) {
+  document.getElementById('modalClasseId').value = classeId;
+  document.getElementById('modalClasseLabel').textContent = classeNom;
+  document.getElementById('edtModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+
+  // Remplir les matières
+  const select = document.getElementById('modal_matiere');
+  select.innerHTML = '<option value="">— Choisir la matière —</option>';
+  const matieres = MATIERES_BY_CLASSE[classeId] || [];
+  if (matieres.length === 0) {
+    select.innerHTML += '<option disabled>Aucune matière associée à cette classe</option>';
+  } else {
+    matieres.forEach(m => {
+      select.innerHTML += `<option value="${m.id}">[${m.code}] ${m.nom}</option>`;
+    });
+  }
+}
+
+function closeModal() {
+  document.getElementById('edtModal').classList.remove('show');
+  document.body.style.overflow = '';
+  document.getElementById('edtForm').reset();
+  document.querySelectorAll('.type-toggle-btn').forEach(b => b.className = 'type-toggle-btn');
+}
+
+function handleBackdropClick(e) {
+  if (e.target === document.getElementById('edtModal')) closeModal();
+}
+
+// Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ── TYPE SÉANCE TOGGLE ────────────────────────────────────────
+function selectType(type) {
+  document.querySelectorAll('.type-toggle-btn').forEach(b => {
+    b.className = 'type-toggle-btn';
+  });
+  const btn = document.getElementById(`btn-${type}`);
+  if (btn) btn.classList.add(`selected-${type}`);
+}
+
+// ── AUTO-FILL HEURE FIN ───────────────────────────────────────
+const NEXT_SLOT = {
+  '08:00': '09:30',
+  '09:30': '11:00',
+  '11:00': '12:30',
+  '13:30': '15:00',
+  '15:00': '16:30',
+  '16:30': '18:00',
+};
+function autoFillEnd() {
+  const deb = document.getElementById('modal_hdeb').value;
+  const fin = document.getElementById('modal_hfin');
+  if (deb && NEXT_SLOT[deb]) fin.value = NEXT_SLOT[deb];
+}
+</script>
+{% endblock %}

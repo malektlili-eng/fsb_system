@@ -1,0 +1,111 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Attestation de Réussite — {{ etudiant.get_full_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',sans-serif;background:#f0f5fb;padding:20px;display:flex;flex-direction:column;align-items:center}
+  .no-print{display:flex;gap:10px;margin-bottom:20px}
+  .btn{padding:9px 20px;border:none;border-radius:8px;font-size:0.86rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:flex;align-items:center;gap:6px}
+  .btn-dark{background:#0b1e3d;color:white}
+  .btn-back{background:white;color:#0b1e3d;border:1.5px solid #e2eaf6}
+  .doc{width:210mm;background:white;box-shadow:0 8px 40px rgba(0,0,0,0.12)}
+  .gold-bar{height:8px;background:linear-gradient(90deg,#0b1e3d,#f59e0b,#0b1e3d)}
+  .header{padding:28px 40px 22px;text-align:center;border-bottom:1px solid #e2eaf6}
+  .logo{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#0b1e3d,#2563eb);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 14px}
+  .inst-name{font-size:1rem;font-weight:800;color:#0b1e3d}
+  .inst-sub{font-size:0.75rem;color:#64748b;margin-top:3px}
+  .title-sec{text-align:center;padding:28px 40px;border-bottom:1px solid #e2eaf6}
+  .medal{font-size:3rem;margin-bottom:12px}
+  .title-label{font-size:0.72rem;color:#94a3b8;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:6px}
+  .title-main{font-size:1.8rem;font-weight:800;color:#0b1e3d;letter-spacing:0.03em}
+  .body-sec{padding:32px 40px}
+  .intro{font-size:0.9rem;color:#334155;line-height:1.8;margin-bottom:24px;text-align:justify}
+  .highlight-box{background:linear-gradient(135deg,#f0f5ff,#e8f5e9);border:2px solid #bfdbfe;border-radius:14px;padding:22px 28px;text-align:center;margin-bottom:24px}
+  .etu-name{font-size:1.4rem;font-weight:800;color:#0b1e3d;margin-bottom:12px}
+  .stats-row{display:flex;justify-content:center;gap:40px}
+  .stat-item{text-align:center}
+  .stat-val{font-size:2rem;font-weight:800;color:#2563eb}
+  .stat-label{font-size:0.72rem;color:#64748b;margin-top:2px}
+  .mention-badge{display:inline-block;padding:8px 24px;border-radius:99px;font-size:1rem;font-weight:800;margin-top:14px;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#0b1e3d;box-shadow:0 4px 14px rgba(245,158,11,0.3)}
+  table{width:100%;border-collapse:collapse;margin-bottom:20px}
+  thead th{background:#f0f5ff;padding:9px 14px;font-size:0.72rem;font-weight:700;text-transform:uppercase;color:#475569;border-bottom:2px solid #e2eaf6;text-align:left}
+  tbody td{padding:10px 14px;border-bottom:1px solid #f0f5f9;font-size:0.88rem;color:#334155}
+  .footer-sec{padding:22px 40px 28px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid #e2eaf6}
+  .sig-label{font-size:0.78rem;color:#64748b;margin-bottom:44px}
+  .sig-line{width:180px;height:1px;background:#0b1e3d;margin-bottom:5px}
+  .sig-name{font-size:0.82rem;font-weight:700;color:#0b1e3d}
+  .qr-block{text-align:center}
+  .qr-block img{width:100px;height:100px;border:2px solid #e2eaf6;border-radius:8px}
+  .qr-label{font-size:0.67rem;color:#94a3b8;margin-top:4px}
+  @media print{body{background:white;padding:0}.no-print{display:none!important}.doc{box-shadow:none;width:100%}}
+</style>
+</head>
+<body>
+<div class="no-print">
+  <button onclick="window.print()" class="btn btn-dark">🖨️ Imprimer</button>
+  <a href="javascript:history.back()" class="btn btn-back">← Retour</a>
+</div>
+<div class="doc">
+  <div class="gold-bar"></div>
+  <div class="header">
+    <div class="logo"><img src="{% static 'images/logo-fsb.jpg' %}" alt="Logo FSB" width="75" height="75" style="border-radius: 12px; object-fit: cover;"></div>
+    <div class="inst-name">Faculté des Sciences de Bizerte</div>
+    <div class="inst-sub">Université de Carthage — République Tunisienne &nbsp;|&nbsp; كلية العلوم ببنزرت</div>
+    <div style="font-size:0.72rem;color:#94a3b8;margin-top:6px">Réf : FSB-ATT-{{ etudiant.numero_etudiant }}-S{{ semestre }}-{{ annee }}</div>
+  </div>
+  <div class="title-sec">
+    <div class="medal">🏆</div>
+    <div class="title-label">Document Officiel</div>
+    <div class="title-main">ATTESTATION DE RÉUSSITE</div>
+    <div style="font-size:0.85rem;color:#64748b;margin-top:6px">Semestre {{ semestre }} — {{ annee }}</div>
+  </div>
+  <div class="body-sec">
+    <p class="intro">
+      Le responsable du Service de Scolarité de la Faculté des Sciences de Bizerte certifie que
+      l'étudiant(e) ci-dessous a <strong>réussi avec succès</strong> le Semestre {{ semestre }}
+      de l'année universitaire <strong>{{ annee }}</strong>.
+    </p>
+    <div class="highlight-box">
+      <div class="etu-name">{{ etudiant.nom|upper }} {{ etudiant.prenom }}</div>
+      <div style="font-size:0.82rem;color:#64748b;margin-bottom:16px">
+        N° {{ etudiant.numero_etudiant }} &nbsp;|&nbsp; {{ etudiant.filiere }}
+      </div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-val">{{ moyenne.moyenne }}</div>
+          <div class="stat-label">Moyenne /20</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val">S{{ semestre }}</div>
+          <div class="stat-label">Semestre</div>
+        </div>
+      </div>
+      <div class="mention-badge">🏅 {{ moyenne.get_mention_display }}</div>
+    </div>
+    <p style="font-size:0.84rem;color:#64748b;text-align:justify;line-height:1.7;margin-bottom:20px">
+      La présente attestation est délivrée à l'intéressé(e) pour servir et valoir ce que de droit,
+      notamment pour toute démarche administrative, académique ou professionnelle en nécessitant la présentation.
+    </p>
+  </div>
+  <div class="footer-sec">
+    <div>
+      <div style="font-size:0.78rem;color:#64748b;margin-bottom:2px">Bizerte, le {% now "d/m/Y" %}</div>
+      <div class="sig-label">Le Responsable de Scolarité</div>
+      <div class="sig-line"></div>
+      <div class="sig-name">Service Scolarité — FSB</div>
+      <div style="font-size:0.72rem;color:#94a3b8">Cachet et Signature</div>
+    </div>
+    <div class="qr-block">
+      <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR Code">
+      <div class="qr-label">Scanner pour vérifier l'authenticité</div>
+    </div>
+  </div>
+  <div class="gold-bar"></div>
+</div>
+</body>
+</html>

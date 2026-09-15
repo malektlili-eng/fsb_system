@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block page_icon %}<i class="fas fa-chart-bar"></i>{% endblock %}
+{% block page_title %}Notes — {{ classe.nom }}{% endblock %}
+{% block extra_css %}<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>{% endblock %}
+
+{% block content %}
+<nav style="margin-bottom:16px;font-size:0.83rem;color:#94a3b8">
+  <a href="{% url 'pedagogie:notes' %}" style="color:#2563eb;text-decoration:none;font-weight:600">Notes</a>
+  <span style="margin:0 8px">›</span>
+  <a href="{% url 'pedagogie:notes_filieres' dept.pk %}" style="color:#2563eb;text-decoration:none;font-weight:600">{{ dept.get_nom_display }}</a>
+  <span style="margin:0 8px">›</span>
+  <span style="color:#0b1e3d;font-weight:700">{{ classe.nom }}</span>
+</nav>
+
+<div class="page-header">
+  <div><h1>{{ classe.nom }}</h1><p class="sub">S{{ semestre }} — {{ annee }} — {{ nb_total }} étudiant(s)</p></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <a href="?semestre=1&annee={{ annee }}" class="{% if semestre == 1 %}btn-primary-fsb{% else %}btn-ghost-fsb{% endif %} btn-sm">S1</a>
+    <a href="?semestre=2&annee={{ annee }}" class="{% if semestre == 2 %}btn-primary-fsb{% else %}btn-ghost-fsb{% endif %} btn-sm">S2</a>
+    <!-- Bouton calcul moyennes -->
+    <form method="post" action="{% url 'pedagogie:calculer_moyennes' classe.pk %}" style="display:inline">
+      {% csrf_token %}
+      <input type="hidden" name="semestre" value="{{ semestre }}">
+      <input type="hidden" name="annee" value="{{ annee }}">
+      <button type="submit" class="btn-primary-fsb btn-sm"
+              onclick="return confirm('Lancer le calcul des moyennes pour cette classe ?')"
+              style="background:linear-gradient(135deg,#059669,#16a34a)">
+        <i class="fas fa-calculator"></i> Calculer Moyennes
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3 fu fu1"><div class="stat-card sc-blue"><div class="stat-num">{{ nb_total }}</div><div class="stat-label">Étudiants</div><i class="fas fa-users stat-icon"></i></div></div>
+  <div class="col-md-3 fu fu2"><div class="stat-card sc-emerald"><div class="stat-num">{{ nb_admis }}</div><div class="stat-label">Admis</div><i class="fas fa-check stat-icon"></i></div></div>
+  <div class="col-md-3 fu fu3"><div class="stat-card sc-rose" style="background:linear-gradient(135deg,#881337,#e11d48)"><div class="stat-num">{{ nb_total|add:"-"|add:nb_admis }}</div><div class="stat-label">Ajournés</div><i class="fas fa-times stat-icon"></i></div></div>
+  <div class="col-md-3 fu fu4"><div class="stat-card sc-cyan"><div class="stat-num">{{ pct_reuss }}%</div><div class="stat-label">Taux de réussite</div><i class="fas fa-percent stat-icon"></i></div></div>
+</div>
+
+<!-- Charts -->
+{% if moyennes_calculees %}
+<div class="row g-3 mb-4">
+  <div class="col-md-5 fu fu1">
+    <div class="card-fsb">
+      <div class="card-fsb-header"><div class="header-left"><i class="fas fa-chart-pie"></i> Réussite / Échec</div></div>
+      <div class="card-fsb-body" style="padding:20px;display:flex;justify-content:center">
+        <canvas id="chartReussite" style="max-width:220px;max-height:220px"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-7 fu fu2">
+    <div class="card-fsb">
+      <div class="card-fsb-header"><div class="header-left"><i class="fas fa-chart-bar"></i> Répartition des Mentions</div></div>
+      <div class="card-fsb-body" style="padding:20px">
+        <canvas id="chartMentions" style="max-height:220px"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Tableau résultats -->
+<div class="card-fsb fu fu3">
+  <div class="card-fsb-header">
+    <div class="header-left"><i class="fas fa-list"></i> Résultats par Étudiant</div>
+    {% if not moyennes_calculees %}
+    <span style="background:#fef9c3;color:#854d0e;padding:4px 12px;border-radius:99px;font-size:0.75rem;font-weight:600">
+      ⚠️ Moyennes non encore calculées
+    </span>
+    {% endif %}
+  </div>
+  <div class="card-fsb-body" style="padding:0;overflow-x:auto">
+    <table class="table-fsb">
+      <thead>
+        <tr>
+          <th>Étudiant</th>
+          {% for mat in matieres %}<th style="font-size:0.68rem;max-width:80px">{{ mat.nom|truncatechars:12 }}</th>{% endfor %}
+          <th>Moyenne</th>
+          <th>Mention</th>
+          <th>Résultat</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in data_etudiants %}
+        <tr style="{% if d.moyenne and not d.moyenne.admis %}background:#fff5f5{% elif d.moyenne and d.moyenne.admis %}background:#f0fdf4{% endif %}">
+          <td>
+            <div style="font-weight:700;color:#0b1e3d">{{ d.etudiant.nom }} {{ d.etudiant.prenom }}</div>
+            <div style="font-size:0.7rem;color:#94a3b8">{{ d.etudiant.numero_etudiant }}</div>
+          </td>
+          {% for mat in matieres %}
+          {% with note_mat=d.notes %}
+          <td style="text-align:center;vertical-align:middle">
+            {% for n in d.notes %}
+              {% if n.matiere.pk == mat.pk %}
+              <span style="font-weight:700;font-size:0.85rem;color:{% if n.note >= 10 %}#166534{% else %}#991b1b{% endif %}">
+                {{ n.note }}
+              </span>
+              {% endif %}
+            {% endfor %}
+          </td>
+          {% endwith %}
+          {% endfor %}
+          <td style="text-align:center;vertical-align:middle">
+            {% if d.moyenne %}
+            <span style="font-size:1.1rem;font-weight:800;color:{% if d.moyenne.admis %}#166534{% else %}#991b1b{% endif %}">
+              {{ d.moyenne.moyenne }}/20
+            </span>
+            {% else %}
+            <span style="color:#94a3b8;font-size:0.82rem">—</span>
+            {% endif %}
+          </td>
+          <td style="text-align:center;vertical-align:middle">
+            {% if d.moyenne and d.moyenne.mention %}
+            <span class="badge-pill
+              {% if d.moyenne.mention == 'excellent' or d.moyenne.mention == 'tres_bien' %}b-green
+              {% elif d.moyenne.mention == 'bien' or d.moyenne.mention == 'assez_bien' %}b-blue
+              {% elif d.moyenne.mention == 'passable' %}b-yellow
+              {% else %}b-gray{% endif %}">
+              {{ d.moyenne.get_mention_display }}
+            </span>
+            {% else %}—{% endif %}
+          </td>
+          <td style="text-align:center;vertical-align:middle">
+            {% if d.moyenne %}
+            <span class="badge-pill {% if d.moyenne.admis %}b-green{% else %}b-red{% endif %}">
+              {% if d.moyenne.admis %}Admis{% else %}Ajourné{% endif %}
+            </span>
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            <div style="display:flex;gap:4px">
+              <a href="{% url 'pedagogie:releve_notes_etudiant' d.etudiant.pk %}?semestre={{ semestre }}&annee={{ annee }}"
+                 class="btn-icon ic-blue" title="Relevé de notes" target="_blank">
+                <i class="fas fa-file-alt"></i>
+              </a>
+              {% if d.moyenne and d.moyenne.admis %}
+              <a href="{% url 'pedagogie:attestation_reussite' d.etudiant.pk %}?semestre={{ semestre }}&annee={{ annee }}"
+                 class="btn-icon ic-green" title="Attestation de réussite" target="_blank">
+                <i class="fas fa-certificate"></i>
+              </a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="20"><div class="empty-state" style="padding:30px"><div class="empty-icon"><i class="fas fa-clipboard"></i></div><p>Aucun étudiant.</p></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+{% if moyennes_calculees %}
+const mentionsData = {{ mentions_json|safe }};
+new Chart(document.getElementById('chartReussite'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Admis','Ajournés'],
+    datasets: [{
+      data: [{{ nb_admis }}, {{ nb_total }} - {{ nb_admis }}],
+      backgroundColor: ['#16a34a','#dc2626'],
+      borderWidth: 0,
+    }]
+  },
+  options: { plugins: { legend: { position:'bottom' }}, cutout: '65%' }
+});
+new Chart(document.getElementById('chartMentions'), {
+  type: 'bar',
+  data: {
+    labels: ['Excellent','Très Bien','Bien','Assez Bien','Passable','Échec'],
+    datasets: [{
+      data: [
+        mentionsData.excellent, mentionsData.tres_bien, mentionsData.bien,
+        mentionsData.assez_bien, mentionsData.passable, mentionsData.echec
+      ],
+      backgroundColor: ['#16a34a','#2563eb','#0284c7','#0e7490','#d97706','#dc2626'],
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false }},
+    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }}
+  }
+});
+{% endif %}
+</script>
+{% endblock %}

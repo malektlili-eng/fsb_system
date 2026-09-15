@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% block title %}Mon Profil — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-user-cog"></i>{% endblock %}
+{% block page_title %}Mon Profil{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div><h1>Mon Profil</h1><p class="sub">Gérez vos informations de compte</p></div>
+</div>
+
+<div class="row g-3">
+
+  <!-- Carte profil -->
+  <div class="col-lg-4">
+    <div class="card-fsb fu">
+      <div class="card-fsb-body" style="text-align:center;padding:32px">
+        <div style="width:88px;height:88px;border-radius:22px;
+                    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+                    display:flex;align-items:center;justify-content:center;
+                    color:white;font-size:2.4rem;font-weight:800;
+                    margin:0 auto 18px;box-shadow:0 8px 24px rgba(37,99,235,0.25)">
+          {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+        </div>
+        <div style="font-size:1.15rem;font-weight:800;color:#0b1e3d">
+          {{ user.get_full_name }}
+        </div>
+        <div style="font-size:0.82rem;color:#94a3b8;margin-top:4px">
+          @{{ user.username }}
+        </div>
+        <div style="margin-top:10px">
+          <span class="badge-pill b-blue" style="font-size:0.78rem">
+            {{ user.get_role_display }}
+          </span>
+        </div>
+
+        <hr style="margin:20px 0;border-color:#e2eaf6">
+
+        <div style="text-align:left;font-size:0.84rem">
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+            <span style="color:#94a3b8">Email</span>
+            <span style="font-weight:600;color:#334155">{{ user.email|default:"—" }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+            <span style="color:#94a3b8">Téléphone</span>
+            <span style="font-weight:600;color:#334155">{{ user.telephone|default:"—" }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+            <span style="color:#94a3b8">Département</span>
+            <span style="font-weight:600;color:#334155">{{ user.departement|default:"Tous" }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="color:#94a3b8">Membre depuis</span>
+            <span style="font-weight:600;color:#334155">{{ user.date_joined|date:"d/m/Y" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulaire modification -->
+  <div class="col-lg-8">
+    <div class="card-fsb fu fu2">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-edit"></i> Modifier mes informations</div>
+      </div>
+      <div class="card-fsb-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6 form-group">
+              <label class="form-label">Prénom</label>
+              <input type="text" name="first_name" class="form-control"
+                     value="{{ user.first_name }}">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Nom</label>
+              <input type="text" name="last_name" class="form-control"
+                     value="{{ user.last_name }}">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control"
+                     value="{{ user.email }}">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Téléphone</label>
+              <input type="text" name="telephone" class="form-control"
+                     value="{{ user.telephone }}">
+            </div>
+            <div class="col-12" style="margin-top:6px">
+              <button type="submit" class="btn-primary-fsb">
+                <i class="fas fa-save"></i> Enregistrer
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Accès rapide selon le rôle -->
+    <div class="card-fsb fu fu3 mt-3">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-bolt"></i> Accès Rapide</div>
+      </div>
+      <div class="card-fsb-body">
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <a href="{% url 'administration:liste_etudiants' %}" class="btn-primary-fsb btn-sm">
+            <i class="fas fa-user-graduate"></i> Étudiants
+          </a>
+          <a href="{% url 'administration:liste_enseignants' %}" class="btn-outline-fsb btn-sm">
+            <i class="fas fa-chalkboard-teacher"></i> Enseignants
+          </a>
+          <a href="{% url 'pedagogie:notes' %}" class="btn-ghost-fsb btn-sm">
+            <i class="fas fa-clipboard-list"></i> Saisir Notes
+          </a>
+          <a href="{% url 'stages:demandes' %}" class="btn-ghost-fsb btn-sm">
+            <i class="fas fa-briefcase"></i> Stages
+          </a>
+          {% if user.is_super_admin %}
+          <a href="{% url 'accounts:gestion_agents' %}" class="btn-ghost-fsb btn-sm">
+            <i class="fas fa-users-cog"></i> Gérer les Agents
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

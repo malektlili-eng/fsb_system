@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}Salles & Amphis — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-door-open"></i>{% endblock %}
+{% block page_title %}Salles & Amphithéâtres{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div><h1>Salles & Amphis</h1><p class="sub">Gestion des espaces pédagogiques</p></div>
+</div>
+
+<div class="row g-3">
+  <!-- Formulaire ajout -->
+  <div class="col-lg-4">
+    <div class="card-fsb fu">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-plus-circle"></i> Ajouter une Salle</div>
+      </div>
+      <div class="card-fsb-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Nom de la salle <span style="color:#e11d48">*</span></label>
+            <input type="text" name="nom" class="form-control" placeholder="Ex: Amphi A, Salle 101..." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type <span style="color:#e11d48">*</span></label>
+            <select name="type_salle" class="form-select" required>
+              <option value="amphi">Amphithéâtre</option>
+              <option value="salle">Salle de Cours</option>
+              <option value="tp">Salle TP</option>
+              <option value="info">Salle Informatique</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Capacité <span style="color:#e11d48">*</span></label>
+            <input type="number" name="capacite" class="form-control" placeholder="Ex: 150" min="1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bâtiment</label>
+            <input type="text" name="batiment" class="form-control" placeholder="Ex: Bât. A">
+          </div>
+          <button type="submit" class="btn-primary-fsb w-100">
+            <i class="fas fa-plus"></i> Ajouter
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des salles -->
+  <div class="col-lg-8">
+    <div class="card-fsb fu fu2">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-building"></i> Salles Disponibles</div>
+        <span class="badge-pill b-blue">{{ salles.count }}</span>
+      </div>
+      <div class="card-fsb-body">
+        <div class="row g-3">
+          {% for salle in salles %}
+          <div class="col-md-6">
+            <div style="background:#f8faff;border:1px solid #e2eaf6;border-radius:12px;padding:14px;transition:all 0.2s"
+                 onmouseover="this.style.borderColor='#2563eb';this.style.background='#eff6ff'"
+                 onmouseout="this.style.borderColor='#e2eaf6';this.style.background='#f8faff'">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div style="font-weight:700;color:#0b1e3d;font-size:0.9rem">{{ salle.nom }}</div>
+                <span class="badge-pill
+                  {% if salle.type_salle == 'amphi' %}b-purple
+                  {% elif salle.type_salle == 'info' %}b-blue
+                  {% elif salle.type_salle == 'tp' %}b-cyan
+                  {% else %}b-gray{% endif %}">
+                  {{ salle.get_type_salle_display }}
+                </span>
+              </div>
+              <div style="display:flex;gap:14px;font-size:0.79rem;color:#64748b">
+                <span><i class="fas fa-users me-1" style="color:#3b82f6"></i>{{ salle.capacite }} places</span>
+                {% if salle.batiment %}
+                <span><i class="fas fa-building me-1" style="color:#94a3b8"></i>{{ salle.batiment }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="col-12">
+            <div class="empty-state">
+              <div class="empty-icon"><i class="fas fa-door-open"></i></div>
+              <h5>Aucune salle</h5>
+              <p>Ajoutez des salles via le formulaire.</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

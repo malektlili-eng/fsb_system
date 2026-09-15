@@ -1,0 +1,154 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Diplôme — {{ diplome.etudiant.get_full_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',sans-serif;background:#f0f5fb;padding:20px;display:flex;flex-direction:column;align-items:center}
+  .no-print{display:flex;gap:10px;margin-bottom:20px}
+  .btn{padding:9px 20px;border:none;border-radius:8px;font-size:0.86rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:flex;align-items:center;gap:6px}
+  .btn-dark{background:#0b1e3d;color:white}.btn-back{background:white;color:#0b1e3d;border:1.5px solid #e2eaf6}
+  .doc{width:297mm;min-height:210mm;background:white;box-shadow:0 8px 40px rgba(0,0,0,0.15);position:relative;overflow:hidden}
+  /* Bordures décoratives */
+  .doc::before{content:'';position:absolute;inset:12px;border:2px solid rgba(11,30,61,0.1);pointer-events:none}
+  .doc::after{content:'';position:absolute;inset:16px;border:1px solid rgba(245,158,11,0.3);pointer-events:none}
+  /* Bandes couleur */
+  .gold-top{height:10px;background:linear-gradient(90deg,#0b1e3d 0%,#f59e0b 30%,#fbbf24 50%,#f59e0b 70%,#0b1e3d 100%)}
+  /* Arrière-plan watermark */
+  .watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8rem;opacity:0.03;font-weight:800;color:#0b1e3d;white-space:nowrap;pointer-events:none;user-select:none}
+  /* Corps */
+  .diplome-body{padding:32px 52px;text-align:center;position:relative;z-index:1}
+  .header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+  .logo-circle{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#0b1e3d,#2563eb);display:flex;align-items:center;justify-content:center;font-size:2.2rem;box-shadow:0 6px 20px rgba(11,30,61,0.25)}
+  .inst-name{font-size:0.9rem;font-weight:800;color:#0b1e3d;text-align:left}
+  .inst-sub{font-size:0.72rem;color:#64748b;text-align:left}
+  .ref-bloc{text-align:right;font-size:0.72rem;color:#94a3b8}
+  .republic{font-size:0.78rem;color:#64748b;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:20px}
+  /* Titre principal */
+  .diploma-title{font-family:'Playfair Display',serif;font-size:2.8rem;font-weight:800;color:#0b1e3d;letter-spacing:0.03em;margin-bottom:6px}
+  .diploma-sub{font-size:1rem;color:#64748b;margin-bottom:24px}
+  .deco-line{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px}
+  .deco-line::before,.deco-line::after{content:'';flex:1;max-width:80px;height:2px;background:linear-gradient(90deg,transparent,#f59e0b)}
+  .star{color:#f59e0b;font-size:1.2rem}
+  /* Texte certifie */
+  .certifie-text{font-size:0.92rem;color:#334155;line-height:1.9;margin-bottom:20px}
+  /* Nom étudiant */
+  .etu-name{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:800;color:#0b1e3d;margin:12px 0;border-bottom:2px solid #f59e0b;display:inline-block;padding-bottom:5px}
+  /* Info diplôme */
+  .diplome-info{background:linear-gradient(135deg,#f0f5ff,#fff9f0);border:2px solid #e2eaf6;border-radius:14px;padding:18px 28px;margin:20px 0;display:inline-block;min-width:400px}
+  .di-type{font-size:1.2rem;font-weight:800;color:#0b1e3d;margin-bottom:4px}
+  .di-spec{font-size:0.92rem;color:#475569;margin-bottom:10px}
+   /*Stats */
+  .stats-row{display:flex;justify-content:center;gap:40px;margin-top:10px}
+  .stat-b{text-align:center}
+  .stat-v{font-size:1.8rem;font-weight:800;color:#2563eb}
+  .stat-l{font-size:0.72rem;color:#64748b}
+  /* Mention */
+  .mention-badge{display:inline-block;margin:14px 0;padding:8px 28px;border-radius:99px;font-size:1rem;font-weight:800;background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#0b1e3d;box-shadow:0 4px 14px rgba(245,158,11,0.3)}
+  /* Footer */
+  .footer-row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:26px;padding-top:18px;border-top:1px solid #e2eaf6}
+  .sig-block{text-align:center}.sig-date{font-size:0.78rem;color:#64748b;margin-bottom:36px}
+  .sig-line{width:160px;height:1px;background:#0b1e3d;margin:0 auto 5px}
+  .sig-name{font-size:0.82rem;font-weight:700;color:#0b1e3d}.sig-title{font-size:0.7rem;color:#94a3b8}
+  .qr-block{text-align:center}.qr-block img{width:90px;height:90px;border:2px solid #e2eaf6;border-radius:8px}
+  .qr-label{font-size:0.65rem;color:#94a3b8;margin-top:4px}
+  .num-diplome{font-size:0.72rem;color:#94a3b8}
+  .gold-bot{height:8px;background:linear-gradient(90deg,#0b1e3d 0%,#f59e0b 30%,#fbbf24 50%,#f59e0b 70%,#0b1e3d 100%)}
+  @media print{body{background:white;padding:0}.no-print{display:none!important}.doc{box-shadow:none;width:100%;min-height:100vh}}
+</style>
+</head>
+<body>
+<div class="no-print">
+  <button onclick="window.print()" class="btn btn-dark">🖨️ Imprimer le Diplôme</button>
+  <a href="javascript:history.back()" class="btn btn-back">← Retour</a>
+</div>
+
+<div class="doc">
+  <div class="gold-top"></div>
+  <div class="watermark">FSB</div>
+
+  <div class="diplome-body">
+    <!-- En-tête -->
+    <div class="header-row">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="logo-circle"><img src="{% static 'images/logo-fsb.jpg' %}" alt="Logo FSB" width="75" height="75" style="border-radius: 12px; object-fit: cover;"></div>
+        <div>
+          <div class="inst-name">FACULTÉ DES SCIENCES DE BIZERTE</div>
+          <div class="inst-sub">Université de Carthage — République Tunisienne</div>
+          <div class="inst-sub">كلية العلوم ببنزرت — جامعة قرطاج</div>
+        </div>
+      </div>
+      <div class="ref-bloc">
+        <div>N° {{ diplome.numero_diplome }}</div>
+        <div style="margin-top:4px">Délivré le {{ diplome.date_delivrance|date:"d/m/Y" }}</div>
+      </div>
+    </div>
+
+    <div class="republic">République Tunisienne — Ministère de l'Enseignement Supérieur et de la Recherche Scientifique</div>
+
+    <!-- Titre -->
+    <div class="deco-line"><span class="star">✦</span></div>
+    <div class="diploma-title">DIPLÔME</div>
+    <div class="diploma-sub">{{ diplome.type_diplome }}</div>
+    <div class="deco-line"><span class="star">✦</span></div>
+
+    <div class="certifie-text">
+      Le Doyen de la Faculté des Sciences de Bizerte certifie que
+    </div>
+
+    <div class="etu-name">{{ diplome.etudiant.nom|upper }} {{ diplome.etudiant.prenom }}</div>
+
+    <div style="font-size:0.85rem;color:#64748b;margin-bottom:16px">
+      N° étudiant : {{ diplome.etudiant.numero_etudiant }}
+      {% if diplome.etudiant.cin %} &nbsp;|&nbsp; CIN : {{ diplome.etudiant.cin }}{% endif %}
+    </div>
+
+    <div class="certifie-text">a satisfait aux conditions requises et obtenu le</div>
+
+    <div class="diplome-info">
+      <div class="di-type">{{ diplome.type_diplome }}</div>
+      <div class="di-spec">Spécialité : <strong>{{ diplome.specialite }}</strong></div>
+      <div class="stats-row">
+        <div class="stat-b">
+          <div class="stat-v">{{ diplome.moyenne_generale }}/20</div>
+          <div class="stat-l">Moyenne générale</div>
+        </div>
+        <div class="stat-b">
+          <div class="stat-v">{{ diplome.annee_obtention }}</div>
+          <div class="stat-l">Année</div>
+        </div>
+      </div>
+    </div>
+
+    <div><div class="mention-badge">🏅 Mention : {{ diplome.get_mention_display }}</div></div>
+
+    <!-- Footer -->
+    <div class="footer-row">
+      <div class="sig-block">
+        <div class="sig-date">Le Directeur des Études</div>
+        <div class="sig-line"></div>
+        <div class="sig-name">Direction des Études</div>
+        <div class="sig-title">Cachet & Signature</div>
+      </div>
+      <div class="qr-block">
+        <img src="data:image/png;base64,{{ qr_b64 }}" alt="QR Code">
+        <div class="qr-label">Vérification authenticité</div>
+        <div class="num-diplome">{{ diplome.numero_diplome }}</div>
+      </div>
+      <div class="sig-block">
+        <div class="sig-date">Le Doyen de la FSB</div>
+        <div class="sig-line"></div>
+        <div class="sig-name">Doyen — FSB</div>
+        <div class="sig-title">Cachet & Signature</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gold-bot"></div>
+</div>
+</body>
+</html>

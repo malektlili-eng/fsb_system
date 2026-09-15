@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}Ajouter Enseignant — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-user-tie"></i>{% endblock %}
+{% block page_title %}Ajouter un Enseignant{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div><h1>Nouvel Enseignant</h1><p class="sub">Remplissez les informations</p></div>
+  <a href="{% url 'administration:liste_enseignants' %}" class="btn-ghost-fsb btn-sm">
+    <i class="fas fa-arrow-left"></i> Retour
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card-fsb fu">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-id-badge"></i> Informations de l'Enseignant</div>
+      </div>
+      <div class="card-fsb-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6 form-group">
+              <label class="form-label">Prénom <span style="color:#e11d48">*</span></label>
+              <input type="text" name="prenom" class="form-control" placeholder="Ex: Mohamed" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Nom <span style="color:#e11d48">*</span></label>
+              <input type="text" name="nom" class="form-control" placeholder="Ex: Ben Ali" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Matricule <span style="color:#e11d48">*</span></label>
+              <input type="text" name="matricule" class="form-control" placeholder="Ex: PROF001" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" placeholder="prof@fsb.tn">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Département <span style="color:#e11d48">*</span></label>
+              <select name="departement" class="form-select" required>
+                <option value="">-- Choisir --</option>
+                {% for d in departements %}
+                <option value="{{ d.pk }}">{{ d }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Grade <span style="color:#e11d48">*</span></label>
+              <select name="grade" class="form-select" required>
+                {% for g in grades %}
+                <option value="{{ g.0 }}">{{ g.1 }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 form-group">
+              <label class="form-label">Spécialité</label>
+              <input type="text" name="specialite" class="form-control" placeholder="Ex: Bases de Données, Analyse...">
+            </div>
+            <div class="col-12" style="margin-top:8px">
+              <button type="submit" class="btn-primary-fsb">
+                <i class="fas fa-save"></i> Enregistrer
+              </button>
+              <a href="{% url 'administration:liste_enseignants' %}" class="btn-ghost-fsb" style="margin-left:10px">
+                Annuler
+              </a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card-fsb fu fu2">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-graduation-cap"></i> Grades FSB</div>
+      </div>
+      <div class="card-fsb-body">
+        <div style="font-size:0.82rem;color:#64748b;line-height:2">
+          <div><span class="badge-pill b-gray" style="margin-right:6px">Assistant</span> Débutant</div>
+          <div><span class="badge-pill b-cyan" style="margin-right:6px">Maître Assistant</span> Intermédiaire</div>
+          <div><span class="badge-pill b-blue" style="margin-right:6px">Maître de Conf.</span> Avancé</div>
+          <div><span class="badge-pill b-purple" style="margin-right:6px">Professeur</span> Senior</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

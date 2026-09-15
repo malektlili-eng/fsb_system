@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+{% block title %}Inscriptions — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-file-signature"></i>{% endblock %}
+{% block page_title %}Gestion des Inscriptions{% endblock %}
+
+{% block content %}
+<style>
+  .stat-card {
+  background: white;
+  border: 2px solid #e2eaf6;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  border-color: #999; /* couleur par défaut au hover */
+}
+
+.stat-card.active-en-attente { border-color: #f59e0b; }
+.stat-card.active-dossier { border-color: #f97316; }
+.stat-card.active-frais { border-color: #ef4444; }
+.stat-card.active-validee { border-color: #22c55e; }
+.stat-card.active-suspendue { border-color: #a855f7; }
+.stat-card.active-total { border-color: #2563eb; }
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.stat-value.en-attente { color: #d97706; }
+.stat-value.dossier { color: #ea580c; }
+.stat-value.frais { color: #dc2626; }
+.stat-value.validee { color: #16a34a; }
+.stat-value.suspendue { color: #9333ea; }
+.stat-value.total { color: #2563eb; }
+
+.stat-label {
+  font-size: 0.71rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+</style>
+
+<div class="page-header">
+  <div>
+    <h1>Inscriptions</h1>
+    <p class="sub">Gestion et validation des inscriptions universitaires</p>
+  </div>
+</div>
+
+<!-- ── Indicateurs statuts ── -->
+<div class="row g-2 mb-4">
+
+  <div class="col fu fu1">
+    <a href="?statut=en_attente" class="stat-link">
+      <div class="stat-card {% if statut_filtre == 'en_attente' %}active-en-attente{% endif %}">
+        <div class="stat-value en-attente">{{ stats.en_attente }}</div>
+        <div class="stat-label">En attente</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col fu fu2">
+    <a href="?statut=dossier_incomplet" class="stat-link">
+      <div class="stat-card {% if statut_filtre == 'dossier_incomplet' %}active-dossier{% endif %}">
+        <div class="stat-value dossier">{{ stats.dossier_incomplet }}</div>
+        <div class="stat-label">Dossier incomplet</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col fu fu3">
+    <a href="?statut=frais_non_payes" class="stat-link">
+      <div class="stat-card {% if statut_filtre == 'frais_non_payes' %}active-frais{% endif %}">
+        <div class="stat-value frais">{{ stats.frais_non_payes }}</div>
+        <div class="stat-label">Frais non payés</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col fu fu4">
+    <a href="?statut=validee" class="stat-link">
+      <div class="stat-card {% if statut_filtre == 'validee' %}active-validee{% endif %}">
+        <div class="stat-value validee">{{ stats.validee }}</div>
+        <div class="stat-label">Validées</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col fu fu5">
+    <a href="?statut=suspendue" class="stat-link">
+      <div class="stat-card {% if statut_filtre == 'suspendue' %}active-suspendue{% endif %}">
+        <div class="stat-value suspendue">{{ stats.suspendue }}</div>
+        <div class="stat-label">Suspendues</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="col fu fu6">
+    <a href="?" class="stat-link">
+      <div class="stat-card {% if not statut_filtre %}active-total{% endif %}">
+        <div class="stat-value total">
+          {{ stats.en_attente|add:stats.dossier_incomplet|add:stats.frais_non_payes|add:stats.validee|add:stats.suspendue|add:stats.annulee }}
+        </div>
+        <div class="stat-label">Total</div>
+      </div>
+    </a>
+  </div>
+
+</div>
+
+<div class="row g-3">
+
+  <!-- ── Formulaire Nouvelle Inscription ── -->
+  <div class="col-lg-3">
+    <div class="card-fsb fu" style="position:sticky;top:80px">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-user-plus"></i> Nouvelle Inscription</div>
+      </div>
+      <div class="card-fsb-body">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="inscrire">
+          <div class="form-group">
+            <label class="form-label">Étudiant <span style="color:#e11d48">*</span></label>
+            <select name="etudiant" class="form-select" required>
+              <option value="">-- Choisir --</option>
+              {% for et in etudiants %}
+              <option value="{{ et.pk }}">
+                {{ et.nom }} {{ et.prenom }} ({{ et.numero_etudiant }})
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Année Universitaire</label>
+            <input type="text" name="annee_univ" class="form-control" value="2024-2025" placeholder="2024-2025">
+          </div>
+          <button type="submit" class="btn-primary-fsb w-100" style="justify-content:center">
+            <i class="fas fa-plus"></i> Créer l'Inscription
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Liste des Inscriptions ── -->
+  <div class="col-lg-9">
+
+    <!-- Filtres -->
+    <form method="get" style="margin-bottom:14px">
+      <div class="filter-bar" style="flex-wrap:wrap;gap:8px">
+        <div class="search-wrap" style="flex:1;min-width:200px">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" name="q" value="{{ query }}" class="form-control"
+            placeholder="Nom, prénom, N° étudiant...">
+        </div>
+        <select name="statut" class="form-select" style="max-width:180px">
+          <option value="">Tous les statuts</option>
+          {% for val, label in statut_choices %}
+          <option value="{{ val }}" {% if statut_filtre == val %}selected{% endif %}>
+            {{ label }}
+          </option>
+          {% endfor %}
+        </select>
+        <select name="dept" class="form-select" style="max-width:180px">
+          <option value="">Tous les départements</option>
+          {% for d in departements %}
+          <option value="{{ d.pk }}" {% if dept_filtre == d.pk|stringformat:'s' %}selected{% endif %}>
+            {{ d.get_nom_display }}
+          </option>
+          {% endfor %}
+        </select>
+        <input type="text" name="annee" value="{{ annee_filtre }}" class="form-control"
+          placeholder="Année ex: 2024-2025" style="max-width:140px">
+        <button type="submit" class="btn-primary-fsb btn-sm">
+          <i class="fas fa-filter"></i> Filtrer
+        </button>
+        {% if statut_filtre or query or dept_filtre or annee_filtre %}
+        <a href="?" class="btn-ghost-fsb btn-sm">
+          <i class="fas fa-times"></i> Réinitialiser
+        </a>
+        {% endif %}
+      </div>
+    </form>
+
+    <div class="card-fsb fu fu2">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-list"></i> Liste des Inscriptions</div>
+        <span class="badge-pill b-blue">{{ inscriptions.count }}</span>
+      </div>
+      <div class="card-fsb-body" style="padding:0">
+        <div class="table-responsive">
+          <table class="table-fsb">
+            <thead>
+              <tr>
+                <th>Étudiant</th>
+                <th>Filière / Département</th>
+                <th>Année</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ins in inscriptions %}
+              <tr>
+                <!-- Étudiant -->
+                <td style="vertical-align:middle">
+                  <div style="display:flex;align-items:center;gap:9px">
+                    <div style="width:32px;height:32px;border-radius:8px;
+                                background:linear-gradient(135deg,#1e3a8a,#2563eb);
+                                display:flex;align-items:center;justify-content:center;
+                                color:white;font-weight:700;font-size:0.74rem;flex-shrink:0">
+                      {{ ins.etudiant.prenom|first|upper }}{{ ins.etudiant.nom|first|upper }}
+                    </div>
+                    <div>
+                      <div style="font-weight:700;color:#0b1e3d;font-size:0.87rem">
+                        {{ ins.etudiant.nom }} {{ ins.etudiant.prenom }}
+                      </div>
+                      <div style="font-size:0.7rem;color:#94a3b8">
+                        {{ ins.etudiant.numero_etudiant }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Filière -->
+                <td style="vertical-align:middle">
+                  <div style="font-size:0.83rem;color:#334155;font-weight:600">
+                    {{ ins.filiere.nom|truncatechars:30 }}
+                  </div>
+                  <div style="font-size:0.71rem;color:#94a3b8">
+                    {{ ins.filiere.departement.get_nom_display }}
+                  </div>
+                </td>
+
+                <!-- Année -->
+                <td style="vertical-align:middle">
+                  <span class="badge-pill b-blue">{{ ins.annee_universitaire }}</span>
+                </td>
+
+                <!-- Date -->
+                <td style="vertical-align:middle;color:#94a3b8;font-size:0.82rem">
+                  {{ ins.date_inscription|date:"d/m/Y" }}
+                </td>
+
+                <!-- Statut -->
+                <td style="vertical-align:middle">
+                  <span class="badge-pill
+                    {% if ins.statut == 'validee' %}b-green
+                    {% elif ins.statut == 'en_attente' %}b-yellow
+                    {% elif ins.statut == 'suspendue' %}b-purple
+                    {% elif ins.statut == 'annulee' %}b-red
+                    {% elif ins.statut == 'frais_non_payes' %}b-red
+                    {% else %}b-orange{% endif %}">
+                    {{ ins.get_statut_display }}
+                  </span>
+                  {% if ins.date_validation %}
+                  <div style="font-size:0.67rem;color:#94a3b8;margin-top:2px">
+                    Validé le {{ ins.date_validation|date:"d/m/Y" }}
+                  </div>
+                  {% endif %}
+                </td>
+
+                <!-- Actions -->
+                <td style="vertical-align:middle">
+                  <div style="display:flex;gap:4px;flex-wrap:wrap">
+
+                    <!-- Valider rapidement -->
+                    {% if ins.statut != 'validee' %}
+                    <a href="{% url 'administration:valider_inscription' ins.pk %}" class="btn-icon ic-green"
+                      title="Valider" onclick="return confirm('Valider cette inscription ?')">
+                      <i class="fas fa-check"></i>
+                    </a>
+                    {% endif %}
+
+                    <!-- Changer statut (modal) -->
+                    <button class="btn-icon ic-gray btn-change-statut"
+        title="Changer le statut"
+        data-id="{{ ins.pk }}"
+        data-statut="{{ ins.statut }}"
+        data-nom="{{ ins.etudiant.nom }} {{ ins.etudiant.prenom }}">
+  <i class="fas fa-edit"></i>
+</button>
+
+                    <!-- Attestation (seulement si validée) -->
+                    {% if ins.statut == 'validee' %}
+                    <a href="{% url 'administration:attestation' ins.pk %}" class="btn-icon ic-blue"
+                      title="Attestation d'inscription" target="_blank">
+                      <i class="fas fa-certificate"></i>
+                    </a>
+                    {% endif %}
+
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state" style="padding:40px">
+                    <div class="empty-icon"><i class="fas fa-file-signature"></i></div>
+                    <h5>Aucune inscription</h5>
+                    <p>Les inscriptions apparaîtront ici.</p>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL Changement de Statut ══ -->
+<div id="modalStatut" style="display:none;position:fixed;inset:0;z-index:9999;
+     background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);
+     align-items:center;justify-content:center">
+  <div style="background:white;border-radius:16px;width:100%;max-width:480px;
+              margin:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden">
+
+    <!-- Header modal -->
+    <div style="background:linear-gradient(135deg,#0b1e3d,#1a3f7a);
+                padding:18px 22px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:0.95rem;font-weight:800;color:white">Modifier le Statut</div>
+        <div id="modalEtudiantNom" style="font-size:0.75rem;color:rgba(255,255,255,0.55);margin-top:2px"></div>
+      </div>
+      <button onclick="fermerModal()" style="background:rgba(255,255,255,0.1);border:none;color:white;
+                     width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:1rem">
+        ✕
+      </button>
+    </div>
+
+    <!-- Body modal -->
+    <form method="post" style="padding:22px">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="changer_statut">
+      <input type="hidden" name="inscription_id" id="modalInscriptionId">
+
+      <div class="form-group">
+        <label class="form-label">Nouveau Statut <span style="color:#e11d48">*</span></label>
+        <select name="statut" id="modalStatutSelect" class="form-select" required>
+          {% for val, label in statut_choices %}
+          <option value="{{ val }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Commentaire (optionnel)</label>
+        <textarea name="commentaire" class="form-control" rows="3"
+          placeholder="Ex: Dossier incomplet — manque acte de naissance..."></textarea>
+      </div>
+
+      <!-- Aperçu statuts -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;font-size:0.75rem">
+        <div style="background:#fef9c3;color:#854d0e;padding:6px 10px;border-radius:7px">
+          ⏳ En attente — Dossier en cours d'examen
+        </div>
+        <div style="background:#ffedd5;color:#9a3412;padding:6px 10px;border-radius:7px">
+          📁 Dossier incomplet — Documents manquants
+        </div>
+        <div style="background:#fee2e2;color:#991b1b;padding:6px 10px;border-radius:7px">
+          💳 Frais non payés — Paiement en attente
+        </div>
+        <div style="background:#dcfce7;color:#166534;padding:6px 10px;border-radius:7px">
+          ✅ Validée — Inscription confirmée
+        </div>
+        <div style="background:#f3e8ff;color:#6b21a8;padding:6px 10px;border-radius:7px">
+          🔒 Suspendue — Temporairement bloquée
+        </div>
+        <div style="background:#fee2e2;color:#991b1b;padding:6px 10px;border-radius:7px">
+          ❌ Annulée — Inscription annulée définitivement
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button type="submit" class="btn-primary-fsb" style="flex:1;justify-content:center">
+          <i class="fas fa-save"></i> Enregistrer
+        </button>
+        <button type="button" onclick="fermerModal()" class="btn-ghost-fsb" style="flex:1;justify-content:center">
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  function ouvrirModal(inscriptionId, statutActuel, nomEtudiant) {
+    document.getElementById('modalInscriptionId').value = inscriptionId;
+    document.getElementById('modalStatutSelect').value = statutActuel;
+    document.getElementById('modalEtudiantNom').textContent = nomEtudiant;
+    const modal = document.getElementById('modalStatut');
+    modal.style.display = 'flex';
+  }
+  function fermerModal() {
+    document.getElementById('modalStatut').style.display = 'none';
+  }
+  document.querySelectorAll('.btn-change-statut').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.id;
+    const statut = btn.dataset.statut;
+    const nom = btn.dataset.nom;
+    ouvrirModal(id, statut, nom);
+  });
+});
+  // Fermer en cliquant dehors
+  document.getElementById('modalStatut').addEventListener('click', function (e) {
+    if (e.target === this) fermerModal();
+  });
+</script>
+{% endblock %}

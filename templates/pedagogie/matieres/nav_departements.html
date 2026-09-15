@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Matières — Départements{% endblock %}
+{% block page_icon %}<i class="fas fa-book-open"></i>{% endblock %}
+{% block page_title %}Matières — Choisir un Département{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Matières</h1>
+    <p class="sub">Sélectionnez un département pour voir ses matières</p>
+  </div>
+  <a href="{% url 'pedagogie:ajouter_matiere' %}" class="btn-primary-fsb">
+    <i class="fas fa-plus"></i> Ajouter une Matière
+  </a>
+</div>
+
+<div class="row g-3">
+  {% for item in dept_data %}
+  <div class="col-lg-4 col-md-6 fu fu{{ forloop.counter }}">
+    <a href="{% url 'pedagogie:matieres_filieres' item.dept.pk %}"
+       style="text-decoration:none;display:block">
+      <div class="card-fsb" style="transition:all 0.25s;cursor:pointer"
+           onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(37,99,235,0.15)'"
+           onmouseout="this.style.transform='translateY(0)';this.style.boxShadow=''">
+
+        <div style="background:linear-gradient(135deg,#0b1e3d,#1a3f7a);
+                    padding:20px;display:flex;align-items:center;gap:14px">
+          <div style="font-size:2.2rem;flex-shrink:0">
+            {% if item.dept.nom == 'informatique' %}💻
+            {% elif item.dept.nom == 'mathematiques' %}📐
+            {% elif item.dept.nom == 'physique' %}🔭
+            {% elif item.dept.nom == 'chimie' %}⚗️
+            {% elif item.dept.nom == 'sciences_vie' %}🔬
+            {% else %}🌍{% endif %}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:1rem;font-weight:800;color:white">
+              {{ item.dept.get_nom_display }}
+            </div>
+            {% if item.dept.chef %}
+            <div style="font-size:0.71rem;color:rgba(255,255,255,0.5);margin-top:2px">
+              Chef : {{ item.dept.chef }}
+            </div>
+            {% endif %}
+          </div>
+          <i class="fas fa-chevron-right" style="color:rgba(255,255,255,0.3)"></i>
+        </div>
+
+        <div style="padding:14px 18px;display:flex;justify-content:space-between;
+                    align-items:center">
+          <div style="display:flex;gap:20px">
+            <div>
+              <div style="font-size:1.3rem;font-weight:800;color:#2563eb">
+                {{ item.nb_matieres }}
+              </div>
+              <div style="font-size:0.71rem;color:#94a3b8">Matières</div>
+            </div>
+            <div>
+              <div style="font-size:1.3rem;font-weight:800;color:#7c3aed">
+                {{ item.nb_filieres }}
+              </div>
+              <div style="font-size:0.71rem;color:#94a3b8">Filières</div>
+            </div>
+          </div>
+          <div style="font-size:0.78rem;color:#2563eb;font-weight:600">
+            Explorer <i class="fas fa-arrow-right ms-1"></i>
+          </div>
+        </div>
+
+      </div>
+    </a>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="card-fsb">
+      <div class="card-fsb-body">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fas fa-university"></i></div>
+          <h5>Aucun département</h5>
+          <p>Lancez <code>python init_data.py</code></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

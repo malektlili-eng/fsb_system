@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Supprimer l'étudiant{% endblock %}
+{% block page_icon %}<i class="fas fa-trash"></i>{% endblock %}
+{% block page_title %}Confirmer la suppression{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card-fsb">
+      <div class="card-fsb-header" style="background:linear-gradient(135deg,#7f1d1d,#dc2626)">
+        <div class="header-left"><i class="fas fa-exclamation-triangle"></i> Suppression définitive</div>
+      </div>
+      <div class="card-fsb-body text-center" style="padding:32px">
+        <div style="font-size:3rem;margin-bottom:16px">⚠️</div>
+        <h4 style="color:#0b1e3d;margin-bottom:8px">Supprimer {{ etudiant.get_full_name }} ?</h4>
+        <p style="color:#64748b;margin-bottom:8px">N° {{ etudiant.numero_etudiant }} — {{ etudiant.filiere }}</p>
+        <p class="text-danger" style="font-size:.85rem;margin-bottom:24px">
+          Cette action est irréversible. Toutes les notes, absences et données associées seront perdues.
+        </p>
+        <div style="display:flex;gap:12px;justify-content:center">
+          <a href="{% url 'administration:detail_etudiant' etudiant.pk %}" class="btn-ghost-fsb">Annuler</a>
+          <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger-fsb"><i class="fas fa-trash"></i> Supprimer définitivement</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

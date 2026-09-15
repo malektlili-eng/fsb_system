@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% block page_icon %}<i class="fas fa-briefcase"></i>{% endblock %}
+{% block page_title %}Détail Stage{% endblock %}
+
+{% block content %}
+<style>
+.note-stage {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-top: 8px;
+}
+.note-success { color: #166534; }
+.note-fail    { color: #991b1b; }
+</style>
+
+<!-- Breadcrumb -->
+<nav style="margin-bottom:16px;font-size:0.83rem;color:#94a3b8">
+  <a href="{% url 'stages:demandes' %}" style="color:#2563eb;text-decoration:none;font-weight:600">
+    <i class="fas fa-briefcase me-1"></i>Stages
+  </a>
+  <span style="margin:0 8px">›</span>
+  <span style="color:#0b1e3d;font-weight:700">{{ demande.sujet|truncatechars:40 }}</span>
+</nav>
+
+<!-- Page header -->
+<div class="page-header">
+  <div>
+    <h1>{{ demande.etudiant.nom }} {{ demande.etudiant.prenom }}</h1>
+    <p class="sub">{{ demande.get_type_stage_display }} — {{ demande.entreprise }}</p>
+  </div>
+  <div style="display:flex;gap:8px">
+    {% if demande.statut == 'valide' or demande.statut == 'en_cours' or demande.statut == 'termine' %}
+    <a href="{% url 'stages:attestation_stage' demande.pk %}" class="btn-primary-fsb btn-sm" target="_blank">
+      <i class="fas fa-certificate"></i> Attestation
+    </a>
+    {% endif %}
+    <a href="{% url 'stages:demandes' %}" class="btn-ghost-fsb btn-sm">
+      <i class="fas fa-arrow-left"></i> Retour
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+
+  <!-- ── Infos stage ──────────────────────────────── -->
+  <div class="col-lg-7">
+    <div class="card-fsb fu">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-info-circle"></i> Informations du Stage</div>
+      </div>
+      <div class="card-fsb-body">
+        <table style="width:100%;font-size:0.88rem;border-collapse:separate;border-spacing:0 6px">
+          <tr>
+            <td style="color:#94a3b8;width:160px;padding:5px 0">Étudiant</td>
+            <td style="font-weight:700;color:#0b1e3d">
+              {{ demande.etudiant.nom }} {{ demande.etudiant.prenom }}
+              ({{ demande.etudiant.numero_etudiant }})
+            </td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;padding:5px 0">Filière</td>
+            <td style="font-weight:600;color:#334155">{{ demande.etudiant.filiere }}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;padding:5px 0">Sujet</td>
+            <td style="font-weight:700;color:#0b1e3d">{{ demande.sujet }}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;padding:5px 0">Entreprise</td>
+            <td style="font-weight:600">{{ demande.entreprise }}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;padding:5px 0">Type</td>
+            <td><span class="badge-pill b-purple">{{ demande.get_type_stage_display }}</span></td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;padding:5px 0">Période</td>
+            <td style="color:#334155">{{ demande.date_debut }} → {{ demande.date_fin }}</td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;padding:5px 0">Encadrant FSB</td>
+            <td>
+              {% if demande.encadrant_fsb %}
+                {{ demande.encadrant_fsb.prenom }} {{ demande.encadrant_fsb.nom }}
+              {% else %}
+                Non assigné
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td style="color:#94a3b8;padding:5px 0">Statut</td>
+            <td>
+              {% if demande.statut == 'valide' %}
+                <span class="badge-pill b-green">{{ demande.get_statut_display }}</span>
+              {% elif demande.statut == 'refuse' %}
+                <span class="badge-pill b-red">{{ demande.get_statut_display }}</span>
+              {% elif demande.statut == 'en_cours' %}
+                <span class="badge-pill b-blue">{{ demande.get_statut_display }}</span>
+              {% elif demande.statut == 'termine' %}
+                <span class="badge-pill b-purple">{{ demande.get_statut_display }}</span>
+              {% else %}
+                <span class="badge-pill b-yellow">{{ demande.get_statut_display }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% if demande.note_stage %}
+          <tr>
+            <td style="color:#94a3b8;padding:5px 0">Note Stage</td>
+            <td>
+              <span class="note-stage {% if demande.note_stage >= 10 %}note-success{% else %}note-fail{% endif %}">
+                {{ demande.note_stage }}/20
+              </span>
+            </td>
+          </tr>
+          {% endif %}
+        </table>
+
+        {% if demande.description %}
+        <div style="margin-top:14px;background:#f8faff;border-radius:10px;padding:12px 15px">
+          <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:6px">
+            Description
+          </div>
+          <div style="font-size:0.86rem;color:#334155;line-height:1.7">{{ demande.description }}</div>
+        </div>
+        {% endif %}
+
+        {% if demande.commentaire_admin %}
+        <div style="margin-top:10px;background:#fef9c3;border-radius:10px;padding:12px 15px">
+          <div style="font-size:0.72rem;font-weight:700;color:#854d0e;text-transform:uppercase;margin-bottom:4px">
+            Commentaire Admin
+          </div>
+          <div style="font-size:0.85rem;color:#92400e">{{ demande.commentaire_admin }}</div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Actions administration ───────────────────── -->
+  <div class="col-lg-5">
+    <div class="card-fsb fu fu2">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-tasks"></i> Actions Administration</div>
+      </div>
+      <div class="card-fsb-body">
+
+        {% if demande.statut == 'en_attente' %}
+        <!-- Valider -->
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin-bottom:12px">
+          <div style="font-weight:700;color:#166534;margin-bottom:10px">
+            <i class="fas fa-check-circle me-2"></i>Valider la demande
+          </div>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="valider">
+            <div class="form-group">
+              <label class="form-label">Encadrant FSB</label>
+              <select name="encadrant" class="form-select">
+                <option value="">-- Non assigné --</option>
+                {% for ens in enseignants %}
+                <option value="{{ ens.pk }}">{{ ens.prenom }} {{ ens.nom }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Commentaire (optionnel)</label>
+              <textarea name="commentaire" class="form-control" rows="2" placeholder="Remarques..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary-fsb w-100"
+              style="background:linear-gradient(135deg,#059669,#16a34a);justify-content:center">
+              <i class="fas fa-check"></i> Valider
+            </button>
+          </form>
+        </div>
+
+        <!-- Refuser -->
+        <div style="background:#fff5f5;border:1px solid #fecaca;border-radius:12px;padding:16px">
+          <div style="font-weight:700;color:#991b1b;margin-bottom:10px">
+            <i class="fas fa-times-circle me-2"></i>Refuser la demande
+          </div>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="refuser">
+            <div class="form-group">
+              <label class="form-label">Motif du refus <span style="color:#e11d48">*</span></label>
+              <textarea name="commentaire" class="form-control" rows="2"
+                placeholder="Raison du refus..." required></textarea>
+            </div>
+            <button type="submit" class="btn-danger-fsb w-100" style="justify-content:center">
+              <i class="fas fa-times"></i> Refuser
+            </button>
+          </form>
+        </div>
+
+        {% elif demande.statut == 'valide' %}
+        <!-- Marquer en cours -->
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px">
+          <div style="font-weight:700;color:#1d4ed8;margin-bottom:10px">
+            <i class="fas fa-play me-2"></i>Marquer en cours
+          </div>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="en_cours">
+            <button type="submit" class="btn-primary-fsb w-100" style="justify-content:center">
+              <i class="fas fa-play"></i> Stage en cours
+            </button>
+          </form>
+        </div>
+
+        {% elif demande.statut == 'en_cours' %}
+        <!-- Terminer le stage -->
+        <div style="background:#f3e8ff;border:1px solid #d8b4fe;border-radius:12px;padding:16px">
+          <div style="font-weight:700;color:#6b21a8;margin-bottom:10px">
+            <i class="fas fa-flag-checkered me-2"></i>Terminer le stage
+          </div>
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="terminer">
+            <div class="form-group">
+              <label class="form-label">Note du stage (/20)</label>
+              <input type="number" name="note_stage" class="form-control"
+                min="0" max="20" step="0.25" placeholder="Ex: 14.5">
+            </div>
+            <button type="submit" class="btn-primary-fsb w-100"
+              style="background:linear-gradient(135deg,#4c1d95,#7c3aed);justify-content:center">
+              <i class="fas fa-flag-checkered"></i> Terminer &amp; Noter
+            </button>
+          </form>
+        </div>
+
+        {% elif demande.statut == 'termine' %}
+        <!-- Stage terminé -->
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:2rem;margin-bottom:8px">✅</div>
+          <div style="font-weight:700;color:#166534">Stage terminé</div>
+          {% if demande.note_stage %}
+          <div class="note-stage {% if demande.note_stage >= 10 %}note-success{% else %}note-fail{% endif %}">
+            {{ demande.note_stage }}/20
+          </div>
+          {% endif %}
+          <a href="{% url 'stages:attestation_stage' demande.pk %}" class="btn-primary-fsb btn-sm"
+            style="margin-top:12px;justify-content:center" target="_blank">
+            <i class="fas fa-certificate"></i> Générer Attestation
+          </a>
+        </div>
+
+        {% elif demande.statut == 'refuse' %}
+        <!-- Stage refusé -->
+        <div style="background:#fff5f5;border:1px solid #fecaca;border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:2rem;margin-bottom:8px">❌</div>
+          <div style="font-weight:700;color:#991b1b">Demande refusée</div>
+          {% if demande.commentaire_admin %}
+          <div style="margin-top:10px;font-size:0.83rem;color:#7f1d1d;background:#fee2e2;border-radius:8px;padding:8px 12px">
+            {{ demande.commentaire_admin }}
+          </div>
+          {% endif %}
+        </div>
+
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

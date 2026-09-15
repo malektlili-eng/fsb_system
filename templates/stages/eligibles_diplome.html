@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block page_icon %}<i class="fas fa-graduation-cap"></i>{% endblock %}
+{% block page_title %}Étudiants Éligibles au Diplôme{% endblock %}
+
+{% block content %}
+<style>
+    .row-eligible {
+        background: #f0fdf4;
+        /* vert pâle */
+    }
+
+    .row-diplome {
+        background: #f0f5ff;
+        /* bleu pâle */
+    }
+</style>
+<div class="page-header">
+    <div>
+        <h1>Étudiants Éligibles au Diplôme</h1>
+        <p class="sub">Niveaux terminaux (L3, M2, Doctorat, CI3) ayant validé toutes les conditions</p>
+    </div>
+    <a href="{% url 'stages:diplomes' %}" class="btn-ghost-fsb btn-sm">
+        <i class="fas fa-scroll"></i> Voir les diplômes délivrés
+    </a>
+</div>
+
+<!-- Conditions -->
+<div
+    style="background:#dbeafe;border:1px solid #93c5fd;border-radius:12px;padding:14px 18px;margin-bottom:20px;font-size:0.85rem;color:#1d4ed8">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>Conditions d'éligibilité :</strong>
+    1) Tous les semestres admis (moyenne ≥ 10/20) &nbsp;·&nbsp;
+    2) Stage PFE terminé avec note ≥ 10/20
+</div>
+
+<!-- Filtres -->
+<div style="display:flex;gap:8px;margin-bottom:16px">
+    <a href="?filtre=tous"
+        class="{% if filtre == 'tous' %}btn-primary-fsb{% else %}btn-ghost-fsb{% endif %} btn-sm">Tous</a>
+    <a href="?filtre=eligible"
+        class="{% if filtre == 'eligible' %}btn-primary-fsb{% else %}btn-ghost-fsb{% endif %} btn-sm">
+        Éligibles ({{ nb_eligibles }})
+    </a>
+    <a href="?filtre=non_eligible"
+        class="{% if filtre == 'non_eligible' %}btn-primary-fsb{% else %}btn-ghost-fsb{% endif %} btn-sm">Non
+        éligibles</a>
+</div>
+
+<div class="card-fsb fu">
+    <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-list"></i> Étudiants des Niveaux Terminaux</div>
+        <span class="badge-pill b-blue">{{ etudiants_data|length }}</span>
+    </div>
+    <div class="card-fsb-body" style="padding:0">
+        <div class="table-responsive">
+            <table class="table-fsb">
+                <thead>
+                    <tr>
+                        <th>Étudiant</th>
+                        <th>Filière</th>
+                        <th>Semestres</th>
+                        <th>Stage PFE</th>
+                        <th>Éligible</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in etudiants_data %}
+                    <tr
+                        class="{% if d.eligible and not d.deja_diplome %}row-eligible{% elif d.deja_diplome %}row-diplome{% endif %}">
+                        <td>
+                            <div style="font-weight:700;color:#0b1e3d">{{ d.etudiant.nom }} {{ d.etudiant.prenom }}
+                            </div>
+                            <div style="font-size:0.71rem;color:#94a3b8">{{ d.etudiant.numero_etudiant }}</div>
+                        </td>
+                        <td style="font-size:0.83rem;color:#334155">
+                            {{ d.filiere.nom|truncatechars:30 }}
+                            <div style="font-size:0.7rem;color:#94a3b8">{{ d.filiere.get_niveau_display }}</div>
+                        </td>
+                        <td>
+                            {% if d.tous_admis %}
+                            <span class="badge-pill b-green">✅ Tous admis</span>
+                            {% else %}
+                            <span class="badge-pill b-red">❌ Non validé</span>
+                            {% endif %}
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px">{{ d.moyennes.count }}
+                                semestre(s)</div>
+                        </td>
+                        <td>
+                            {% if d.stage_pfe %}
+                            <span class="badge-pill b-green">✅ {{ d.stage_pfe.note_stage }}/20</span>
+                            {% else %}
+                            <span class="badge-pill b-red">❌ Absent ou < 10</span>
+                                    {% endif %}
+                        </td>
+                        <td>
+                            {% if d.deja_diplome %}
+                            <span class="badge-pill b-blue">🎓 Déjà diplômé</span>
+                            {% elif d.eligible %}
+                            <span class="badge-pill b-green" style="font-size:0.8rem">✅ Éligible</span>
+                            {% else %}
+                            <span class="badge-pill b-gray">Non éligible</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if d.eligible and not d.deja_diplome %}
+                            <a href="{% url 'stages:generer_diplome' d.etudiant.pk %}" class="btn-primary-fsb btn-xs"
+                                style="background:linear-gradient(135deg,#f59e0b,#d97706);color:white">
+                                <i class="fas fa-graduation-cap"></i> Générer Diplôme
+                            </a>
+                            {% elif d.deja_diplome %}
+                            <a href="{% url 'stages:diplomes' %}" class="btn-ghost-fsb btn-xs">
+                                <i class="fas fa-eye"></i> Voir diplôme
+                            </a>
+                            {% else %}
+                            <span style="font-size:0.75rem;color:#94a3b8">Conditions non remplies</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fas fa-graduation-cap"></i></div>
+                                <h5>Aucun étudiant</h5>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

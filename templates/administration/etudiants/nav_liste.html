@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}{{ classe.nom }} — Étudiants{% endblock %}
+{% block page_icon %}<i class="fas fa-users"></i>{% endblock %}
+{% block page_title %}{{ classe.nom }}{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav style="margin-bottom:18px;font-size:0.83rem;color:#94a3b8">
+  <a href="{% url 'administration:liste_etudiants' %}" style="color:#2563eb;text-decoration:none;font-weight:600"><i class="fas fa-user-graduate me-1"></i>Étudiants</a>
+  <span style="margin:0 8px">›</span>
+  <a href="{% url 'administration:etudiants_filieres' dept.pk %}" style="color:#2563eb;text-decoration:none;font-weight:600">{{ dept.get_nom_display }}</a>
+  <span style="margin:0 8px">›</span>
+  <a href="{% url 'administration:etudiants_classes' dept.pk filiere.pk %}" style="color:#2563eb;text-decoration:none;font-weight:600">{{ filiere.nom }}</a>
+  <span style="margin:0 8px">›</span>
+  <span style="color:#0b1e3d;font-weight:700">{{ classe.nom }}</span>
+</nav>
+
+<div class="page-header">
+  <div>
+    <h1>{{ classe.nom }}</h1>
+    <p class="sub">{{ filiere.nom }} — {{ etudiants.count }} étudiant(s)</p>
+  </div>
+  <a href="{% url 'administration:ajouter_etudiant' %}" class="btn-primary-fsb btn-sm">
+    <i class="fas fa-user-plus"></i> Ajouter
+  </a>
+</div>
+
+<!-- Recherche -->
+<form method="get">
+  <div class="filter-bar">
+    <div class="search-wrap" style="flex:1;max-width:320px">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" name="q" value="{{ query }}" class="form-control"
+             placeholder="Rechercher un étudiant...">
+    </div>
+    <button type="submit" class="btn-primary-fsb btn-sm"><i class="fas fa-search"></i> Chercher</button>
+    {% if query %}<a href="." class="btn-ghost-fsb btn-sm"><i class="fas fa-times"></i> Effacer</a>{% endif %}
+  </div>
+</form>
+
+<div class="card-fsb fu">
+  <div class="card-fsb-header">
+    <div class="header-left"><i class="fas fa-list"></i> Liste des Étudiants</div>
+    <span class="badge-pill b-blue">{{ etudiants.count }}</span>
+  </div>
+  <div class="card-fsb-body" style="padding:0">
+    <div class="table-responsive">
+      <table class="table-fsb">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>N° Étudiant</th>
+            <th>Nom & Prénom</th>
+            <th>CIN</th>
+            <th>Email</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for et in etudiants %}
+          <tr>
+            <td style="color:#94a3b8;font-size:0.8rem">{{ forloop.counter }}</td>
+            <td>
+              <code style="background:#f0f5ff;color:#1d4ed8;
+                           padding:3px 8px;border-radius:6px;font-size:0.8rem">
+                {{ et.numero_etudiant }}
+              </code>
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:9px">
+                <div style="width:32px;height:32px;border-radius:8px;
+                            background:linear-gradient(135deg,#1e3a8a,#2563eb);
+                            display:flex;align-items:center;justify-content:center;
+                            color:white;font-weight:700;font-size:0.75rem;flex-shrink:0">
+                  {{ et.prenom|first|upper }}{{ et.nom|first|upper }}
+                </div>
+                <div>
+                  <div style="font-weight:700;color:#0b1e3d">{{ et.nom }} {{ et.prenom }}</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-size:0.83rem;color:#64748b">{{ et.cin|default:"—" }}</td>
+            <td style="font-size:0.8rem;color:#64748b">{{ et.email|default:"—" }}</td>
+            <td>
+              <span class="badge-pill
+                {% if et.statut == 'inscrit' %}b-green
+                {% elif et.statut == 'diplome' %}b-blue
+                {% elif et.statut == 'suspendu' %}b-red
+                {% else %}b-gray{% endif %}">
+                {{ et.get_statut_display }}
+              </span>
+            </td>
+            <td>
+              <div style="display:flex;gap:5px">
+                <a href="{% url 'administration:detail_etudiant' et.pk %}"
+                   class="btn-icon ic-blue" title="Fiche complète">
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a href="{% url 'administration:modifier_etudiant' et.pk %}"
+                   class="btn-icon ic-gray" title="Modifier">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'administration:releve_notes' et.pk %}"
+                   class="btn-icon ic-green" title="Relevé de notes">
+                  <i class="fas fa-file-alt"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7">
+            <div class="empty-state">
+              <div class="empty-icon"><i class="fas fa-users"></i></div>
+              <h5>Aucun étudiant dans cette classe</h5>
+              <p><a href="{% url 'administration:ajouter_etudiant' %}" style="color:#2563eb">Ajouter un étudiant</a></p>
+            </div>
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

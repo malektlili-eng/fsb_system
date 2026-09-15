@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% block title %}Diplômes — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-scroll"></i>{% endblock %}
+{% block page_title %}Diplômes{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ── PAGE HEADER ─────────────────────────────────────── */
+.diplomes-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.diplomes-header h1 { font-size: 1.4rem; font-weight: 800; color: #0f172a; margin: 0 0 4px; }
+.diplomes-header .sub { font-size: 0.83rem; color: #64748b; margin: 0; }
+
+/* ── STATS BANNER ────────────────────────────────────── */
+.stats-banner {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.stat-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 130px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.stat-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.si-purple { background: #faf5ff; color: #7c3aed; }
+.si-green  { background: #f0fdf4; color: #16a34a; }
+.si-blue   { background: #eff6ff; color: #2563eb; }
+.si-orange { background: #fff7ed; color: #c2410c; }
+.stat-val  { font-size: 1.4rem; font-weight: 800; color: #0f172a; line-height: 1; }
+.stat-lbl  { font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+
+/* ── TABLE ───────────────────────────────────────────── */
+.card-actions-bar {
+  padding: 12px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.search-input {
+  padding: 7px 12px 7px 34px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  color: #0f172a;
+  background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 10px center;
+  transition: border-color .15s, box-shadow .15s;
+  min-width: 220px;
+}
+.search-input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+
+/* Bouton voir diplôme */
+.btn-voir-diplome {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #2563eb;
+  text-decoration: none;
+  transition: background .15s, border-color .15s, transform .1s;
+}
+.btn-voir-diplome:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-generer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity .15s, transform .1s;
+}
+.btn-generer:hover { opacity: .9; color: white; transform: translateY(-1px); }
+
+/* Mention colors */
+.mention-tres-bien { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.mention-bien      { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.mention-assez-bien{ background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+.mention-passable  { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+.mention-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+/* No. diplôme style */
+.num-chip {
+  background: #faf5ff;
+  color: #6b21a8;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 600;
+  border: 1px solid #ddd6fe;
+}
+
+/* Row hover */
+.table-fsb tbody tr { transition: background .12s; }
+.table-fsb tbody tr:hover { background: #f8faff; }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: fadeUp .35s ease both; }
+.animate-in-2 { animation: fadeUp .35s ease .08s both; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── PAGE HEADER ──────────────────────────────────────────── -->
+<div class="diplomes-header animate-in">
+  <div>
+    <h1>Diplômes Délivrés</h1>
+    <p class="sub">Registre officiel des diplômes de la Faculté des Sciences de Bizerte</p>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <a href="{% url 'stages:eligibles_diplome' %}" class="btn-generer">
+      <i class="fas fa-graduation-cap"></i> Générer un diplôme
+    </a>
+    <a href="{% url 'stages:ajouter_diplome' %}" class="btn-ghost-fsb btn-sm">
+      <i class="fas fa-plus"></i> Saisie manuelle
+    </a>
+  </div>
+</div>
+
+<!-- ── STATS BANNER ─────────────────────────────────────────── -->
+<div class="stats-banner animate-in" style="animation-delay:.04s">
+  <div class="stat-card">
+    <div class="stat-icon si-purple"><i class="fas fa-scroll"></i></div>
+    <div>
+      <div class="stat-val">{{ diplomes.count }}</div>
+      <div class="stat-lbl">Total diplômes</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-green"><i class="fas fa-medal"></i></div>
+    <div>
+      <div class="stat-val">{{ nb_tres_bien }}</div>
+      <div class="stat-lbl">Très Bien</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-blue"><i class="fas fa-star"></i></div>
+    <div>
+      <div class="stat-val">{{ nb_bien }}</div>
+      <div class="stat-lbl">Bien</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon si-orange"><i class="fas fa-university"></i></div>
+    <div>
+      <div class="stat-val">{{ annee_courante }}</div>
+      <div class="stat-lbl">Année en cours</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TABLE DES DIPLÔMES ───────────────────────────────────── -->
+<div class="card-fsb fu animate-in-2">
+
+  <div class="card-actions-bar">
+    <div class="header-left" style="display:flex;align-items:center;gap:8px">
+      <i class="fas fa-scroll" style="color:#7c3aed"></i>
+      <span style="font-weight:700;font-size:0.9rem;color:#0f172a">Registre des diplômes</span>
+      <span class="badge-pill b-purple">{{ diplomes.count }}</span>
+    </div>
+    <input
+      type="text"
+      class="search-input"
+      id="searchInput"
+      placeholder="Rechercher un étudiant, N° diplôme…"
+      onkeyup="filterTable()"
+    >
+  </div>
+
+  <div class="card-fsb-body" style="padding:0">
+    <div class="table-responsive">
+      <table class="table-fsb" id="diplomesTable">
+        <thead>
+          <tr>
+            <th>N° Diplôme</th>
+            <th>Étudiant</th>
+            <th>Type</th>
+            <th>Spécialité</th>
+            <th>Année</th>
+            <th>Mention</th>
+            <th>Moyenne</th>
+            <th style="text-align:center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="diplomesBody">
+          {% for d in diplomes %}
+          <tr>
+
+            <!-- N° diplôme -->
+            <td>
+              <span class="num-chip">{{ d.numero_diplome|default:"—" }}</span>
+            </td>
+
+            <!-- Étudiant -->
+            <td>
+              <div style="font-weight:700;color:#0b1e3d">
+                {{ d.etudiant.nom }} {{ d.etudiant.prenom }}
+              </div>
+              <div style="font-size:0.71rem;color:#94a3b8">
+                {{ d.etudiant.numero_etudiant }}
+              </div>
+            </td>
+
+            <!-- Type -->
+            <td>
+              <span class="badge-pill b-blue">{{ d.type_diplome }}</span>
+            </td>
+
+            <!-- Spécialité -->
+            <td style="font-size:0.82rem;color:#334155;max-width:180px">
+              {{ d.specialite|truncatechars:32 }}
+            </td>
+
+            <!-- Année -->
+            <td style="font-weight:700;color:#0b1e3d;text-align:center">
+              {{ d.annee_obtention }}
+            </td>
+
+            <!-- Mention -->
+            <td>
+              {% if d.mention == 'tres_bien' %}
+                <span class="mention-chip mention-tres-bien">🏅 Très Bien</span>
+              {% elif d.mention == 'bien' %}
+                <span class="mention-chip mention-bien">⭐ Bien</span>
+              {% elif d.mention == 'assez_bien' %}
+                <span class="mention-chip mention-assez-bien">✔ Assez Bien</span>
+              {% elif d.mention == 'passable' %}
+                <span class="mention-chip mention-passable">— Passable</span>
+              {% else %}
+                <span class="mention-chip mention-passable">{{ d.get_mention_display|default:"—" }}</span>
+              {% endif %}
+            </td>
+
+            <!-- Moyenne -->
+            <td style="text-align:center">
+              {% if d.moyenne_generale %}
+              <span style="font-weight:800;font-size:1.05rem;
+                color:{% if d.moyenne_generale >= 14 %}#166534{% elif d.moyenne_generale >= 10 %}#1d4ed8{% else %}#991b1b{% endif %}">
+                {{ d.moyenne_generale }}/20
+              </span>
+              {% else %}
+              <span style="color:#94a3b8">—</span>
+              {% endif %}
+            </td>
+
+            <!-- Actions -->
+            <td style="text-align:center">
+              <a href="{% url 'stages:diplome_officiel' d.pk %}"
+                 class="btn-voir-diplome"
+                 target="_blank"
+                 title="Voir le diplôme officiel">
+                <i class="fas fa-eye"></i> Voir diplôme
+              </a>
+            </td>
+
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-scroll"></i></div>
+                <h5>Aucun diplôme enregistré</h5>
+                <p>Cliquez sur <strong>Générer un diplôme</strong> pour commencer.</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterTable() {
+  const q     = document.getElementById('searchInput').value.toLowerCase();
+  const rows  = document.querySelectorAll('#diplomesBody tr');
+  rows.forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

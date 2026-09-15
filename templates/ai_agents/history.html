@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Historique IA — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-history"></i>{% endblock %}
+{% block page_title %}Historique des Conversations{% endblock %}
+{% block content %}
+
+<style>
+    .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .avatar-admin {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    }
+
+    .avatar-agent {
+        background: linear-gradient(135deg, #065f46, #059669);
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <h1>Historique IA</h1>
+        <p class="sub">{{ conversations.count }} conversation(s) enregistrée(s)</p>
+    </div>
+    <div style="display:flex;gap:8px">
+        <a href="{% url 'ai_agent:chat' %}?agent=assistant_admin" class="btn-primary-fsb btn-sm">
+            <i class="fas fa-robot"></i> Nouvelle Conv.
+        </a>
+    </div>
+</div>
+
+<div class="row g-3">
+    {% for conv in conversations %}
+    <div class="col-lg-6 fu fu{{ forloop.counter|add:0 }}">
+        <div class="card-fsb">
+            <div class="card-fsb-body" style="padding:16px">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+                    <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+                        <div class="avatar 
+    {% if conv.agent_type == 'assistant_admin' %}avatar-admin
+    {% else %}avatar-agent{% endif %}">
+                            <!-- contenu -->
+                        </div>
+                        <div style="min-width:0">
+                            <div
+                                style="font-weight:700;color:#0b1e3d;font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                                {{ conv.titre|default:"Conversation sans titre" }}
+                            </div>
+                            <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px">
+                                {{ conv.get_agent_type_display }} · {{ conv.created_at|date:"d/m/Y à H:i" }}
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'ai_agent:chat' %}?agent={{ conv.agent_type }}&conv={{ conv.pk }}"
+                        class="btn-outline-fsb btn-sm" style="white-space:nowrap;flex-shrink:0">
+                        <i class="fas fa-comment"></i> Reprendre
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card-fsb">
+            <div class="card-fsb-body">
+                <div class="empty-state" style="padding:52px">
+                    <div class="empty-icon"><i class="fas fa-comments"></i></div>
+                    <h5>Aucune conversation</h5>
+                    <p>Commencez une conversation avec un assistant IA.</p>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px">
+                        <a href="{% url 'ai_agent:chat' %}?agent=assistant_admin" class="btn-primary-fsb btn-sm">
+                            🏛️ Assistant Admin
+                        </a>
+                        <a href="{% url 'ai_agent:chat' %}?agent=assistant_pedagogique" class="btn-outline-fsb btn-sm">
+                            📚 Assistant Péda.
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

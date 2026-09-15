@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block page_icon %}<i class="fas fa-user-times"></i>{% endblock %}
+{% block page_title %}Absences — Départements{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Absences</h1><p class="sub">Visualisation uniquement — Sélectionnez un département</p></div>
+  <div style="background:#fef9c3;color:#854d0e;padding:8px 14px;border-radius:8px;font-size:0.8rem;font-weight:600">
+    <i class="fas fa-eye me-1"></i> Mode lecture seule
+  </div>
+</div>
+<div class="row g-3">
+  {% for item in dept_data %}
+  <div class="col-lg-4 col-md-6 fu fu{{ forloop.counter }}">
+    <a href="{% url 'pedagogie:absences_filieres' item.dept.pk %}" style="text-decoration:none">
+      <div class="card-fsb" style="transition:all 0.25s;cursor:pointer"
+           onmouseover="this.style.transform='translateY(-4px)'"
+           onmouseout="this.style.transform='translateY(0)'">
+        <div style="background:linear-gradient(135deg,#0b1e3d,#1a3f7a);padding:20px;display:flex;align-items:center;gap:14px">
+          <div style="font-size:2rem">
+            {% if item.dept.nom == 'informatique' %}💻{% elif item.dept.nom == 'mathematiques' %}📐{% elif item.dept.nom == 'physique' %}🔭{% elif item.dept.nom == 'chimie' %}⚗️{% elif item.dept.nom == 'biologie' %}🔬{% else %}🌍{% endif %}
+          </div>
+          <div style="font-size:1rem;font-weight:800;color:white">{{ item.dept.get_nom_display }}</div>
+          <i class="fas fa-chevron-right ms-auto" style="color:rgba(255,255,255,0.3)"></i>
+        </div>
+        <div style="padding:12px 18px;display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:1.3rem;font-weight:800;color:#dc2626">{{ item.nb_absences }}</div>
+            <div style="font-size:0.71rem;color:#94a3b8">Absences enregistrées</div>
+          </div>
+          <i class="fas fa-arrow-right" style="color:#bfdbfe"></i>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

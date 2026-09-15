@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% block title %}Agents Administratifs — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-users-cog"></i>{% endblock %}
+{% block page_title %}Gestion des Agents Administratifs{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <h1>Agents Administratifs</h1>
+    <p class="sub">Comptes ayant accès à la plateforme FSB</p>
+  </div>
+</div>
+
+<div class="row g-3">
+
+  <!-- Formulaire ajout agent -->
+  <div class="col-lg-4">
+    <div class="card-fsb fu">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-user-plus"></i> Créer un Agent</div>
+      </div>
+      <div class="card-fsb-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label class="form-label">Prénom <span style="color:#e11d48">*</span></label>
+            <input type="text" name="first_name" class="form-control"
+                   placeholder="Ex: Mouna" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nom <span style="color:#e11d48">*</span></label>
+            <input type="text" name="last_name" class="form-control"
+                   placeholder="Ex: Rekik" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Identifiant (login) <span style="color:#e11d48">*</span></label>
+            <input type="text" name="username" class="form-control"
+                   placeholder="Ex: scolarite1" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mot de passe <span style="color:#e11d48">*</span></label>
+            <input type="password" name="password" class="form-control"
+                   placeholder="Mot de passe sécurisé" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rôle <span style="color:#e11d48">*</span></label>
+            <select name="role" class="form-select" required>
+              {% for r in roles %}
+              <option value="{{ r.0 }}">{{ r.1 }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control"
+                   placeholder="agent@fsb.tn">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            <input type="text" name="telephone" class="form-control"
+                   placeholder="+216 XX XXX XXX">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Département géré</label>
+            <input type="text" name="departement" class="form-control"
+                   placeholder="Ex: Informatique (optionnel)">
+          </div>
+          <button type="submit" class="btn-primary-fsb w-100">
+            <i class="fas fa-user-plus"></i> Créer le Compte
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des agents -->
+  <div class="col-lg-8">
+    <div class="card-fsb fu fu2">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-list"></i> Agents Enregistrés</div>
+        <span class="badge-pill b-blue">{{ agents.count }}</span>
+      </div>
+      <div class="card-fsb-body" style="padding:0">
+        <div class="table-responsive">
+          <table class="table-fsb">
+            <thead>
+              <tr>
+                <th>Agent</th>
+                <th>Identifiant</th>
+                <th>Rôle</th>
+                <th>Département</th>
+                <th>Dernier accès</th>
+                <th>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for agent in agents %}
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:9px">
+                    <div style="width:32px;height:32px;border-radius:8px;
+                                background:linear-gradient(135deg,#1e3a8a,#2563eb);
+                                display:flex;align-items:center;justify-content:center;
+                                color:white;font-weight:700;font-size:0.75rem;flex-shrink:0">
+                      {{ agent.first_name|first|upper }}{{ agent.last_name|first|upper }}
+                    </div>
+                    <div>
+                      <div style="font-weight:700;color:#0b1e3d">
+                        {{ agent.get_full_name }}
+                      </div>
+                      <div style="font-size:0.71rem;color:#94a3b8">
+                        {{ agent.email|default:"—" }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <code style="background:#f0f5ff;color:#1d4ed8;
+                               padding:3px 8px;border-radius:6px;font-size:0.81rem">
+                    {{ agent.username }}
+                  </code>
+                </td>
+                <td>
+                  <span class="badge-pill
+                    {% if agent.role == 'super_admin' %}b-purple
+                    {% elif agent.role == 'doyen' %}b-blue
+                    {% elif agent.role == 'chef_dept' %}b-cyan
+                    {% elif agent.role == 'admin' %}b-green
+                    {% else %}b-gray{% endif %}">
+                    {{ agent.get_role_display }}
+                  </span>
+                </td>
+                <td style="font-size:0.83rem;color:#64748b">
+                  {{ agent.departement|default:"Tous" }}
+                </td>
+                <td style="font-size:0.79rem;color:#94a3b8">
+                  {% if agent.last_login %}
+                    {{ agent.last_login|date:"d/m/Y H:i" }}
+                  {% else %}
+                    Jamais connecté
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge-pill {% if agent.is_active %}b-green{% else %}b-red{% endif %}">
+                    {% if agent.is_active %}Actif{% else %}Inactif{% endif %}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="6">
+                <div class="empty-state">
+                  <div class="empty-icon"><i class="fas fa-users"></i></div>
+                  <h5>Aucun agent</h5>
+                </div>
+              </td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info rôles -->
+    <div class="card-fsb fu fu3 mt-3">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-info-circle"></i> Niveaux d'Accès</div>
+      </div>
+      <div class="card-fsb-body">
+        <div class="row g-2" style="font-size:0.82rem">
+          <div class="col-md-6">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;
+                        background:#f8faff;border-radius:8px">
+              <span class="badge-pill b-purple">Super Admin</span>
+              <span style="color:#64748b">Accès total + gestion des agents</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;
+                        background:#f8faff;border-radius:8px">
+              <span class="badge-pill b-blue">Doyen</span>
+              <span style="color:#64748b">Consultation + validation</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;
+                        background:#f8faff;border-radius:8px">
+              <span class="badge-pill b-cyan">Chef Département</span>
+              <span style="color:#64748b">Gestion de son département</span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;
+                        background:#f8faff;border-radius:8px">
+              <span class="badge-pill b-green">Admin / Scolarité</span>
+              <span style="color:#64748b">Gestion complète étudiants/notes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Assistant IA — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-robot"></i>{% endblock %}
+{% block page_title %}Assistant Intelligent FSB{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+<style>
+.msg-bubble h1,.msg-bubble h2,.msg-bubble h3{font-size:1rem;font-weight:600;margin:.5rem 0 .25rem}
+.msg-bubble ul,.msg-bubble ol{padding-left:1.2rem;margin:.25rem 0}
+.msg-bubble code{background:rgba(0,0,0,.07);border-radius:4px;padding:1px 5px;font-size:.82rem;font-family:monospace}
+.msg-bubble pre{background:rgba(0,0,0,.06);border-radius:6px;padding:.6rem;overflow-x:auto;font-size:.82rem}
+.msg-bubble strong{font-weight:600}
+.msg-bubble p{margin:.15rem 0}
+.typing-cursor{display:inline-block;animation:blink 1s step-end infinite;margin-left:1px}
+.typing-cursor.done{display:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.bubble-tool{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 10px;font-size:12px;color:#64748b;display:none;align-items:center;gap:6px;margin-bottom:6px}
+.tool-spinner{animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.agents-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:10px}
+.agent-chip{display:flex;align-items:center;gap:5px;padding:5px 9px;border-radius:8px;font-size:.69rem;font-weight:600;border:1px solid transparent}
+.chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.chip-admin{background:#eff6ff;color:#2563eb;border-color:#bfdbfe}
+.chip-pedago{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0}
+.chip-stage{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
+.chip-stat{background:#faf5ff;color:#7c3aed;border-color:#ddd6fe}
+.chip-action{background:#f0fdfa;color:#0f766e;border-color:#99f6e4;grid-column:span 2}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-layout" id="chatApp" data-conv-id="{{ current_conv.pk|default:'' }}">
+
+  <aside class="chat-sidebar">
+    <div class="agent-card">
+      <div class="agent-avatar admin-av">🤖<span class="agent-status"></span></div>
+      <div class="agent-name" style="font-size:.9rem;font-weight:700;margin-top:8px">Assistant FSB</div>
+      <div style="font-size:.75rem;color:#64748b;margin-top:4px;text-align:center">Agent multi-rôles · accès BD temps réel</div>
+      {% if not has_api_key %}
+      <div class="alert alert-warning mt-2" style="font-size:.75rem;padding:6px 10px">⚠️ GROQ_API_KEY manquante dans .env</div>
+      {% endif %}
+      <div class="agents-grid">
+        <div class="agent-chip chip-admin"><span class="chip-dot"></span>Admin</div>
+        <div class="agent-chip chip-pedago"><span class="chip-dot"></span>Pédago</div>
+        <div class="agent-chip chip-stage"><span class="chip-dot"></span>Stages</div>
+        <div class="agent-chip chip-stat"><span class="chip-dot"></span>Stats</div>
+        <div class="agent-chip chip-action"><span class="chip-dot"></span>Actions BD réelles</div>
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;margin-top:12px">
+      <div style="font-size:.7rem;font-weight:700;color:#94a3b8;padding:4px 0 8px;text-transform:uppercase;letter-spacing:.06em">Conversations</div>
+      {% for conv in conversations %}
+      <a href="?conv={{ conv.pk }}" style="display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;text-decoration:none;color:inherit;margin-bottom:2px;{% if current_conv and current_conv.pk == conv.pk %}background:#eff6ff{% endif %}">
+        <div style="width:28px;height:28px;border-radius:7px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0">💬</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.78rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ conv.titre|default:"Sans titre"|truncatechars:28 }}</div>
+          <div style="font-size:.68rem;color:#94a3b8">{{ conv.created_at|date:"d/m H:i" }}</div>
+        </div>
+      </a>
+      {% empty %}
+      <div style="font-size:.75rem;color:#94a3b8;text-align:center;padding:20px 0">Aucune conversation</div>
+      {% endfor %}
+    </div>
+
+    <div style="padding-top:10px;border-top:1px solid #f1f5f9;display:flex;gap:6px">
+      <a href="?new=1" class="btn btn-outline-secondary btn-sm flex-1" style="font-size:.75rem">+ Nouvelle</a>
+      <a href="{% url 'ai_agent:history' %}" class="btn btn-outline-secondary btn-sm" style="font-size:.75rem">Tout voir</a>
+    </div>
+  </aside>
+
+  <div class="chat-main" style="display:flex;flex-direction:column;height:100%">
+    <div id="chatMessages" class="chat-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px">
+
+      {% if not current_conv %}
+      <div id="chatWelcome" style="margin:auto;text-align:center;max-width:460px;padding:32px 16px">
+        <div style="font-size:3rem;margin-bottom:12px">🤖</div>
+        <h2 style="font-size:1.1rem;font-weight:600;margin-bottom:8px">Assistant FSB</h2>
+        <p style="font-size:.85rem;color:#64748b;margin-bottom:20px">Je peux rechercher des étudiants, afficher des statistiques, créer des étudiants, planifier des examens…</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="quick-btn btn btn-outline-secondary btn-sm" data-msg="Combien d'étudiants sont inscrits ?" style="text-align:left;font-size:.78rem;padding:8px 10px">📊 Statistiques générales</button>
+          <button class="quick-btn btn btn-outline-secondary btn-sm" data-msg="Quels stages sont en attente de validation ?" style="text-align:left;font-size:.78rem;padding:8px 10px">📋 Stages en attente</button>
+          <button class="quick-btn btn btn-outline-secondary btn-sm" data-msg="Liste les filières disponibles" style="text-align:left;font-size:.78rem;padding:8px 10px">🎓 Filières disponibles</button>
+          <button class="quick-btn btn btn-outline-secondary btn-sm" data-msg="Cherche l'étudiant Trabelsi" style="text-align:left;font-size:.78rem;padding:8px 10px">🔍 Chercher un étudiant</button>
+        </div>
+      </div>
+      {% else %}
+      {% for msg in conv_messages %}
+      <div class="msg-row {{ msg.role }}">
+        <div class="msg-av {% if msg.role == 'user' %}user-av{% else %}bot-av{% endif %}" style="font-size:{% if msg.role != 'user' %}1rem{% endif %}">
+          {% if msg.role == 'user' %}{{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}{% else %}🤖{% endif %}
+        </div>
+        <div style="{% if msg.role == 'user' %}max-width:70%{% else %}flex:1{% endif %}">
+          <div class="msg-bubble rendered-md" data-raw="{{ msg.contenu|escapejs }}"></div>
+          <div class="msg-time">{{ msg.timestamp|date:"H:i" }}</div>
+        </div>
+      </div>
+      {% endfor %}
+      {% endif %}
+
+    </div>
+
+    <div style="padding:12px 16px;border-top:1px solid #f1f5f9">
+      {% csrf_token %}
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <textarea id="chatInput" placeholder="Tapez votre message… (Entrée pour envoyer)" rows="1"
+          style="flex:1;resize:none;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;font-size:.88rem;line-height:1.5;outline:none;transition:border-color .2s;min-height:42px;max-height:150px;overflow-y:auto"
+          onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+        <button onclick="sendMessage()" style="background:#2563eb;color:#fff;border:none;border-radius:10px;width:42px;height:42px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">➤</button>
+      </div>
+      <div style="font-size:.68rem;color:#94a3b8;margin-top:5px;text-align:center">
+        Modèle : {{ model_name|default:"llama-3.3-70b" }} · Actions réelles sur la base de données
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/marked@12/marked.min.js"></script>
+<script>
+// Rendu markdown des messages existants
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.rendered-md').forEach(function(el){
+    var raw=el.dataset.raw;
+    if(raw){el.innerHTML=marked.parse(raw);delete el.dataset.raw;}
+  });
+});
+
+let conversationId='{{ current_conv.pk|default:"" }}';
+let isStreaming=false;
+
+document.addEventListener('DOMContentLoaded',function(){
+  scrollChat();
+  var ta=document.getElementById('chatInput');
+  if(ta){
+    ta.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,150)+'px';});
+    ta.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+  }
+  document.querySelectorAll('.quick-btn').forEach(function(b){
+    b.addEventListener('click',function(){var ta=document.getElementById('chatInput');if(ta){ta.value=this.dataset.msg;sendMessage();}});
+  });
+});
+
+async function sendMessage(){
+  if(isStreaming)return;
+  var ta=document.getElementById('chatInput');
+  var text=ta?ta.value.trim():'';
+  if(!text)return;
+  ta.value='';ta.style.height='auto';
+  isStreaming=true;
+  document.getElementById('chatWelcome')&&document.getElementById('chatWelcome').remove();
+  appendUserMsg(text);
+  var bubble=appendAssistantBubble();
+  var textSpan=bubble.querySelector('.bubble-text');
+  var toolSpan=bubble.querySelector('.bubble-tool');
+  var full='';
+  try{
+    var resp=await fetch('{% url "ai_agent:send" %}',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':getCsrf()},body:JSON.stringify({message:text,conversation_id:conversationId||null})});
+    if(!resp.ok){var e=await resp.json();textSpan.innerHTML='<span style="color:red">Erreur: '+(e.error||'Inconnue')+'</span>';return;}
+    var reader=resp.body.getReader();var dec=new TextDecoder();var buf='';
+    while(true){
+      var {done,value}=await reader.read();if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      var lines=buf.split('\n');buf=lines.pop();
+      for(var line of lines){
+        if(!line.startsWith('data: '))continue;
+        var payload=line.slice(6).trim();if(!payload)continue;
+        try{
+          var ev=JSON.parse(payload);
+          if(ev.type==='conv_id'){conversationId=ev.data;}
+          else if(ev.type==='token'){full+=ev.data;textSpan.textContent=full;scrollChat();}
+          else if(ev.type==='tool_start'){toolSpan.style.display='flex';toolSpan.querySelector('.tool-name').textContent=ev.data;}
+          else if(ev.type==='tool_done'){toolSpan.querySelector('.tool-spinner').style.display='none';toolSpan.querySelector('.tool-icon').textContent=ev.success?'✓':'✗';}
+          else if(ev.type==='error'){textSpan.innerHTML='<span style="color:red">'+ev.data+'</span>';}
+        }catch(e){}
+      }
+    }
+    if(full){textSpan.innerHTML=marked.parse(full);}
+    bubble.querySelector('.typing-cursor').classList.add('done');
+  }catch(err){textSpan.innerHTML='<span style="color:red">Erreur réseau.</span>';}
+  finally{isStreaming=false;toolSpan.style.display='none';scrollChat();}
+}
+
+function appendUserMsg(text){
+  var c=document.getElementById('chatMessages');
+  var d=document.createElement('div');d.className='msg-row user';
+  d.innerHTML='<div class="msg-av user-av">'+getUserInitials()+'</div><div style="max-width:70%"><div class="msg-bubble" style="background:#eff6ff;color:#1e40af">'+escHtml(text)+'</div><div class="msg-time">'+now()+'</div></div>';
+  c.appendChild(d);scrollChat();
+}
+function appendAssistantBubble(){
+  var c=document.getElementById('chatMessages');
+  var d=document.createElement('div');d.className='msg-row assistant';
+  d.innerHTML='<div class="msg-av bot-av" style="font-size:1rem">🤖</div><div style="flex:1"><div class="bubble-tool"><span class="tool-icon">⚙️</span><span class="tool-spinner" style="display:none">⟳</span><span class="tool-name"></span></div><div class="msg-bubble"><span class="bubble-text"></span><span class="typing-cursor">▋</span></div><div class="msg-time">'+now()+'</div></div>';
+  c.appendChild(d);scrollChat();return d;
+}
+function scrollChat(){var e=document.getElementById('chatMessages');if(e)e.scrollTop=e.scrollHeight;}
+function now(){return new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
+function getUserInitials(){var a=document.querySelector('.topbar .user-avatar');return a?a.textContent.trim().substring(0,2):'ME';}
+function escHtml(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s));return d.innerHTML;}
+function getCsrf(){return document.querySelector('[name=csrfmiddlewaretoken]')?.value||'';}
+window.sendMessage=sendMessage;
+</script>
+{% endblock %}

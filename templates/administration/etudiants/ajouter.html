@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block title %}Ajouter Étudiant — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-user-plus"></i>{% endblock %}
+{% block page_title %}Ajouter un Étudiant{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Nouvel Étudiant</h1><p class="sub">Remplissez les informations de l'étudiant</p></div>
+  <a href="{% url 'administration:liste_etudiants' %}" class="btn-ghost-fsb btn-sm"><i class="fas fa-arrow-left"></i> Retour</a>
+</div>
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card-fsb fu">
+      <div class="card-fsb-header"><div class="header-left"><i class="fas fa-id-card"></i> Informations de l'Étudiant</div></div>
+      <div class="card-fsb-body">
+        <form method="post">{% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6 form-group">
+              <label class="form-label">Prénom <span style="color:#e11d48">*</span></label>
+              <input type="text" name="prenom" class="form-control" placeholder="Ex: Fatma" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Nom <span style="color:#e11d48">*</span></label>
+              <input type="text" name="nom" class="form-control" placeholder="Ex: Trabelsi" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">N° Étudiant <span style="color:#e11d48">*</span></label>
+              <input type="text" name="numero" class="form-control" placeholder="Ex: 20241001" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">CIN</label>
+              <input type="text" name="cin" class="form-control" placeholder="Ex: 12345678">
+            </div>
+            <div class="col-12 form-group">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" placeholder="etudiant@fsb.tn">
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Filière <span style="color:#e11d48">*</span></label>
+              <select name="filiere" class="form-select" required>
+                <option value="">-- Choisir une filière --</option>
+                {% for f in filieres %}<option value="{{ f.pk }}">{{ f }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6 form-group">
+              <label class="form-label">Année d'inscription</label>
+              <input type="number" name="annee_inscription" class="form-control" value="2024" min="2000" max="2099">
+            </div>
+            <div class="col-12" style="margin-top:8px">
+              <button type="submit" class="btn-primary-fsb"><i class="fas fa-save"></i> Enregistrer l'Étudiant</button>
+              <a href="{% url 'administration:liste_etudiants' %}" class="btn-ghost-fsb" style="margin-left:10px">Annuler</a>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card-fsb fu fu2">
+      <div class="card-fsb-header"><div class="header-left"><i class="fas fa-info-circle"></i> Informations</div></div>
+      <div class="card-fsb-body">
+        <div style="font-size:0.82rem;color:#64748b;line-height:1.7">
+          <p><i class="fas fa-key me-2" style="color:#2563eb"></i>Le login et mot de passe par défaut seront le <strong>numéro étudiant</strong>.</p>
+          <p><i class="fas fa-shield-alt me-2" style="color:#059669"></i>L'étudiant pourra changer son mot de passe après la première connexion.</p>
+          <p><i class="fas fa-envelope me-2" style="color:#d97706"></i>Un email sera optionnellement assigné au compte.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

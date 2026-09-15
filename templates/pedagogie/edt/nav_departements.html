@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block page_icon %}<i class="fas fa-calendar-week"></i>{% endblock %}
+{% block page_title %}Emploi du Temps — Départements{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Emploi du Temps</h1><p class="sub">Sélectionnez un département</p></div>
+</div>
+<div class="row g-3">
+  {% for item in dept_data %}
+  <div class="col-lg-4 col-md-6 fu fu{{ forloop.counter }}">
+    <a href="{% url 'pedagogie:edt_filieres' item.dept.pk %}" style="text-decoration:none">
+      <div class="card-fsb" style="transition:all 0.25s;cursor:pointer"
+           onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 28px rgba(37,99,235,0.15)'"
+           onmouseout="this.style.transform='translateY(0)';this.style.boxShadow=''">
+        <div style="background:linear-gradient(135deg,#0b1e3d,#1a3f7a);padding:20px;display:flex;align-items:center;gap:14px">
+          <div style="font-size:2.2rem">
+            {% if item.dept.nom == 'informatique' %}💻
+            {% elif item.dept.nom == 'mathematiques' %}📐
+            {% elif item.dept.nom == 'physique' %}🔭
+            {% elif item.dept.nom == 'chimie' %}⚗️
+            {% elif item.dept.nom == 'biologie' %}🔬
+            {% else %}🌍{% endif %}
+          </div>
+          <div style="flex:1">
+            <div style="font-size:1rem;font-weight:800;color:white">{{ item.dept.get_nom_display }}</div>
+          </div>
+          <i class="fas fa-chevron-right" style="color:rgba(255,255,255,0.3)"></i>
+        </div>
+        <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:1.3rem;font-weight:800;color:#2563eb">{{ item.nb_seances }}</div>
+            <div style="font-size:0.71rem;color:#94a3b8">Séances planifiées</div>
+          </div>
+          <div style="font-size:0.78rem;color:#2563eb;font-weight:600">
+            Voir les filières <i class="fas fa-arrow-right ms-1"></i>
+          </div>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

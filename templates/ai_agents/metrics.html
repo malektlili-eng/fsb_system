@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Métriques Agent IA — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-chart-bar"></i>{% endblock %}
+{% block page_title %}Monitoring — Agent IA{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="stat-card sc-blue">
+      <div class="stat-num">{{ metrics.total_requetes|default:0 }}</div>
+      <div class="stat-label">Requêtes totales</div>
+      <i class="fas fa-comments stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card sc-violet">
+      <div class="stat-num">{{ metrics.temps_moyen_ms|floatformat:0|default:0 }} ms</div>
+      <div class="stat-label">Temps de réponse moyen</div>
+      <i class="fas fa-clock stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card sc-cyan">
+      <div class="stat-num">{{ metrics.tokens_moyens|floatformat:0|default:0 }}</div>
+      <div class="stat-label">Tokens moyens / requête</div>
+      <i class="fas fa-brain stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="stat-card sc-emerald">
+      <div class="stat-num">{{ outils|length }}</div>
+      <div class="stat-label">Outils distincts utilisés</div>
+      <i class="fas fa-tools stat-icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="card-fsb">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-wrench"></i> Outils les plus utilisés</div>
+      </div>
+      <div class="card-fsb-body" style="padding:0">
+        <table class="table-fsb">
+          <thead><tr><th>Outil</th><th>Utilisations</th></tr></thead>
+          <tbody>
+            {% for outil in outils %}
+            <tr>
+              <td><code style="background:#f0f5ff;padding:2px 8px;border-radius:4px;font-size:.82rem">{{ outil.tool_called }}</code></td>
+              <td><span class="badge-pill b-blue">{{ outil.count }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2" class="text-center" style="padding:20px;color:#94a3b8">Aucune donnée</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card-fsb">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-history"></i> 20 dernières interactions</div>
+      </div>
+      <div class="card-fsb-body" style="padding:0;max-height:400px;overflow-y:auto">
+        <table class="table-fsb">
+          <thead>
+            <tr>
+              <th>Date</th><th>Question</th><th>Outil</th><th>Temps</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for m in recentes %}
+            <tr>
+              <td style="white-space:nowrap;font-size:.78rem;color:#64748b">{{ m.timestamp|date:"d/m H:i" }}</td>
+              <td style="font-size:.82rem;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.question|truncatechars:60 }}</td>
+              <td>
+                {% if m.tool_called %}
+                <code style="font-size:.72rem;background:#f0fdf4;color:#166534;padding:2px 6px;border-radius:4px">{{ m.tool_called }}</code>
+                {% else %}<span style="color:#94a3b8;font-size:.78rem">—</span>{% endif %}
+              </td>
+              <td style="font-size:.8rem;color:#64748b;white-space:nowrap">{{ m.response_time_ms }} ms</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center" style="padding:20px;color:#94a3b8">Aucune interaction enregistrée</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

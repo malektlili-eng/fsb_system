@@ -1,0 +1,32 @@
+# requirements/base.txt — Dépendances communes à tous les environnements
+Django>=5.0,<6.0
+djangorestframework>=3.15
+djangorestframework-simplejwt>=5.3
+django-filter>=24.0
+django-cors-headers>=4.3
+drf-spectacular>=0.27
+django-crispy-forms>=2.1
+crispy-bootstrap5>=2024.2
+python-decouple>=3.8
+Pillow>=10.0
+groq>=0.9
+qrcode>=7.4
+gunicorn>=22.0
+psycopg2-binary>=2.9
+dj-database-url>=2.1
+# ─── RAG : embeddings et vector store ────────────────────────────────
+numpy>=1.26
+scipy>=1.11          # matrices creuses : index TF-IDF à 20 000+ chunks
+scikit-learn>=1.4
+
+# ─── Backends d'embeddings sémantiques (optionnels) ──────────────────
+# Utilisés par l'ablation A4 (sémantique vs lexical). Le défaut TF-IDF
+# ne nécessite AUCUN de ces paquets — la CI reste reproductible sans eux.
+#
+# Option 1 — vecteurs FR pré-entraînés via spaCy (poids installables
+# par pip, pas de téléchargement HuggingFace) :
+#   pip install spacy
+#   pip install https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.8.0/fr_core_news_md-3.8.0-py3-none-any.whl
+#
+# Option 2 — sentence-transformers (télécharge les poids au 1er usage) :
+#   pip install sentence-transformers

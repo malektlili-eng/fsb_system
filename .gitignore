@@ -1,0 +1,62 @@
+# ─── Python ────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ─── Django ────────────────────────────────
+*.log
+local_settings.py
+db.sqlite3
+# CRITIQUE : ne jamais commiter la base de données.
+# (Le commentaire est sur SA PROPRE ligne : git ne gère pas les
+#  commentaires en fin de ligne, ils font partie du motif.)
+*.db
+*.sqlite3
+/media/
+/staticfiles/
+/static_collected/
+
+# ─── Environnement ─────────────────────────
+.env
+.env.*
+# Le fichier exemple (sans valeurs) DOIT être commité : le README
+# demande `cp .env.example .env`. Négation sur sa propre ligne.
+!.env.example
+venv/
+.venv/
+env/
+
+# ─── IDE ───────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ─── Tests & Coverage ──────────────────────
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml
+
+# ─── Docker ────────────────────────────────
+*.pid
+
+# ─── Secrets ───────────────────────────────
+*.pem
+*.key
+secrets.json
+
+# Index vectoriel RAG (généré par build_rag_index)
+var/
+# Rapports générés (le .md est committé, le reste est régénérable)
+reports/htmlcov/
+reports/coverage.xml
+reports/benchmark_results_*.json

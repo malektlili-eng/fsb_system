@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Sessions d'Examens — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-graduation-cap"></i>{% endblock %}
+{% block page_title %}Sessions d'Examens{% endblock %}
+
+{% block content %}
+
+<style>
+    .bande-haut {
+        height: 6px;
+    }
+
+    .bande-principale {
+        background: linear-gradient(90deg, #1e3a8a, #2563eb);
+    }
+
+    .bande-secondaire {
+        background: linear-gradient(90deg, #78350f, #d97706);
+    }
+
+    .contenu-session {
+        padding: 20px;
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <h1>Sessions d'Examens</h1>
+        <p class="sub">{{ sessions.count }} session(s) enregistrée(s)</p>
+    </div>
+    <a href="{% url 'examens:ajouter_session' %}" class="btn-primary-fsb">
+        <i class="fas fa-plus"></i> Nouvelle Session
+    </a>
+</div>
+
+{% if sessions %}
+
+<!-- Grille de sessions -->
+<div class="row g-3">
+    {% for s in sessions %}
+    <div class="col-lg-4 col-md-6 fu fu{{ forloop.counter }}">
+        <div class="card-fsb" style="overflow:hidden">
+
+            <!-- Bande couleur haut -->
+
+
+            <div class="bande-haut 
+            {% if s.type_session == 'principale' %}bande-principale
+            {% else %}bande-secondaire{% endif %}">
+            </div>
+
+            <div class="contenu-session">
+
+
+                <!-- Type badge + Année -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                    <span style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;
+                       text-transform:uppercase;color:#94a3b8">Session</span>
+                    <span class="badge-pill {% if s.type_session == 'principale' %}b-blue{% else %}b-yellow{% endif %}">
+                        {{ s.get_type_session_display }}
+                    </span>
+                </div>
+
+                <!-- Nom session -->
+                <div style="font-size:1.05rem;font-weight:800;color:#0b1e3d;
+                    margin-bottom:10px;line-height:1.3">
+                    {{ s.nom }}
+                </div>
+
+                <!-- Dates -->
+                <div style="display:flex;align-items:center;gap:6px;
+                    font-size:0.82rem;color:#64748b;margin-bottom:16px">
+                    <i class="fas fa-calendar-alt" style="color:#2563eb"></i>
+                    {{ s.date_debut|date:"d M Y" }} &rarr; {{ s.date_fin|date:"d M Y" }}
+                </div>
+
+                <!-- Infos rapides -->
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;
+                    gap:8px;margin-bottom:16px">
+                    <div style="background:#f8faff;border-radius:8px;padding:8px;text-align:center">
+                        <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:2px">Année</div>
+                        <div style="font-size:0.8rem;font-weight:700;color:#0b1e3d">
+                            {{ s.annee_universitaire }}
+                        </div>
+                    </div>
+                    <div style="background:#f8faff;border-radius:8px;padding:8px;text-align:center">
+                        <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:2px">Semestre</div>
+                        <span class="badge-pill b-blue" style="font-size:0.72rem">S{{ s.semestre }}</span>
+                    </div>
+                    <div style="background:#f8faff;border-radius:8px;padding:8px;text-align:center">
+                        <div style="font-size:0.72rem;color:#94a3b8;margin-bottom:2px">Examens</div>
+                        <div style="font-size:0.8rem;font-weight:700;color:#2563eb">
+                            {{ s.planningexamen_set.count }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bouton planning -->
+                <a href="{% url 'examens:planning' %}?session={{ s.pk }}" class="btn-primary-fsb w-100"
+                    style="justify-content:center">
+                    <i class="fas fa-calendar-check"></i> Voir le Planning
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+
+{% else %}
+<div class="card-fsb fu">
+    <div class="card-fsb-body">
+        <div class="empty-state" style="padding:60px">
+            <div class="empty-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h5>Aucune session d'examen</h5>
+            <p>
+                <a href="{% url 'examens:ajouter_session' %}" style="color:#2563eb">
+                    Créer la première session
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

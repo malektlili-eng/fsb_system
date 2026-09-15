@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}{{ filiere.nom }} — Classes{% endblock %}
+{% block page_icon %}<i class="fas fa-layer-group"></i>{% endblock %}
+{% block page_title %}{{ filiere.nom }}{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav style="margin-bottom:18px;font-size:0.83rem;color:#94a3b8">
+  <a href="{% url 'administration:liste_etudiants' %}"
+     style="color:#2563eb;text-decoration:none;font-weight:600">
+    <i class="fas fa-user-graduate me-1"></i>Étudiants
+  </a>
+  <span style="margin:0 8px">›</span>
+  <a href="{% url 'administration:etudiants_filieres' dept.pk %}"
+     style="color:#2563eb;text-decoration:none;font-weight:600">
+    {{ dept.get_nom_display }}
+  </a>
+  <span style="margin:0 8px">›</span>
+  <span style="color:#0b1e3d;font-weight:700">{{ filiere.nom }}</span>
+</nav>
+
+<div class="page-header">
+  <div>
+    <h1>{{ filiere.nom }}</h1>
+    <p class="sub">{{ filiere.code }} — {{ dept.get_nom_display }}</p>
+  </div>
+</div>
+
+{% if etudiants_direct %}
+<!-- Pas de classes : affichage direct des étudiants -->
+<div class="card-fsb fu">
+  <div class="card-fsb-header">
+    <div class="header-left">
+      <i class="fas fa-users"></i> Étudiants de {{ filiere.nom }}
+    </div>
+    <span class="badge-pill b-blue">{{ etudiants_direct.count }}</span>
+  </div>
+  <div class="card-fsb-body" style="padding:0">
+    <div class="table-responsive">
+      <table class="table-fsb">
+        <thead>
+          <tr><th>N°</th><th>Nom & Prénom</th><th>Statut</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for et in etudiants_direct %}
+          <tr>
+            <td><code style="background:#f0f5ff;color:#1d4ed8;padding:3px 8px;border-radius:6px;font-size:0.8rem">{{ et.numero_etudiant }}</code></td>
+            <td>
+              <div style="font-weight:700;color:#0b1e3d">{{ et.nom }} {{ et.prenom }}</div>
+              <div style="font-size:0.71rem;color:#94a3b8">{{ et.email|default:"—" }}</div>
+            </td>
+            <td><span class="badge-pill {% if et.statut == 'inscrit' %}b-green{% elif et.statut == 'diplome' %}b-blue{% else %}b-red{% endif %}">{{ et.get_statut_display }}</span></td>
+            <td>
+              <div style="display:flex;gap:5px">
+                <a href="{% url 'administration:detail_etudiant' et.pk %}" class="btn-icon ic-blue"><i class="fas fa-eye"></i></a>
+                <a href="{% url 'administration:releve_notes' et.pk %}" class="btn-icon ic-green"><i class="fas fa-file-alt"></i></a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4"><div class="empty-state" style="padding:24px"><div class="empty-icon"><i class="fas fa-users"></i></div><p>Aucun étudiant.</p></div></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<!-- Affichage des classes -->
+<div class="row g-3">
+  {% for item in classes_data %}
+  <div class="col-lg-4 col-md-6 fu fu{{ forloop.counter }}">
+    <a href="{% url 'administration:etudiants_liste_classe' dept.pk filiere.pk item.classe.pk %}"
+       style="text-decoration:none;display:block">
+      <div class="card-fsb" style="transition:all 0.25s;cursor:pointer"
+           onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(37,99,235,0.15)'"
+           onmouseout="this.style.transform='translateY(0)';this.style.boxShadow=''">
+
+        <div style="background:linear-gradient(135deg,#1e3a8a,#2563eb);padding:18px 20px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:42px;height:42px;border-radius:10px;background:rgba(255,255,255,0.15);
+                        display:flex;align-items:center;justify-content:center;font-size:1.2rem">
+              🏫
+            </div>
+            <div>
+              <div style="font-size:1rem;font-weight:800;color:white">{{ item.classe.nom }}</div>
+              <div style="font-size:0.71rem;color:rgba(255,255,255,0.55);margin-top:1px">
+                {{ item.classe.code }} — {{ item.classe.get_niveau_display }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:1.3rem;font-weight:800;color:#2563eb">
+              {{ item.nb_etudiants }}
+            </div>
+            <div style="font-size:0.72rem;color:#94a3b8">Étudiants</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:0.82rem;color:#94a3b8">{{ item.classe.annee_universitaire }}</div>
+            <div style="font-size:0.75rem;color:#2563eb;font-weight:600;margin-top:2px">
+              Capacité : {{ item.classe.capacite }}
+            </div>
+          </div>
+          <i class="fas fa-chevron-right" style="color:#bfdbfe;font-size:0.9rem"></i>
+        </div>
+
+      </div>
+    </a>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="card-fsb">
+      <div class="card-fsb-body">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fas fa-door-open"></i></div>
+          <h5>Aucune classe configurée</h5>
+          <p>Ajoutez des classes via <a href="/admin/administration/classe/add/" style="color:#2563eb">l'interface admin</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}

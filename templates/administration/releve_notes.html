@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block title %}Relevé de Notes — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-file-alt"></i>{% endblock %}
+{% block page_title %}Relevé de Notes Officiel{% endblock %}
+{% block extra_css %}
+{% load static %}
+<style>
+    @media print {
+
+        .sidebar,
+        .topbar,
+        .no-print {
+            display: none !important;
+        }
+
+        .main-wrapper {
+            margin-left: 0 !important;
+        }
+
+        .content-area {
+            padding: 0 !important;
+        }
+
+        .card-fsb {
+            box-shadow: none !important;
+            border: 1px solid #ccc !important;
+        }
+    }
+
+    .note-text {
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+
+    .note-max {
+        font-size: 0.72rem;
+        opacity: 0.6;
+    }
+
+    .note-success {
+        color: #166534;
+        /* vert */
+    }
+
+    .note-fail {
+        color: #991b1b;
+        /* rouge */
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="page-header no-print">
+    <div>
+        <h1>Relevé de Notes</h1>
+        <p class="sub">{{ etudiant.user.get_full_name }} — {{ etudiant.numero_etudiant }}</p>
+    </div>
+    <div style="display:flex;gap:8px">
+        <button onclick="window.print()" class="btn-primary-fsb btn-sm">
+            <i class="fas fa-print"></i> Imprimer
+        </button>
+        <a href="{% url 'administration:detail_etudiant' etudiant.pk %}" class="btn-ghost-fsb btn-sm">
+            <i class="fas fa-arrow-left"></i> Retour
+        </a>
+    </div>
+</div>
+
+<div class="card-fsb fu">
+    <!-- En-tête officiel -->
+    <div
+        style="background:linear-gradient(135deg,#0b1e3d,#1a3f7a);color:white;padding:24px 28px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:16px">
+            <div
+                style="width:60px;height:60px;border-radius:14px;background:linear-gradient(135deg,#f59e0b,#fde68a);display:flex;align-items:center;justify-content:center;font-size:1.8rem">
+                <img src="{% static 'images/logo-fsb.jpg' %}" alt="Logo FSB" width="75" height="75" style="border-radius: 12px; object-fit: cover;"></div>
+            <div>
+                <div style="font-size:1.1rem;font-weight:800;letter-spacing:0.01em">Faculté des Sciences de Bizerte
+                </div>
+                <div style="font-size:0.78rem;opacity:0.65;margin-top:2px">Université de Carthage — Tunisie</div>
+                <div style="font-size:0.72rem;opacity:0.5;margin-top:1px">كلية العلوم ببنزرت — جامعة قرطاج</div>
+            </div>
+        </div>
+        <div style="text-align:right">
+            <div style="font-size:1rem;font-weight:700">RELEVÉ DE NOTES OFFICIEL</div>
+            <div style="font-size:0.75rem;opacity:0.65;margin-top:3px">Année Universitaire 2024–2025</div>
+        </div>
+    </div>
+
+    <div class="card-fsb-body">
+        <!-- Infos étudiant -->
+        <div
+            style="background:#f8faff;border:1px solid #e2eaf6;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+            <div class="row">
+                <div class="col-md-6">
+                    <table style="font-size:0.85rem;width:100%">
+                        <tr>
+                            <td style="color:#94a3b8;padding:3px 0;width:130px">Nom & Prénom</td>
+                            <td style="font-weight:700;color:#0b1e3d">{{ etudiant.user.last_name }} {{
+                                etudiant.user.first_name }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#94a3b8;padding:3px 0">N° Étudiant</td>
+                            <td style="font-weight:700;color:#1d4ed8">{{ etudiant.numero_etudiant }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#94a3b8;padding:3px 0">CIN</td>
+                            <td style="font-weight:600">{{ etudiant.cin|default:"—" }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table style="font-size:0.85rem;width:100%">
+                        <tr>
+                            <td style="color:#94a3b8;padding:3px 0;width:130px">Filière</td>
+                            <td style="font-weight:700;color:#0b1e3d">{{ etudiant.filiere }}</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#94a3b8;padding:3px 0">Statut</td>
+                            <td><span class="badge-pill b-green">{{ etudiant.get_statut_display }}</span></td>
+                        </tr>
+                        <tr>
+                            <td style="color:#94a3b8;padding:3px 0">Inscrit en</td>
+                            <td style="font-weight:600">{{ etudiant.annee_inscription }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notes par semestre -->
+        {% for mn in matieres_notes %}
+        <div style="margin-bottom:20px">
+            <div
+                style="background:linear-gradient(135deg,#1a3f7a,#2563eb);color:white;padding:8px 14px;border-radius:8px;font-weight:700;font-size:0.84rem;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+                <i class="fas fa-book-open"></i>
+                Semestre {{ mn.semestre }} — {{ mn.matiere.nom }}
+                <span style="margin-left:auto;font-weight:500;opacity:0.75;font-size:0.76rem">{{ mn.matiere.code
+                    }}</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table-fsb">
+                    <thead>
+                        <tr>
+                            <th>Type d'évaluation</th>
+                            <th>Note</th>
+                            <th>Résultat</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for n in mn.notes %}
+                        <tr>
+                            <td style="font-weight:600">{{ n.get_type_note_display }}</td>
+                            <td>
+                                <span class="note-text {% if n.note >= 10 %}note-success{% else %}note-fail{% endif %}">
+                                    {{ n.note }}
+                                    <span class="note-max">/20</span>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge-pill {% if n.note >= 10 %}b-green{% else %}b-red{% endif %}">
+                                    {% if n.note >= 10 %}Admis{% else %}Ajourné{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-clipboard"></i></div>
+            <h5>Aucune note enregistrée</h5>
+            <p>Les notes apparaîtront ici après la saisie.</p>
+        </div>
+        {% endfor %}
+
+        <!-- Signature -->
+        <div
+            style="margin-top:32px;display:flex;justify-content:space-between;font-size:0.82rem;color:#64748b;padding-top:16px;border-top:1px dashed #e2eaf6">
+            <div>
+                <div style="font-weight:600;color:#334155">Le Responsable de Scolarité</div>
+                <div style="margin-top:32px;border-top:1px solid #94a3b8;padding-top:4px;width:150px;text-align:center">
+                    Signature & Cachet</div>
+            </div>
+            <div style="text-align:right">
+                <div style="font-weight:600;color:#334155">Date d'édition</div>
+                <div>{% now "d/m/Y" %}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,521 @@
+{
+  "summary": {
+    "mode": "offline",
+    "provider": "offline",
+    "generated_at": "2026-09-14 19:39:32",
+    "n_queries": 20,
+    "passed": 19,
+    "pass_rate": 0.95,
+    "latency_retrieval_ms": {
+      "p50": 0.9,
+      "p95": 1.2,
+      "mean": 0.6
+    },
+    "latency_total_ms": {
+      "p50": 5.5,
+      "p95": 6.4,
+      "mean": 5.7
+    },
+    "latency_first_token_ms": {
+      "p50": 3.3,
+      "p95": 4.2,
+      "mean": 3.5
+    },
+    "context_ablation": {
+      "v1_full_dump_tokens": 2663,
+      "v2_selective_mean_tokens": 96.0,
+      "reduction_pct": 96.4
+    }
+  },
+  "results": [
+    {
+      "id": "K1",
+      "category": "connaissance",
+      "query": "Combien d'absences non justifiées avant d'être éliminé ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_déclenché": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 1.4,
+        "first_token_ms": 6.2,
+        "total_ms": 9.1
+      },
+      "rag": {
+        "sources_injected": 3,
+        "top_score": 0.543,
+        "context_tokens_v2": 228
+      },
+      "tools": [
+        "obtenir_statistiques"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "K2",
+      "category": "connaissance",
+      "query": "Quelle est la pondération contrôle continu / examen final ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_déclenché": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 1.2,
+        "first_token_ms": 3.4,
+        "total_ms": 6.1
+      },
+      "rag": {
+        "sources_injected": 4,
+        "top_score": 0.478,
+        "context_tokens_v2": 357
+      },
+      "tools": [],
+      "response_tokens": 15
+    },
+    {
+      "id": "K3",
+      "category": "connaissance",
+      "query": "Comment se déroule la session de rattrapage ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_déclenché": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 1.2,
+        "first_token_ms": 3.3,
+        "total_ms": 5.4
+      },
+      "rag": {
+        "sources_injected": 3,
+        "top_score": 0.483,
+        "context_tokens_v2": 235
+      },
+      "tools": [],
+      "response_tokens": 13
+    },
+    {
+      "id": "K4",
+      "category": "connaissance",
+      "query": "Quelles pièces fournir pour l'inscription administrative ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_déclenché": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 1.1,
+        "first_token_ms": 3.3,
+        "total_ms": 5.8
+      },
+      "rag": {
+        "sources_injected": 4,
+        "top_score": 0.397,
+        "context_tokens_v2": 319
+      },
+      "tools": [],
+      "response_tokens": 12
+    },
+    {
+      "id": "K5",
+      "category": "connaissance",
+      "query": "Quelle est la durée minimale du stage de fin d'études ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_déclenché": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 1.2,
+        "first_token_ms": 3.2,
+        "total_ms": 5.3
+      },
+      "rag": {
+        "sources_injected": 1,
+        "top_score": 0.41,
+        "context_tokens_v2": 83
+      },
+      "tools": [],
+      "response_tokens": 16
+    },
+    {
+      "id": "K6",
+      "category": "connaissance",
+      "query": "Que se passe-t-il en cas de fraude à un examen ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_déclenché": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 1.1,
+        "first_token_ms": 3.3,
+        "total_ms": 5.8
+      },
+      "rag": {
+        "sources_injected": 1,
+        "top_score": 0.266,
+        "context_tokens_v2": 76
+      },
+      "tools": [],
+      "response_tokens": 16
+    },
+    {
+      "id": "K7",
+      "category": "connaissance",
+      "query": "Un retardataire peut-il entrer en salle d'examen ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_déclenché": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.8,
+        "first_token_ms": 2.7,
+        "total_ms": 4.5
+      },
+      "rag": {
+        "sources_injected": 4,
+        "top_score": 0.254,
+        "context_tokens_v2": 78
+      },
+      "tools": [],
+      "response_tokens": 13
+    },
+    {
+      "id": "K8",
+      "category": "connaissance",
+      "query": "Comment obtenir un duplicata de carte étudiant et à quel prix ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_déclenché": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.9,
+        "first_token_ms": 2.7,
+        "total_ms": 4.8
+      },
+      "rag": {
+        "sources_injected": 3,
+        "top_score": 0.368,
+        "context_tokens_v2": 195
+      },
+      "tools": [],
+      "response_tokens": 17
+    },
+    {
+      "id": "A1",
+      "category": "action",
+      "query": "Cherche l'étudiant BENALI",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "bon_outil": true,
+        "outil_succès": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.0,
+        "first_token_ms": 3.7,
+        "total_ms": 5.8
+      },
+      "rag": {
+        "sources_injected": 0,
+        "top_score": null,
+        "context_tokens_v2": 0
+      },
+      "tools": [
+        "chercher_etudiant"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "A2",
+      "category": "action",
+      "query": "Trouve les étudiants nommés Trabelsi",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "bon_outil": true,
+        "outil_succès": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.0,
+        "first_token_ms": 3.5,
+        "total_ms": 5.5
+      },
+      "rag": {
+        "sources_injected": 0,
+        "top_score": null,
+        "context_tokens_v2": 0
+      },
+      "tools": [
+        "chercher_etudiant"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "A3",
+      "category": "action",
+      "query": "Donne-moi la liste des filières",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "bon_outil": true,
+        "outil_succès": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.7,
+        "first_token_ms": 3.2,
+        "total_ms": 5.4
+      },
+      "rag": {
+        "sources_injected": 4,
+        "top_score": 0.231,
+        "context_tokens_v2": 62
+      },
+      "tools": [
+        "lister_filieres"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "A4",
+      "category": "action",
+      "query": "Cherche l'étudiant numéro ETU2025",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "bon_outil": true,
+        "outil_succès": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.9,
+        "first_token_ms": 3.5,
+        "total_ms": 5.3
+      },
+      "rag": {
+        "sources_injected": 1,
+        "top_score": 0.304,
+        "context_tokens_v2": 71
+      },
+      "tools": [
+        "chercher_etudiant"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "A5",
+      "category": "action",
+      "query": "Trouve l'étudiante Sarra",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "bon_outil": true,
+        "outil_succès": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.0,
+        "first_token_ms": 3.4,
+        "total_ms": 5.5
+      },
+      "rag": {
+        "sources_injected": 0,
+        "top_score": null,
+        "context_tokens_v2": 0
+      },
+      "tools": [
+        "chercher_etudiant"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "A6",
+      "category": "action",
+      "query": "Cherche INEXISTANT_XYZ",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "bon_outil": true,
+        "outil_succès": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.0,
+        "first_token_ms": 3.2,
+        "total_ms": 5.0
+      },
+      "rag": {
+        "sources_injected": 0,
+        "top_score": null,
+        "context_tokens_v2": 0
+      },
+      "tools": [
+        "chercher_etudiant"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "S1",
+      "category": "statistiques",
+      "query": "Combien d'étudiants sont inscrits actuellement ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "bon_outil": true,
+        "outil_succès": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.0,
+        "first_token_ms": 3.6,
+        "total_ms": 6.0
+      },
+      "rag": {
+        "sources_injected": 0,
+        "top_score": null,
+        "context_tokens_v2": 0
+      },
+      "tools": [
+        "obtenir_statistiques"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "S2",
+      "category": "statistiques",
+      "query": "Donne-moi les statistiques globales de la faculté",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "bon_outil": true,
+        "outil_succès": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.0,
+        "first_token_ms": 4.2,
+        "total_ms": 6.3
+      },
+      "rag": {
+        "sources_injected": 0,
+        "top_score": null,
+        "context_tokens_v2": 0
+      },
+      "tools": [
+        "obtenir_statistiques"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "S3",
+      "category": "statistiques",
+      "query": "Combien d'enseignants actifs avons-nous ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "bon_outil": true,
+        "outil_succès": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.0,
+        "first_token_ms": 4.1,
+        "total_ms": 6.4
+      },
+      "rag": {
+        "sources_injected": 0,
+        "top_score": null,
+        "context_tokens_v2": 0
+      },
+      "tools": [
+        "obtenir_statistiques"
+      ],
+      "response_tokens": 9
+    },
+    {
+      "id": "M1",
+      "category": "limite",
+      "query": "Quels sont les horaires de la piscine du campus ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_correctement_absent": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 0.0,
+        "first_token_ms": 3.2,
+        "total_ms": 5.1
+      },
+      "rag": {
+        "sources_injected": 0,
+        "top_score": null,
+        "context_tokens_v2": 0
+      },
+      "tools": [],
+      "response_tokens": 14
+    },
+    {
+      "id": "M2",
+      "category": "limite",
+      "query": "Raconte-moi une blague sur les mathématiciens",
+      "mode": "offline",
+      "passed": false,
+      "checks": {
+        "rag_correctement_absent": false,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 1.1,
+        "first_token_ms": 3.2,
+        "total_ms": 5.1
+      },
+      "rag": {
+        "sources_injected": 2,
+        "top_score": 0.353,
+        "context_tokens_v2": 44
+      },
+      "tools": [],
+      "response_tokens": 11
+    },
+    {
+      "id": "M3",
+      "category": "limite",
+      "query": "Quels rôles peuvent créer un étudiant via l'agent ?",
+      "mode": "offline",
+      "passed": true,
+      "checks": {
+        "rag_déclenché": true,
+        "sans_erreur": true
+      },
+      "latency": {
+        "retrieval_ms": 1.1,
+        "first_token_ms": 3.2,
+        "total_ms": 5.7
+      },
+      "rag": {
+        "sources_injected": 2,
+        "top_score": 0.297,
+        "context_tokens_v2": 171
+      },
+      "tools": [],
+      "response_tokens": 14
+    }
+  ]
+}

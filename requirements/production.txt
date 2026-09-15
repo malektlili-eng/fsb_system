@@ -1,0 +1,17 @@
+-r base.txt
+
+# Serveur WSGI production
+gunicorn>=22.0
+
+# Base PostgreSQL
+psycopg2-binary>=2.9
+dj-database-url>=2.1
+
+# Cache Redis
+django-redis>=5.4
+
+# Sécurité
+django-axes>=6.3
+
+# Stockage statique
+whitenoise>=6.6

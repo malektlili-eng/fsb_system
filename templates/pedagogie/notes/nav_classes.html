@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block page_icon %}<i class="fas fa-chart-bar"></i>{% endblock %}
+{% block page_title %}Notes — {{ filiere.nom }}{% endblock %}
+{% block content %}
+<nav style="margin-bottom:16px;font-size:0.83rem;color:#94a3b8">
+  <a href="{% url 'pedagogie:notes' %}" style="color:#2563eb;text-decoration:none;font-weight:600">Notes</a>
+  <span style="margin:0 8px">›</span>
+  <a href="{% url 'pedagogie:notes_filieres' dept.pk %}" style="color:#2563eb;text-decoration:none;font-weight:600">{{ dept.get_nom_display }}</a>
+  <span style="margin:0 8px">›</span>
+  <span style="color:#0b1e3d;font-weight:700">{{ filiere.nom }}</span>
+</nav>
+<div class="page-header"><div><h1>{{ filiere.nom }}</h1><p class="sub">Choisissez une classe</p></div></div>
+<div class="row g-3">
+  {% for item in cl_data %}
+  <div class="col-lg-4 col-md-6 fu fu{{ forloop.counter }}">
+    <a href="{% url 'pedagogie:notes_classe' item.classe.pk %}" style="text-decoration:none">
+      <div class="card-fsb" style="transition:all 0.25s" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <div style="background:linear-gradient(135deg,#1e3a8a,#2563eb);padding:16px 18px">
+          <div style="font-size:0.95rem;font-weight:800;color:white">{{ item.classe.nom }}</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.55)">{{ item.classe.get_niveau_display }}</div>
+        </div>
+        <div style="padding:12px 18px;display:flex;justify-content:space-between;align-items:center">
+          <div><div style="font-size:1.1rem;font-weight:800;color:#2563eb">{{ item.nb_moyennes }}</div><div style="font-size:0.71rem;color:#94a3b8">Moyennes calculées</div></div>
+          <i class="fas fa-arrow-right" style="color:#bfdbfe"></i>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

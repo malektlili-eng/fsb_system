@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% block page_icon %}<i class="fas fa-briefcase"></i>{% endblock %}
+{% block page_title %}Demandes de Stage{% endblock %}
+
+{% block content %}
+<style>
+  .link-unstyled {
+    text-decoration: none;
+  }
+
+  .stat-card {
+    background: white;
+    border: 2px solid #e2eaf6;
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .stat-number {
+    font-size: 1.6rem;
+    font-weight: 800;
+  }
+
+  .stat-label {
+    font-size: 0.71rem;
+    color: #94a3b8;
+  }
+
+  /* Couleurs par statut */
+  .text-en-attente {
+    color: #d97706;
+  }
+
+  .text-valide {
+    color: #16a34a;
+  }
+
+  .text-en-cours {
+    color: #2563eb;
+  }
+
+  .text-termine {
+    color: #7c3aed;
+  }
+
+  .text-refuse {
+    color: #dc2626;
+  }
+
+  .text-total {
+    color: #2563eb;
+  }
+
+  /* Bordures actives */
+  .active-en-attente {
+    border-color: #f59e0b;
+  }
+
+  .active-valide {
+    border-color: #22c55e;
+  }
+
+  .active-en-cours {
+    border-color: #2563eb;
+  }
+
+  .active-termine {
+    border-color: #7c3aed;
+  }
+
+  .active-refuse {
+    border-color: #dc2626;
+  }
+
+  .active-total {
+    border-color: #2563eb;
+  }
+</style>
+<div class="page-header">
+  <div>
+    <h1>Demandes de Stage</h1>
+    <p class="sub">Gestion et validation des stages</p>
+  </div>
+  <div style="background:#dbeafe;color:#1d4ed8;padding:8px 14px;border-radius:8px;font-size:0.8rem;font-weight:600">
+    <i class="fas fa-eye me-1"></i> L'admin visualise et valide — pas de création
+  </div>
+</div>
+
+<!-- Indicateurs -->
+<div class="row g-2 mb-4">
+  <div class="col fu fu1">
+    <a href="?statut=en_attente" class="link-unstyled">
+      <div class="stat-card {% if statut == 'en_attente' %}active-en-attente{% endif %}">
+        <div class="stat-number text-en-attente">{{ stats.en_attente }}</div>
+        <div class="stat-label">En attente</div>
+      </div>
+    </a>
+  </div>
+  <div class="col fu fu2">
+    <a href="?statut=valide" class="link-unstyled">
+      <div class="stat-card {% if statut == 'valide' %}active-valide{% endif %}">
+        <div class="stat-number text-valide">{{ stats.valide }}</div>
+        <div class="stat-label">Validées</div>
+      </div>
+    </a>
+  </div>
+  <div class="col fu fu3">
+    <a href="?statut=en_cours" class="link-unstyled">
+      <div class="stat-card {% if statut == 'en_cours' %}active-en-cours{% endif %}">
+        <div class="stat-number text-en-cours">{{ stats.en_cours }}</div>
+        <div class="stat-label">En cours</div>
+      </div>
+    </a>
+  </div>
+  <div class="col fu fu4">
+    <a href="?statut=termine" class="link-unstyled">
+      <div class="stat-card {% if statut == 'termine' %}active-termine{% endif %}">
+        <div class="stat-number text-termine">{{ stats.termine }}</div>
+        <div class="stat-label">Terminés</div>
+      </div>
+    </a>
+  </div>
+  <div class="col fu fu5">
+    <a href="?statut=refuse" class="link-unstyled">
+      <div class="stat-card {% if statut == 'refuse' %}active-refuse{% endif %}">
+        <div class="stat-number text-refuse">{{ stats.refuse }}</div>
+        <div class="stat-label">Refusées</div>
+      </div>
+    </a>
+  </div>
+  <div class="col fu fu6">
+    <a href="?" class="link-unstyled">
+      <div class="stat-card {% if not statut %}active-total{% endif %}">
+        <div class="stat-number text-total">{{ demandes.count }}</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Filtre recherche -->
+<form method="get" style="margin-bottom:14px">
+  <div class="filter-bar">
+    <div class="search-wrap" style="flex:1;max-width:300px">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Étudiant, sujet...">
+    </div>
+    <select name="statut" class="form-select" style="max-width:180px">
+      <option value="">Tous les statuts</option>
+      <option value="en_attente" {% if statut == 'en_attente' %}selected{% endif %}>En attente</option>
+      <option value="valide" {% if statut == 'valide' %}selected{% endif %}>Validée</option>
+      <option value="refuse" {% if statut == 'refuse' %}selected{% endif %}>Refusée</option>
+      <option value="en_cours" {% if statut == 'en_cours' %}selected{% endif %}>En cours</option>
+      <option value="termine" {% if statut == 'termine' %}selected{% endif %}>Terminée</option>
+    </select>
+    <button type="submit" class="btn-primary-fsb btn-sm"><i class="fas fa-filter"></i> Filtrer</button>
+    {% if statut or query %}<a href="?" class="btn-ghost-fsb btn-sm"><i class="fas fa-times"></i></a>{% endif %}
+  </div>
+</form>
+
+<div class="card-fsb fu">
+  <div class="card-fsb-header">
+    <div class="header-left"><i class="fas fa-list"></i> Demandes</div>
+    <span class="badge-pill b-blue">{{ demandes.count }}</span>
+  </div>
+  <div class="card-fsb-body" style="padding:0">
+    <div class="table-responsive">
+      <table class="table-fsb">
+        <thead>
+          <tr>
+            <th>Étudiant</th>
+            <th>Sujet</th>
+            <th>Entreprise</th>
+            <th>Type</th>
+            <th>Période</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in demandes %}
+          <tr>
+            <td>
+              <div style="font-weight:700;color:#0b1e3d">{{ d.etudiant.nom }} {{ d.etudiant.prenom }}</div>
+              <div style="font-size:0.71rem;color:#94a3b8">{{ d.etudiant.numero_etudiant }}</div>
+            </td>
+            <td style="max-width:200px">
+              <div
+                style="font-weight:600;color:#334155;font-size:0.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                {{ d.sujet }}</div>
+            </td>
+            <td style="font-size:0.83rem;color:#64748b">{{ d.entreprise }}</td>
+            <td>
+              <span
+                class="badge-pill {% if d.type_stage == 'pfe' %}b-purple{% elif d.type_stage == 'initiation' %}b-cyan{% else %}b-blue{% endif %}">
+                {{ d.get_type_stage_display }}
+              </span>
+            </td>
+            <td style="font-size:0.78rem;color:#94a3b8;white-space:nowrap">
+              {{ d.date_debut }} → {{ d.date_fin }}
+            </td>
+            <td>
+              <span
+                class="badge-pill {% if d.statut == 'valide' %}b-green{% elif d.statut == 'refuse' %}b-red{% elif d.statut == 'en_cours' %}b-blue{% elif d.statut == 'termine' %}b-purple{% else %}b-yellow{% endif %}">
+                {{ d.get_statut_display }}
+              </span>
+              {% if d.note_stage %}<div style="font-size:0.7rem;color:#94a3b8;margin-top:2px">Note: {{ d.note_stage
+                }}/20</div>{% endif %}
+            </td>
+            <td>
+              <div style="display:flex;gap:4px">
+                <a href="{% url 'stages:detail_demande' d.pk %}" class="btn-icon ic-blue" title="Voir détail">
+                  <i class="fas fa-eye"></i>
+                </a>
+                {% if d.statut in 'valide,en_cours,termine' %}
+                <a href="{% url 'stages:attestation_stage' d.pk %}" class="btn-icon ic-green" title="Attestation"
+                  target="_blank">
+                  <i class="fas fa-certificate"></i>
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7">
+              <div class="empty-state">
+                <div class="empty-icon"><i class="fas fa-briefcase"></i></div>
+                <h5>Aucune demande</h5>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% block title %}{{ label }} — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-university"></i>{% endblock %}
+{% block page_title %}{{ label }}{% endblock %}
+
+{% block content %}
+
+<style>
+    .formation-btn {
+        padding: 6px 14px;
+        border-radius: 99px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .formation-active {
+        background: #0b1e3d;
+        color: white;
+    }
+
+    .formation-inactive {
+        background: #f0f5ff;
+        color: #2563eb;
+        border: 1.5px solid #dbeafe;
+    }
+</style>
+<!-- Breadcrumb -->
+<nav style="margin-bottom:18px;font-size:0.83rem;color:#94a3b8">
+    <a href="{% url 'administration:dashboard' %}" style="color:#2563eb;text-decoration:none;font-weight:600">
+        <i class="fas fa-home me-1"></i>Tableau de Bord
+    </a>
+    <span style="margin:0 8px">›</span>
+    <span style="color:#0b1e3d;font-weight:700">{{ label }}</span>
+</nav>
+
+<div class="page-header">
+    <div>
+        <h1>{{ label }}</h1>
+        <p class="sub">{{ dept_data|length }} département(s) proposant des {{ label|lower }}</p>
+    </div>
+
+    <!-- Boutons navigation rapide formations -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+        {% for tf, lbl in type_list %}
+        <a href="{% url 'administration:formation_detail' tf %}"
+            class="formation-btn {% if tf == type_formation %}formation-active{% else %}formation-inactive{% endif %}">
+            {{ lbl }}
+        </a>
+
+        {% endfor %}
+    </div>
+</div>
+
+{% if dept_data %}
+<div class="row g-3">
+    {% for item in dept_data %}
+    <div class="col-lg-6 fu fu{{ forloop.counter }}">
+        <div class="card-fsb">
+
+            <!-- En-tête département -->
+            <div style="background:linear-gradient(135deg,#0b1e3d,#1a3f7a);
+                  padding:18px 20px;display:flex;align-items:center;gap:14px">
+                <div style="font-size:2rem;flex-shrink:0">
+                    {% if item.dept.nom == 'informatique' %}💻
+                    {% elif item.dept.nom == 'mathematiques' %}📐
+                    {% elif item.dept.nom == 'physique' %}🔭
+                    {% elif item.dept.nom == 'chimie' %}⚗️
+                    {% elif item.dept.nom == 'biologie' %}🔬
+                    {% else %}🌍{% endif %}
+                </div>
+                <div style="flex:1">
+                    <div style="font-size:1rem;font-weight:800;color:white">
+                        {{ item.dept.get_nom_display }}
+                    </div>
+                    {% if item.dept.chef %}
+                    <div style="font-size:0.73rem;color:rgba(255,255,255,0.55);margin-top:2px">
+                        <i class="fas fa-user me-1"></i>Chef : {{ item.dept.chef }}
+                    </div>
+                    {% endif %}
+                </div>
+                <a href="{% url 'administration:departement_detail' type_formation item.dept.pk %}" style="background:rgba(255,255,255,0.12);color:white;padding:6px 12px;
+                  border-radius:8px;font-size:0.75rem;font-weight:700;
+                  text-decoration:none;white-space:nowrap;transition:all 0.2s"
+                    onmouseover="this.style.background='rgba(255,255,255,0.22)'"
+                    onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+                    Voir Détail <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <!-- Stats rapides -->
+            <div style="display:flex;border-bottom:1px solid #e2eaf6">
+                <div style="flex:1;padding:12px 16px;text-align:center;border-right:1px solid #e2eaf6">
+                    <div style="font-size:1.4rem;font-weight:800;color:#2563eb">
+                        {{ item.nb_etudiants }}
+                    </div>
+                    <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px">Étudiants</div>
+                </div>
+                <div style="flex:1;padding:12px 16px;text-align:center;border-right:1px solid #e2eaf6">
+                    <div style="font-size:1.4rem;font-weight:800;color:#0284c7">
+                        {{ item.nb_enseignants }}
+                    </div>
+                    <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px">Enseignants</div>
+                </div>
+                <div style="flex:1;padding:12px 16px;text-align:center">
+                    <div style="font-size:1.4rem;font-weight:800;color:#7c3aed">
+                        {{ item.filieres.count }}
+                    </div>
+                    <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px">Filières</div>
+                </div>
+            </div>
+
+            <!-- Liste des filières -->
+            <div class="card-fsb-body" style="padding:14px">
+                <div style="font-size:0.72rem;font-weight:700;color:#94a3b8;
+                    text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">
+                    Filières
+                </div>
+                {% for filiere in item.filieres %}
+                <a href="{% url 'administration:filiere_detail' type_formation item.dept.pk filiere.pk %}" style="display:flex;align-items:center;justify-content:space-between;
+                  padding:9px 12px;border-radius:9px;margin-bottom:6px;
+                  background:#f8faff;border:1px solid #e2eaf6;
+                  text-decoration:none;transition:all 0.2s"
+                    onmouseover="this.style.background='#eff6ff';this.style.borderColor='#2563eb'"
+                    onmouseout="this.style.background='#f8faff';this.style.borderColor='#e2eaf6'">
+                    <div style="display:flex;align-items:center;gap:9px">
+                        <div style="width:7px;height:7px;border-radius:50%;background:#2563eb;
+                        flex-shrink:0"></div>
+                        <div>
+                            <div style="font-weight:700;font-size:0.84rem;color:#0b1e3d">
+                                {{ filiere.nom }}
+                            </div>
+                            <div style="font-size:0.7rem;color:#94a3b8">{{ filiere.code }}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <span class="badge-pill b-blue" style="font-size:0.67rem">
+                            {{ filiere.nb_etudiants }} étud.
+                        </span>
+                        <i class="fas fa-chevron-right" style="color:#bfdbfe;font-size:0.75rem"></i>
+                    </div>
+                </a>
+                {% empty %}
+                <div style="font-size:0.82rem;color:#94a3b8;text-align:center;padding:10px">
+                    Aucune filière
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="card-fsb fu">
+    <div class="card-fsb-body">
+        <div class="empty-state" style="padding:60px">
+            <div class="empty-icon"><i class="fas fa-university"></i></div>
+            <h5>Aucune filière de type {{ label }}</h5>
+            <p>Ajoutez des filières avec le type "{{ label }}" pour les voir apparaître ici.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Passer la liste des formations au template via le contexte Django n'est pas possible
+    // directement dans le JS, mais on peut utiliser des data attributes si besoin.
+</script>
+{% endblock %}

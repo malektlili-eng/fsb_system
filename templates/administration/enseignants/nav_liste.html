@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Enseignants — {{ dept.get_nom_display }}{% endblock %}
+{% block page_icon %}<i class="fas fa-chalkboard-teacher"></i>{% endblock %}
+{% block page_title %}Enseignants — {{ dept.get_nom_display }}{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav style="margin-bottom:18px;font-size:0.83rem;color:#94a3b8">
+  <a href="{% url 'administration:liste_enseignants' %}"
+     style="color:#2563eb;text-decoration:none;font-weight:600">
+    <i class="fas fa-chalkboard-teacher me-1"></i>Enseignants
+  </a>
+  <span style="margin:0 8px">›</span>
+  <span style="color:#0b1e3d;font-weight:700">{{ dept.get_nom_display }}</span>
+</nav>
+
+<div class="page-header">
+  <div>
+    <h1>
+      {% if dept.nom == 'informatique' %}💻
+      {% elif dept.nom == 'mathematiques' %}📐
+      {% elif dept.nom == 'physique' %}🔭
+      {% elif dept.nom == 'chimie' %}⚗️
+      {% elif dept.nom == 'biologie' %}🔬
+      {% else %}🌍{% endif %}
+      {{ dept.get_nom_display }}
+    </h1>
+    <p class="sub">{{ enseignants.count }} enseignant(s) actif(s)</p>
+  </div>
+  <a href="{% url 'administration:ajouter_enseignant' %}" class="btn-primary-fsb btn-sm">
+    <i class="fas fa-user-plus"></i> Ajouter
+  </a>
+</div>
+
+<!-- Recherche -->
+<form method="get">
+  <div class="filter-bar">
+    <div class="search-wrap" style="flex:1;max-width:320px">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" name="q" value="{{ query }}" class="form-control"
+             placeholder="Rechercher un enseignant...">
+    </div>
+    <button type="submit" class="btn-primary-fsb btn-sm">
+      <i class="fas fa-search"></i> Chercher
+    </button>
+    {% if query %}
+    <a href="." class="btn-ghost-fsb btn-sm"><i class="fas fa-times"></i> Effacer</a>
+    {% endif %}
+  </div>
+</form>
+
+<div class="row g-3">
+  {% for ens in enseignants %}
+  <div class="col-lg-4 col-md-6 fu fu{{ forloop.counter }}">
+    <a href="{% url 'administration:detail_enseignant' ens.pk %}"
+       style="text-decoration:none;display:block">
+      <div style="background:white;border:1.5px solid #e2eaf6;border-radius:14px;
+                  padding:18px;transition:all 0.22s;cursor:pointer"
+           onmouseover="this.style.borderColor='#0284c7';this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(2,132,199,0.12)'"
+           onmouseout="this.style.borderColor='#e2eaf6';this.style.transform='translateY(0)';this.style.boxShadow=''">
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div style="width:48px;height:48px;border-radius:12px;
+                      background:linear-gradient(135deg,#0c4a6e,#0284c7);
+                      display:flex;align-items:center;justify-content:center;
+                      color:white;font-size:1.1rem;font-weight:800;flex-shrink:0">
+            {{ ens.prenom|first|upper }}{{ ens.nom|first|upper }}
+          </div>
+          <div style="min-width:0">
+            <div style="font-weight:800;font-size:0.95rem;color:#0b1e3d;
+                        white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+              {{ ens.prenom }} {{ ens.nom }}
+            </div>
+            <span class="badge-pill
+              {% if ens.grade == 'professeur' %}b-purple
+              {% elif ens.grade == 'maitre_conf' %}b-blue
+              {% elif ens.grade == 'maitre_assistant' %}b-cyan
+              {% else %}b-gray{% endif %}"
+              style="margin-top:3px;display:inline-block;font-size:0.65rem">
+              {{ ens.get_grade_display }}
+            </span>
+          </div>
+        </div>
+
+        <div style="font-size:0.8rem;color:#64748b;margin-bottom:6px">
+          <i class="fas fa-flask me-2" style="color:#0284c7"></i>
+          {{ ens.specialite|default:"—" }}
+        </div>
+        <div style="font-size:0.78rem;color:#94a3b8">
+          <i class="fas fa-id-badge me-2"></i>
+          {{ ens.matricule }}
+        </div>
+
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f0f5f9;
+                    display:flex;justify-content:flex-end">
+          <span style="font-size:0.78rem;color:#0284c7;font-weight:600">
+            Voir la fiche <i class="fas fa-arrow-right ms-1"></i>
+          </span>
+        </div>
+
+      </div>
+    </a>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="card-fsb">
+      <div class="card-fsb-body">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+          <h5>Aucun enseignant dans ce département</h5>
+          <p><a href="{% url 'administration:ajouter_enseignant' %}" style="color:#2563eb">Ajouter un enseignant</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

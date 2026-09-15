@@ -1,0 +1,230 @@
+# .github/workflows/ci.yml
+# ═══════════════════════════════════════════════════════════════════
+#  FSB System — Pipeline CI/CD GitHub Actions
+#  Exécuté à chaque push et pull request sur main/develop
+# ═══════════════════════════════════════════════════════════════════
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PYTHON_VERSION: "3.12"
+  # Fournisseur LLM déterministe : aucun appel réseau en CI.
+  LLM_PROVIDER: "offline"
+  # Backend d'embeddings reproductible (pas de téléchargement de modèle).
+  RAG_EMBEDDING_BACKEND: "tfidf"
+
+jobs:
+
+  # ─── 1. Linting et style ──────────────────────────────────────────
+  lint:
+    name: Linting & Style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install linting tools
+        run: |
+          pip install flake8 black isort
+
+      - name: Check formatting with Black (advisory)
+        # Le dépôt initial n'a pas été formaté avec Black ; on signale les
+        # écarts sans bloquer, le temps d'un reformatage global séparé.
+        run: black --check --diff . || true
+
+      - name: Check imports with isort (advisory)
+        run: isort --check-only --diff . || true
+
+      - name: Lint with flake8
+        run: |
+          # Erreurs critiques (syntaxe, noms non définis) — porte BLOQUANTE
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Style — informatif seulement : --exit-zero, sinon cette ligne
+          # bloquerait le job au premier dépassement de longueur de ligne,
+          # ce qui contredit le libellé « avertissements ».
+          flake8 . --count --exit-zero --max-complexity=12 --max-line-length=100 --statistics
+
+
+  # ─── 2. Tests et couverture ───────────────────────────────────────
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    needs: lint
+
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    env:
+      SECRET_KEY: "ci-test-secret-key-not-for-production"
+      DEBUG: "True"
+      DATABASE_URL: "sqlite:///./test_db.sqlite3"
+      GROQ_API_KEY: "test-key-placeholder"
+      DJANGO_SETTINGS_MODULE: "config.settings.development"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements/development.txt
+
+      - name: Check Django configuration
+        run: |
+          python manage.py check --settings=config.settings.development
+
+      - name: Run migrations (test DB)
+        run: |
+          python manage.py migrate --settings=config.settings.development
+
+      - name: Run tests with coverage
+        run: |
+          # tests/* est exclu du DÉNOMINATEUR : du code de test est
+          # exécuté par construction (~99 %), donc le compter gonfle le
+          # total de plusieurs points sans rien dire du code sous test.
+          coverage run --source='.' \
+            --omit='*/migrations/*,tests/*,manage.py,config/wsgi.py,config/asgi.py,init_data.py,QUICKSTART.py' \
+            manage.py test tests/ -v 2
+          coverage report
+          # Porte GLOBALE, volontairement dotée de marge : le total réel
+          # est ~70 %, un seuil à 70 rendrait la CI rouge au premier
+          # ajout de code non testé. La porte qui compte vraiment est
+          # celle du sous-système IA/RAG, ci-dessous.
+          coverage report --fail-under=65
+          coverage xml
+
+      - name: Coverage split by subsystem (honest breakdown + AI gate)
+        run: |
+          # Rend vérifiable la phrase « l'effort de test est concentré
+          # sur la couche IA/RAG » : ce n'est plus une affirmation du
+          # README, c'est une porte qui casse le build si elle tombe.
+          python manage.py coverage_split --output-dir reports --fail-under-ai=90
+          cat reports/coverage_split.md
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+      - name: Security check
+        run: |
+          pip install bandit
+          bandit -r apps/ -ll --skip B101
+
+
+  # ─── 3. Évaluation RAG + benchmark (artefacts de qualité) ─────────
+  rag-eval:
+    name: RAG evaluation & benchmarks
+    runs-on: ubuntu-latest
+    needs: test
+
+    env:
+      SECRET_KEY: "ci-rageval-key"
+      DEBUG: "True"
+      DATABASE_URL: "sqlite:///./rageval.sqlite3"
+      GROQ_API_KEY: "test-key-placeholder"
+      DJANGO_SETTINGS_MODULE: "config.settings.development"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements/development.txt
+
+      - name: Install semantic embedding backend (executes ablation A4)
+        # Poids FR pré-entraînés hébergés sur GitHub Releases : l'ablation
+        # A4 (sémantique vs lexical) s'exécute donc réellement en CI.
+        # Non bloquant : si l'installation échoue, run_rag_eval marque A4
+        # "NON EXÉCUTÉ" au lieu de faire échouer le job.
+        continue-on-error: true
+        run: |
+          pip install spacy
+          pip install https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.8.0/fr_core_news_md-3.8.0-py3-none-any.whl
+
+      - name: Migrate + seed demo data
+        run: |
+          python manage.py migrate
+          python manage.py init_data || true
+
+      - name: Build RAG index
+        run: python manage.py build_rag_index
+
+      - name: Run RAG retrieval evaluation (gold set + ablations)
+        run: python manage.py run_rag_eval --output-dir reports
+
+      - name: Run agent benchmarks (offline, deterministic)
+        run: python manage.py run_benchmarks --output-dir reports
+
+      - name: Upload evaluation & benchmark reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: rag-reports
+          path: |
+            reports/rag_evaluation.md
+            reports/rag_evaluation.json
+            reports/benchmark_results_offline.json
+            reports/coverage_split.md
+
+
+  # ─── 4. Vérifications de déploiement ─────────────────────────────
+  deploy-check:
+    name: Deploy checks
+    runs-on: ubuntu-latest
+    needs: [test, rag-eval]
+    if: github.ref == 'refs/heads/main'
+
+    env:
+      SECRET_KEY: "ci-deploy-check-key"
+      DEBUG: "False"
+      DATABASE_URL: "sqlite:///./deploy_check.sqlite3"
+      GROQ_API_KEY: "placeholder"
+      DJANGO_SETTINGS_MODULE: "config.settings.production"
+      ALLOWED_HOSTS: "localhost"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install production dependencies
+        run: pip install -r requirements/production.txt
+
+      - name: Django deploy check
+        run: |
+          python manage.py check --deploy --settings=config.settings.production
+
+      - name: Test collectstatic
+        run: |
+          python manage.py collectstatic --noinput --settings=config.settings.production
+
+
+  # ─── 5. Badge de statut (affiché dans le README) ─────────────────
+  # [![CI](https://github.com/malektlili/fsb_system/actions/workflows/ci.yml/badge.svg)](https://github.com/malektlili/fsb_system/actions)

@@ -1,0 +1,943 @@
+{% extends 'base.html' %}
+{% block page_icon %}<i class="fas fa-graduation-cap"></i>{% endblock %}
+{% block page_title %}Ajouter un Diplôme{% endblock %}
+
+{% block extra_css %}
+<style>
+
+/* ── BREADCRUMB ──────────────────────────────────────── */
+.breadcrumb-nav {
+  display: flex; align-items: center; gap: 6px;
+  margin-bottom: 24px; font-size: 0.82rem; flex-wrap: wrap;
+}
+.breadcrumb-link {
+  color: #2563eb; text-decoration: none; font-weight: 600;
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 6px;
+  background: #eff6ff; border: 1px solid #bfdbfe;
+  transition: background .15s;
+}
+.breadcrumb-link:hover { background: #dbeafe; color: #1d4ed8; }
+.breadcrumb-sep { color: #cbd5e1; }
+.breadcrumb-current {
+  color: #0f172a; font-weight: 700;
+  padding: 4px 10px; background: #f1f5f9;
+  border-radius: 6px; border: 1px solid #e2e8f0;
+}
+
+/* ── PAGE HEADER ─────────────────────────────────────── */
+.page-header-custom {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 16px;
+  margin-bottom: 28px; flex-wrap: wrap;
+}
+.page-header-custom h1 {
+  font-size: 1.4rem; font-weight: 800;
+  color: #0f172a; margin: 0 0 4px;
+}
+.page-header-custom .sub {
+  font-size: 0.83rem; color: #64748b; margin: 0;
+}
+
+/* ── TABS ────────────────────────────────────────────── */
+.tabs-bar {
+  display: flex; gap: 4px; margin-bottom: 24px;
+  background: #f1f5f9; border: 1px solid #e2e8f0;
+  border-radius: 12px; padding: 4px;
+}
+.tab-btn {
+  flex: 1; padding: 10px 16px;
+  border-radius: 9px; border: none;
+  background: transparent; color: #64748b;
+  font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  display: flex; align-items: center;
+  justify-content: center; gap: 7px;
+}
+.tab-btn.active {
+  background: white; color: #2563eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.tab-btn:hover:not(.active) { background: #e2e8f0; color: #374151; }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── FORM SECTIONS ───────────────────────────────────── */
+.form-section {
+  background: white; border: 1px solid #e2e8f0;
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  margin-bottom: 16px;
+}
+.form-section-header {
+  padding: 14px 20px; border-bottom: 1px solid #f1f5f9;
+  display: flex; align-items: center; gap: 10px;
+  background: #fafbfc;
+}
+.form-section-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; flex-shrink: 0;
+}
+.fsi-blue   { background: #eff6ff; color: #2563eb; }
+.fsi-green  { background: #f0fdf4; color: #16a34a; }
+.fsi-purple { background: #faf5ff; color: #7c3aed; }
+.fsi-orange { background: #fff7ed; color: #c2410c; }
+
+.form-section-title {
+  font-size: 0.87rem; font-weight: 700; color: #0f172a;
+}
+.form-section-sub {
+  font-size: 0.72rem; color: #94a3b8; margin-top: 1px;
+}
+.form-section-body { padding: 20px; }
+
+/* ── FORM ELEMENTS ───────────────────────────────────── */
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.form-full   { grid-column: 1 / -1; }
+
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label {
+  font-size: 0.72rem; font-weight: 700; color: #374151;
+  text-transform: uppercase; letter-spacing: .05em;
+  display: flex; align-items: center; gap: 5px;
+}
+.form-label .req { color: #e11d48; }
+
+.form-control, .form-select {
+  padding: 9px 12px; border: 1px solid #e2e8f0;
+  border-radius: 8px; font-size: 0.85rem; color: #0f172a;
+  background: white; transition: border-color .15s, box-shadow .15s;
+  font-family: inherit; width: 100%;
+}
+.form-control:focus, .form-select:focus {
+  outline: none; border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+.form-control::placeholder { color: #cbd5e1; }
+
+.form-hint {
+  font-size: 0.70rem; color: #94a3b8;
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* ── MENTION TOGGLE ──────────────────────────────────── */
+.mention-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+.mention-card {
+  position: relative; cursor: pointer;
+}
+.mention-card input[type="radio"] {
+  position: absolute; opacity: 0; width: 0; height: 0;
+}
+.mention-label {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; padding: 12px 8px; border-radius: 10px;
+  border: 2px solid #e2e8f0; background: #f8fafc;
+  transition: all .15s; cursor: pointer; text-align: center;
+}
+.mention-label:hover { border-color: #93c5fd; background: #eff6ff; }
+.mention-icon { font-size: 1.4rem; }
+.mention-text { font-size: 0.72rem; font-weight: 700; color: #475569; }
+
+.mention-card input:checked + .mention-label.tb { border-color: #16a34a; background: #f0fdf4; }
+.mention-card input:checked + .mention-label.tb .mention-text { color: #15803d; }
+.mention-card input:checked + .mention-label.b  { border-color: #2563eb; background: #eff6ff; }
+.mention-card input:checked + .mention-label.b  .mention-text { color: #1d4ed8; }
+.mention-card input:checked + .mention-label.ab { border-color: #0891b2; background: #ecfeff; }
+.mention-card input:checked + .mention-label.ab .mention-text { color: #0e7490; }
+.mention-card input:checked + .mention-label.p  { border-color: #64748b; background: #f1f5f9; }
+.mention-card input:checked + .mention-label.p  .mention-text { color: #475569; }
+
+/* ── NOTE SLIDER ─────────────────────────────────────── */
+.note-display {
+  font-size: 2rem; font-weight: 800; color: #2563eb;
+  text-align: center; line-height: 1;
+}
+.note-display small { font-size: 1rem; color: #94a3b8; font-weight: 400; }
+
+input[type="range"] {
+  -webkit-appearance: none; width: 100%;
+  height: 6px; border-radius: 99px;
+  background: linear-gradient(90deg, #2563eb 0%, #e2e8f0 0%);
+  outline: none; cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px;
+  border-radius: 50%; background: #2563eb;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(37,99,235,.3);
+  cursor: pointer; transition: transform .1s;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+/* ── ETUDIANT SEARCH ─────────────────────────────────── */
+.etu-search-wrap { position: relative; }
+.etu-dropdown {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: white; border: 1px solid #e2e8f0; border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.1); z-index: 50;
+  max-height: 220px; overflow-y: auto; display: none;
+}
+.etu-dropdown.open { display: block; }
+.etu-option {
+  padding: 10px 14px; cursor: pointer;
+  border-bottom: 1px solid #f8fafc;
+  transition: background .1s;
+  display: flex; align-items: center; gap: 10px;
+}
+.etu-option:last-child { border-bottom: none; }
+.etu-option:hover { background: #eff6ff; }
+.etu-avatar {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: linear-gradient(135deg,#1e3a8a,#2563eb);
+  color: white; font-size: 0.72rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.etu-name { font-size: 0.83rem; font-weight: 700; color: #0f172a; }
+.etu-num  { font-size: 0.70rem; color: #94a3b8; }
+.etu-fil  { font-size: 0.70rem; color: #64748b; margin-top: 1px; }
+
+.etu-selected {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; background: #f0fdf4;
+  border: 1px solid #bbf7d0; border-radius: 9px;
+  margin-top: 8px;
+}
+.etu-selected .etu-avatar { background: linear-gradient(135deg,#059669,#16a34a); }
+
+/* ── PREVIEW CARD ────────────────────────────────────── */
+.preview-card {
+  background: linear-gradient(135deg, #0b1e3d 0%, #1e3a8a 50%, #2563eb 100%);
+  border-radius: 16px; padding: 28px 32px;
+  color: white; position: relative; overflow: hidden;
+  box-shadow: 0 12px 40px rgba(11,30,61,.25);
+}
+.preview-card::before {
+  content: 'FSB';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 6rem; font-weight: 800;
+  opacity: .05; pointer-events: none;
+  white-space: nowrap;
+}
+.preview-card::after {
+  content: '';
+  position: absolute; bottom: -20px; right: -20px;
+  width: 100px; height: 100px; border-radius: 50%;
+  background: rgba(255,255,255,.05);
+}
+.preview-gold-bar {
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #f59e0b, #fbbf24, #f59e0b, transparent);
+  border-radius: 99px; margin-bottom: 20px;
+}
+.preview-label {
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: .1em; color: rgba(255,255,255,.5);
+  margin-bottom: 3px;
+}
+.preview-value {
+  font-size: 0.9rem; font-weight: 700; color: white;
+  min-height: 20px;
+}
+.preview-name {
+  font-size: 1.4rem; font-weight: 800; color: white;
+  border-bottom: 2px solid rgba(245,158,11,.5);
+  display: inline-block; padding-bottom: 4px;
+  margin: 12px 0; min-height: 36px;
+}
+.preview-mention-badge {
+  display: inline-block; padding: 5px 16px;
+  border-radius: 99px; font-size: 0.78rem; font-weight: 800;
+  background: linear-gradient(135deg,#f59e0b,#fbbf24);
+  color: #0b1e3d; margin-top: 12px;
+}
+.preview-stats {
+  display: flex; gap: 24px; margin-top: 16px;
+  padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1);
+}
+.preview-stat-val { font-size: 1.3rem; font-weight: 800; color: #fbbf24; }
+.preview-stat-lbl { font-size: 0.65rem; color: rgba(255,255,255,.5); }
+
+/* ── SUBMIT BAR ──────────────────────────────────────── */
+.submit-bar {
+  background: white; border: 1px solid #e2e8f0;
+  border-radius: 14px; padding: 18px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  margin-top: 8px;
+}
+.submit-info { font-size: 0.80rem; color: #64748b; }
+.submit-info strong { color: #0f172a; }
+
+.btn-submit-diplome {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 28px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white; border: none; border-radius: 10px;
+  font-size: 0.88rem; font-weight: 800;
+  cursor: pointer; transition: opacity .15s, transform .1s;
+  box-shadow: 0 4px 14px rgba(245,158,11,.3);
+}
+.btn-submit-diplome:hover { opacity: .92; transform: translateY(-1px); }
+
+.btn-cancel-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px; background: white;
+  border: 1px solid #e2e8f0; border-radius: 9px;
+  font-size: 0.83rem; font-weight: 600; color: #64748b;
+  text-decoration: none; transition: background .15s;
+}
+.btn-cancel-link:hover { background: #f8fafc; }
+
+/* ── INFO BOX ────────────────────────────────────────── */
+.info-box {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 16px; border-radius: 10px;
+  font-size: 0.80rem; line-height: 1.5;
+  margin-bottom: 16px;
+}
+.info-box.blue   { background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; }
+.info-box.green  { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+.info-box.orange { background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c; }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in  { animation: fadeUp .35s ease both; }
+.animate-in2 { animation: fadeUp .35s ease .08s both; }
+.animate-in3 { animation: fadeUp .35s ease .14s both; }
+
+@media (max-width: 768px) {
+  .form-grid-2, .form-grid-3 { grid-template-columns: 1fr; }
+  .mention-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ── BREADCRUMB ──────────────────────────────────────────── -->
+<nav class="breadcrumb-nav">
+  <a href="{% url 'stages:diplomes' %}" class="breadcrumb-link">
+    <i class="fas fa-scroll"></i> Diplômes
+  </a>
+  <span class="breadcrumb-sep">›</span>
+  <span class="breadcrumb-current">
+    <i class="fas fa-plus" style="font-size:.72rem;margin-right:3px;color:#64748b"></i>
+    Ajouter un diplôme
+  </span>
+</nav>
+
+<!-- ── PAGE HEADER ─────────────────────────────────────────── -->
+<div class="page-header-custom animate-in">
+  <div>
+    <h1>Ajouter un Diplôme</h1>
+    <p class="sub">Enregistrement manuel d'un diplôme dans le registre officiel FSB</p>
+  </div>
+  <a href="{% url 'stages:eligibles_diplome' %}" class="btn-ghost-fsb btn-sm">
+    <i class="fas fa-graduation-cap"></i> Génération automatique
+  </a>
+</div>
+
+<!-- ── INFO BOX ────────────────────────────────────────────── -->
+<div class="info-box orange animate-in">
+  <i class="fas fa-exclamation-triangle" style="margin-top:1px;flex-shrink:0"></i>
+  <div>
+    <strong>Saisie manuelle</strong> — Ce formulaire permet d'enregistrer un diplôme manuellement.
+    Pour les étudiants ayant validé toutes les conditions (semestres + stage PFE),
+    utilisez la <a href="{% url 'stages:eligibles_diplome' %}" style="color:inherit;font-weight:700">génération automatique</a>.
+  </div>
+</div>
+
+<!-- ── TABS ────────────────────────────────────────────────── -->
+<div class="tabs-bar animate-in2">
+  <button class="tab-btn active" onclick="switchTab('form', this)">
+    <i class="fas fa-edit"></i> Formulaire
+  </button>
+  <button class="tab-btn" onclick="switchTab('preview', this)">
+    <i class="fas fa-eye"></i> Aperçu du diplôme
+  </button>
+</div>
+
+<form method="POST" id="diplomaForm" action="{% url 'stages:ajouter_diplome' %}">
+  {% csrf_token %}
+
+  <!-- ═══════════════════════════════════════
+       TAB 1 — FORMULAIRE
+  ═══════════════════════════════════════ -->
+  <div class="tab-panel active" id="tab-form">
+    <div class="row g-3">
+
+      <!-- Colonne principale -->
+      <div class="col-lg-8">
+
+        <!-- SECTION 1 : Étudiant -->
+        <div class="form-section animate-in">
+          <div class="form-section-header">
+            <div class="form-section-icon fsi-blue"><i class="fas fa-user-graduate"></i></div>
+            <div>
+              <div class="form-section-title">Étudiant</div>
+              <div class="form-section-sub">Sélectionnez l'étudiant concerné</div>
+            </div>
+          </div>
+          <div class="form-section-body">
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-search" style="color:#2563eb;font-size:.6rem"></i>
+                Rechercher un étudiant <span class="req">*</span>
+              </label>
+              <div class="etu-search-wrap">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="etuSearch"
+                  placeholder="Nom, prénom ou numéro étudiant…"
+                  autocomplete="off"
+                  oninput="searchEtu(this.value)"
+                >
+                <div class="etu-dropdown" id="etuDropdown">
+                  {% for et in etudiants %}
+                  <div class="etu-option"
+                       onclick="selectEtu('{{ et.pk }}', '{{ et.nom|escapejs }} {{ et.prenom|escapejs }}', '{{ et.numero_etudiant }}', '{{ et.filiere.nom|default:''|escapejs }}')">
+                    <div class="etu-avatar">{{ et.nom|first|upper }}{{ et.prenom|first|upper }}</div>
+                    <div>
+                      <div class="etu-name">{{ et.nom }} {{ et.prenom }}</div>
+                      <div class="etu-num">N° {{ et.numero_etudiant }}</div>
+                      <div class="etu-fil">{{ et.filiere.nom|default:"—"|truncatechars:40 }}</div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+              <input type="hidden" name="etudiant" id="etuId" required>
+              <div id="etuSelected" style="display:none" class="etu-selected">
+                <div class="etu-avatar" id="selectedAvatar">—</div>
+                <div>
+                  <div class="etu-name" id="selectedName"></div>
+                  <div class="etu-num" id="selectedNum"></div>
+                  <div class="etu-fil" id="selectedFil"></div>
+                </div>
+                <button type="button" onclick="clearEtu()"
+                  style="margin-left:auto;background:#fee2e2;border:none;color:#dc2626;
+                         border-radius:6px;padding:3px 8px;cursor:pointer;font-size:.72rem">
+                  ✕ Changer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2 : Infos diplôme -->
+        <div class="form-section animate-in" style="animation-delay:.05s">
+          <div class="form-section-header">
+            <div class="form-section-icon fsi-purple"><i class="fas fa-scroll"></i></div>
+            <div>
+              <div class="form-section-title">Informations du Diplôme</div>
+              <div class="form-section-sub">Type, spécialité et identifiant</div>
+            </div>
+          </div>
+          <div class="form-section-body">
+            <div class="form-grid-2">
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-certificate" style="color:#7c3aed;font-size:.6rem"></i>
+                  Type de diplôme <span class="req">*</span>
+                </label>
+                <select class="form-select" name="type_diplome" required onchange="updatePreview()">
+                  <option value="">— Choisir —</option>
+                  <option value="Licence">Licence</option>
+                  <option value="Master">Master</option>
+                  <option value="Doctorat">Doctorat</option>
+                  <option value="Ingénieur">Ingénieur</option>
+                  <option value="CPI">CPI</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-calendar" style="color:#7c3aed;font-size:.6rem"></i>
+                  Année d'obtention <span class="req">*</span>
+                </label>
+                <select class="form-select" name="annee_obtention" required onchange="updatePreview()">
+                  <option value="">— Année —</option>
+                  {% for y in annees %}
+                  <option value="{{ y }}" {% if y == annee_courante %}selected{% endif %}>{{ y }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="form-group form-full">
+                <label class="form-label">
+                  <i class="fas fa-book" style="color:#7c3aed;font-size:.6rem"></i>
+                  Spécialité <span class="req">*</span>
+                </label>
+                <input
+                  type="text" class="form-control" name="specialite"
+                  placeholder="Ex : Génie Logiciel et Systèmes d'Information"
+                  required oninput="updatePreview()"
+                >
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-hashtag" style="color:#7c3aed;font-size:.6rem"></i>
+                  N° Diplôme <span class="req">*</span>
+                </label>
+                <input
+                  type="text" class="form-control" name="numero_diplome"
+                  id="numDiplome"
+                  placeholder="FSB-LF-GL-2025-XXXXX"
+                  required
+                >
+                <div class="form-hint">
+                  <i class="fas fa-magic"></i>
+                  <button type="button" onclick="genNumDiplome()" style="background:none;border:none;color:#2563eb;cursor:pointer;font-size:.70rem;padding:0;font-family:inherit">
+                    Générer automatiquement
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="fas fa-calendar-check" style="color:#7c3aed;font-size:.6rem"></i>
+                  Date de délivrance
+                </label>
+                <input
+                  type="date" class="form-control" name="date_delivrance"
+                  value="{{ today }}"
+                >
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3 : Résultats -->
+        <div class="form-section animate-in" style="animation-delay:.10s">
+          <div class="form-section-header">
+            <div class="form-section-icon fsi-green"><i class="fas fa-chart-line"></i></div>
+            <div>
+              <div class="form-section-title">Résultats académiques</div>
+              <div class="form-section-sub">Moyenne générale et mention</div>
+            </div>
+          </div>
+          <div class="form-section-body">
+
+            <!-- Moyenne slider -->
+            <div class="form-group" style="margin-bottom:20px">
+              <label class="form-label">
+                <i class="fas fa-star" style="color:#16a34a;font-size:.6rem"></i>
+                Moyenne générale
+              </label>
+              <div class="note-display" id="noteDisplay">
+                — <small>/20</small>
+              </div>
+              <input
+                type="range" name="moyenne" id="moyenneSlider"
+                min="0" max="20" step="0.25" value=""
+                oninput="updateSlider(this.value)"
+                style="margin:12px 0"
+              >
+              <div style="display:flex;justify-content:space-between;font-size:.68rem;color:#94a3b8">
+                <span>0</span><span>5</span><span>10</span><span>15</span><span>20</span>
+              </div>
+              <div class="form-hint">
+                <i class="fas fa-info-circle"></i>
+                Laissez vide si la moyenne n'est pas encore disponible.
+                <button type="button" onclick="clearMoyenne()" style="background:none;border:none;color:#e11d48;cursor:pointer;font-size:.70rem;padding:0;font-family:inherit;margin-left:4px">
+                  Réinitialiser
+                </button>
+              </div>
+            </div>
+
+            <!-- Mention -->
+            <div class="form-group">
+              <label class="form-label">
+                <i class="fas fa-medal" style="color:#16a34a;font-size:.6rem"></i>
+                Mention
+              </label>
+              <div class="mention-grid">
+                <label class="mention-card">
+                  <input type="radio" name="mention" value="tres_bien" onchange="updatePreview()">
+                  <div class="mention-label tb">
+                    <span class="mention-icon">🏅</span>
+                    <span class="mention-text">Très Bien</span>
+                    <span style="font-size:.65rem;color:#94a3b8">≥ 16</span>
+                  </div>
+                </label>
+                <label class="mention-card">
+                  <input type="radio" name="mention" value="bien" onchange="updatePreview()">
+                  <div class="mention-label b">
+                    <span class="mention-icon">⭐</span>
+                    <span class="mention-text">Bien</span>
+                    <span style="font-size:.65rem;color:#94a3b8">14–15.99</span>
+                  </div>
+                </label>
+                <label class="mention-card">
+                  <input type="radio" name="mention" value="assez_bien" onchange="updatePreview()">
+                  <div class="mention-label ab">
+                    <span class="mention-icon">✔</span>
+                    <span class="mention-text">Assez Bien</span>
+                    <span style="font-size:.65rem;color:#94a3b8">12–13.99</span>
+                  </div>
+                </label>
+                <label class="mention-card">
+                  <input type="radio" name="mention" value="passable" onchange="updatePreview()">
+                  <div class="mention-label p">
+                    <span class="mention-icon">—</span>
+                    <span class="mention-text">Passable</span>
+                    <span style="font-size:.65rem;color:#94a3b8">10–11.99</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /col-lg-8 -->
+
+      <!-- Colonne droite : résumé -->
+      <div class="col-lg-4">
+        <div style="position:sticky;top:20px">
+
+          <!-- Preview mini -->
+          <div class="preview-card animate-in3">
+            <div class="preview-gold-bar"></div>
+            <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:4px">
+              FACULTÉ DES SCIENCES DE BIZERTE
+            </div>
+            <div style="font-size:.80rem;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:4px" id="prev-type">
+              DIPLÔME
+            </div>
+            <div class="preview-name" id="prev-name">Nom de l'étudiant</div>
+            <div style="font-size:.75rem;color:rgba(255,255,255,.6)" id="prev-spec">Spécialité</div>
+            <div class="preview-mention-badge" id="prev-mention">Mention</div>
+            <div class="preview-stats">
+              <div class="preview-stat">
+                <div class="preview-stat-val" id="prev-moy">—</div>
+                <div class="preview-stat-lbl">Moyenne /20</div>
+              </div>
+              <div class="preview-stat">
+                <div class="preview-stat-val" id="prev-annee">—</div>
+                <div class="preview-stat-lbl">Année</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checklist conditions -->
+          <div class="form-section" style="margin-top:14px">
+            <div class="form-section-header">
+              <div class="form-section-icon fsi-orange"><i class="fas fa-tasks"></i></div>
+              <div>
+                <div class="form-section-title">Vérification</div>
+                <div class="form-section-sub">Champs requis</div>
+              </div>
+            </div>
+            <div class="form-section-body" style="padding:14px 18px">
+              <div id="checklist" style="display:flex;flex-direction:column;gap:8px;font-size:.80rem">
+                <div class="check-item" id="chk-etu">
+                  <span class="chk-icon" style="color:#e11d48">✕</span>
+                  <span>Étudiant sélectionné</span>
+                </div>
+                <div class="check-item" id="chk-type">
+                  <span class="chk-icon" style="color:#e11d48">✕</span>
+                  <span>Type de diplôme</span>
+                </div>
+                <div class="check-item" id="chk-spec">
+                  <span class="chk-icon" style="color:#e11d48">✕</span>
+                  <span>Spécialité</span>
+                </div>
+                <div class="check-item" id="chk-num">
+                  <span class="chk-icon" style="color:#e11d48">✕</span>
+                  <span>N° Diplôme</span>
+                </div>
+                <div class="check-item" id="chk-annee">
+                  <span class="chk-icon" style="color:#e11d48">✕</span>
+                  <span>Année d'obtention</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /row -->
+  </div><!-- /tab-form -->
+
+  <!-- ═══════════════════════════════════════
+       TAB 2 — APERÇU
+  ═══════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-preview">
+    <div style="background:#f0f5fb;border-radius:16px;padding:32px;text-align:center">
+      <p style="color:#64748b;font-size:.85rem;margin-bottom:24px">
+        <i class="fas fa-info-circle me-1"></i>
+        Aperçu non contractuel — le diplôme officiel sera généré après enregistrement.
+      </p>
+      <!-- Mini diplôme preview -->
+      <div style="max-width:600px;margin:0 auto;background:white;border-radius:16px;
+                  box-shadow:0 12px 40px rgba(0,0,0,.12);overflow:hidden">
+        <div style="height:8px;background:linear-gradient(90deg,#0b1e3d,#f59e0b,#fbbf24,#f59e0b,#0b1e3d)"></div>
+        <div style="padding:32px;text-align:center">
+          <div style="font-size:.75rem;font-weight:700;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px">
+            Faculté des Sciences de Bizerte
+          </div>
+          <div style="font-size:.7rem;color:#94a3b8;margin-bottom:20px">
+            Université de Carthage — République Tunisienne
+          </div>
+          <div style="font-size:1.8rem;font-weight:800;color:#0b1e3d;font-family:Georgia,serif;margin-bottom:4px">
+            DIPLÔME
+          </div>
+          <div style="font-size:1rem;color:#64748b;margin-bottom:20px" id="prev2-type">—</div>
+          <div style="font-size:.85rem;color:#475569;margin-bottom:8px">décerné à</div>
+          <div style="font-size:1.5rem;font-weight:800;color:#0b1e3d;font-family:Georgia,serif;
+                      border-bottom:2px solid #f59e0b;display:inline-block;padding-bottom:4px;margin-bottom:16px"
+               id="prev2-name">Nom de l'étudiant</div>
+          <div style="font-size:.85rem;color:#475569;margin-bottom:4px">pour l'obtention du</div>
+          <div style="font-size:1rem;font-weight:700;color:#0b1e3d;margin-bottom:4px" id="prev2-type2">—</div>
+          <div style="font-size:.85rem;color:#64748b;margin-bottom:16px">Spécialité : <strong id="prev2-spec">—</strong></div>
+          <div style="display:inline-block;padding:6px 24px;border-radius:99px;
+                      background:linear-gradient(135deg,#f59e0b,#fbbf24);
+                      color:#0b1e3d;font-weight:800;font-size:.85rem;margin-bottom:20px"
+               id="prev2-mention">Mention</div>
+          <div style="display:flex;justify-content:center;gap:40px;margin-bottom:24px">
+            <div style="text-align:center">
+              <div style="font-size:1.4rem;font-weight:800;color:#2563eb" id="prev2-moy">—</div>
+              <div style="font-size:.68rem;color:#94a3b8">Moyenne /20</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:1.4rem;font-weight:800;color:#2563eb" id="prev2-annee">—</div>
+              <div style="font-size:.68rem;color:#94a3b8">Année</div>
+            </div>
+          </div>
+        </div>
+        <div style="height:6px;background:linear-gradient(90deg,#0b1e3d,#f59e0b,#fbbf24,#f59e0b,#0b1e3d)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUBMIT BAR ──────────────────────────────────────── -->
+  <div class="submit-bar animate-in3">
+    <div class="submit-info">
+      Vérifiez toutes les informations avant d'enregistrer.<br>
+      <strong>Le diplôme sera ajouté au registre officiel FSB.</strong>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a href="{% url 'stages:diplomes' %}" class="btn-cancel-link">
+        <i class="fas fa-times"></i> Annuler
+      </a>
+      <button type="submit" class="btn-submit-diplome">
+        <i class="fas fa-graduation-cap"></i> Enregistrer le Diplôme
+      </button>
+    </div>
+  </div>
+
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+
+// ── DONNÉES ÉTUDIANTS ─────────────────────────────────────────
+const ETUDIANTS = [
+  {% for et in etudiants %}
+  {
+    id: "{{ et.pk }}",
+    nom: "{{ et.nom|escapejs }}",
+    prenom: "{{ et.prenom|escapejs }}",
+    numero: "{{ et.numero_etudiant }}",
+    filiere: "{{ et.filiere.nom|default:''|escapejs }}",
+    filiere_code: "{{ et.filiere.code|default:''|escapejs }}",
+  },
+  {% endfor %}
+];
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'preview') updatePreview();
+}
+
+// ── RECHERCHE ÉTUDIANT ────────────────────────────────────────
+function searchEtu(q) {
+  const dd = document.getElementById('etuDropdown');
+  if (!q.trim()) { dd.classList.remove('open'); return; }
+
+  const filtered = ETUDIANTS.filter(e =>
+    (e.nom + ' ' + e.prenom + ' ' + e.numero)
+    .toLowerCase().includes(q.toLowerCase())
+  );
+
+  const html = filtered.slice(0, 8).map(e => `
+    <div class="etu-option" onclick="selectEtu('${e.id}','${e.nom} ${e.prenom}','${e.numero}','${e.filiere}','${e.filiere_code}')">
+      <div class="etu-avatar">${e.nom[0]||''}${e.prenom[0]||''}</div>
+      <div>
+        <div class="etu-name">${e.nom} ${e.prenom}</div>
+        <div class="etu-num">N° ${e.numero}</div>
+        <div class="etu-fil">${e.filiere||'—'}</div>
+      </div>
+    </div>
+  `).join('');
+
+  dd.innerHTML = html || '<div style="padding:14px;text-align:center;font-size:.80rem;color:#94a3b8">Aucun résultat</div>';
+  dd.classList.add('open');
+}
+
+function selectEtu(id, nom, numero, filiere, filiere_code) {
+  document.getElementById('etuId').value = id;
+  document.getElementById('etuSearch').style.display = 'none';
+  document.getElementById('etuDropdown').classList.remove('open');
+
+  const sel = document.getElementById('etuSelected');
+  sel.style.display = 'flex';
+  document.getElementById('selectedAvatar').textContent = nom.split(' ').map(w=>w[0]||'').join('').substring(0,2).toUpperCase();
+  document.getElementById('selectedName').textContent  = nom;
+  document.getElementById('selectedNum').textContent   = 'N° ' + numero;
+  document.getElementById('selectedFil').textContent   = filiere || '—';
+
+  // Pré-remplir le numéro diplôme
+  genNumDiplome(filiere_code, numero);
+  updatePreview();
+  updateChecklist();
+}
+
+function clearEtu() {
+  document.getElementById('etuId').value = '';
+  document.getElementById('etuSearch').style.display = '';
+  document.getElementById('etuSearch').value = '';
+  document.getElementById('etuSelected').style.display = 'none';
+  updateChecklist();
+}
+
+// Fermer dropdown si clic extérieur
+document.addEventListener('click', e => {
+  if (!e.target.closest('.etu-search-wrap'))
+    document.getElementById('etuDropdown').classList.remove('open');
+});
+
+// ── GÉNÉRER N° DIPLÔME ────────────────────────────────────────
+function genNumDiplome(filiere_code, numero) {
+  const code  = filiere_code || 'FSB';
+  const num   = numero || Math.floor(Math.random() * 90000 + 10000);
+  const annee = document.querySelector('[name="annee_obtention"]')?.value || new Date().getFullYear();
+  document.getElementById('numDiplome').value = `FSB-${code}-${annee}-${num}`;
+  updateChecklist();
+}
+
+// ── SLIDER MOYENNE ────────────────────────────────────────────
+let moyenneActive = false;
+
+function updateSlider(val) {
+  moyenneActive = true;
+  const v = parseFloat(val);
+  document.getElementById('noteDisplay').innerHTML = `<span>${v.toFixed(2)}</span> <small>/20</small>`;
+
+  // Update slider gradient
+  const pct = (v / 20) * 100;
+  const color = v >= 14 ? '#16a34a' : v >= 10 ? '#2563eb' : '#dc2626';
+  document.getElementById('moyenneSlider').style.background =
+    `linear-gradient(90deg, ${color} ${pct}%, #e2e8f0 ${pct}%)`;
+
+  // Auto-suggest mention
+  let mention = '';
+  if (v >= 16) mention = 'tres_bien';
+  else if (v >= 14) mention = 'bien';
+  else if (v >= 12) mention = 'assez_bien';
+  else if (v >= 10) mention = 'passable';
+
+  if (mention) {
+    document.querySelectorAll('[name="mention"]').forEach(r => {
+      r.checked = r.value === mention;
+    });
+  }
+  updatePreview();
+}
+
+function clearMoyenne() {
+  moyenneActive = false;
+  document.getElementById('moyenneSlider').value = '';
+  document.getElementById('noteDisplay').innerHTML = '— <small>/20</small>';
+  document.getElementById('moyenneSlider').style.background = '#e2e8f0';
+  updatePreview();
+}
+
+// ── PREVIEW ───────────────────────────────────────────────────
+const MENTION_LABELS = {
+  tres_bien: '🏅 Très Bien',
+  bien: '⭐ Bien',
+  assez_bien: '✔ Assez Bien',
+  passable: '— Passable',
+};
+
+function updatePreview() {
+  const nom   = document.getElementById('selectedName')?.textContent || 'Nom de l\'étudiant';
+  const type  = document.querySelector('[name="type_diplome"]')?.value || '—';
+  const spec  = document.querySelector('[name="specialite"]')?.value  || 'Spécialité';
+  const annee = document.querySelector('[name="annee_obtention"]')?.value || '—';
+  const moy   = moyenneActive ? parseFloat(document.getElementById('moyenneSlider').value).toFixed(2) : '—';
+  const mentionEl = document.querySelector('[name="mention"]:checked');
+  const mention = mentionEl ? (MENTION_LABELS[mentionEl.value] || mentionEl.value) : 'Mention';
+
+  // Tab 1 preview
+  document.getElementById('prev-type').textContent    = type;
+  document.getElementById('prev-name').textContent    = nom;
+  document.getElementById('prev-spec').textContent    = spec;
+  document.getElementById('prev-mention').textContent = mention;
+  document.getElementById('prev-moy').textContent     = moy;
+  document.getElementById('prev-annee').textContent   = annee;
+
+  // Tab 2 preview
+  document.getElementById('prev2-type').textContent   = type;
+  document.getElementById('prev2-type2').textContent  = type;
+  document.getElementById('prev2-name').textContent   = nom;
+  document.getElementById('prev2-spec').textContent   = spec;
+  document.getElementById('prev2-mention').textContent = mention;
+  document.getElementById('prev2-moy').textContent    = moy;
+  document.getElementById('prev2-annee').textContent  = annee;
+}
+
+// ── CHECKLIST ─────────────────────────────────────────────────
+function updateChecklist() {
+  const checks = {
+    'chk-etu':   !!document.getElementById('etuId').value,
+    'chk-type':  !!document.querySelector('[name="type_diplome"]')?.value,
+    'chk-spec':  !!document.querySelector('[name="specialite"]')?.value?.trim(),
+    'chk-num':   !!document.getElementById('numDiplome')?.value?.trim(),
+    'chk-annee': !!document.querySelector('[name="annee_obtention"]')?.value,
+  };
+  Object.entries(checks).forEach(([id, ok]) => {
+    const el   = document.getElementById(id);
+    const icon = el?.querySelector('.chk-icon');
+    if (!el || !icon) return;
+    icon.textContent = ok ? '✓' : '✕';
+    icon.style.color = ok ? '#16a34a' : '#e11d48';
+    el.style.color   = ok ? '#374151' : '#94a3b8';
+  });
+}
+
+// Attacher les listeners
+document.addEventListener('DOMContentLoaded', () => {
+  ['[name="type_diplome"]','[name="specialite"]','[name="annee_obtention"]','#numDiplome'].forEach(sel => {
+    document.querySelector(sel)?.addEventListener('input', () => { updateChecklist(); updatePreview(); });
+  });
+  updatePreview();
+  updateChecklist();
+});
+
+</script>
+{% endblock %}

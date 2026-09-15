@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Enseignants — Départements{% endblock %}
+{% block page_icon %}<i class="fas fa-chalkboard-teacher"></i>{% endblock %}
+{% block page_title %}Enseignants — Choisir un Département{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Enseignants</h1>
+    <p class="sub">Sélectionnez un département</p>
+  </div>
+  <a href="{% url 'administration:ajouter_enseignant' %}" class="btn-primary-fsb">
+    <i class="fas fa-user-plus"></i> Ajouter un Enseignant
+  </a>
+</div>
+
+<div class="row g-3">
+  {% for item in dept_data %}
+  <div class="col-lg-4 col-md-6 fu fu{{ forloop.counter }}">
+    <a href="{% url 'administration:enseignants_liste' item.dept.pk %}"
+       style="text-decoration:none;display:block">
+      <div class="card-fsb" style="transition:all 0.25s;cursor:pointer"
+           onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(37,99,235,0.15)'"
+           onmouseout="this.style.transform='translateY(0)';this.style.boxShadow=''">
+
+        <div style="background:linear-gradient(135deg,#0c4a6e,#0284c7);
+                    padding:20px;display:flex;align-items:center;gap:14px">
+          <div style="font-size:2.4rem;flex-shrink:0">
+            {% if item.dept.nom == 'informatique' %}💻
+            {% elif item.dept.nom == 'mathematiques' %}📐
+            {% elif item.dept.nom == 'physique' %}🔭
+            {% elif item.dept.nom == 'chimie' %}⚗️
+            {% elif item.dept.nom == 'biologie' %}🔬
+            {% else %}🌍{% endif %}
+          </div>
+          <div>
+            <div style="font-size:1rem;font-weight:800;color:white">
+              {{ item.dept.get_nom_display }}
+            </div>
+            {% if item.dept.chef %}
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:2px">
+              Chef : {{ item.dept.chef }}
+            </div>
+            {% endif %}
+          </div>
+          <i class="fas fa-chevron-right ms-auto" style="color:rgba(255,255,255,0.35)"></i>
+        </div>
+
+        <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:36px;height:36px;border-radius:9px;background:#e0f2fe;
+                        display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-chalkboard-teacher" style="color:#0284c7;font-size:0.9rem"></i>
+            </div>
+            <div>
+              <div style="font-size:1.3rem;font-weight:800;color:#0284c7">
+                {{ item.nb_enseignants }}
+              </div>
+              <div style="font-size:0.72rem;color:#94a3b8">Enseignants actifs</div>
+            </div>
+          </div>
+          <div style="font-size:0.78rem;color:#0284c7;font-weight:600">
+            Voir la liste <i class="fas fa-arrow-right ms-1"></i>
+          </div>
+        </div>
+
+      </div>
+    </a>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="card-fsb">
+      <div class="card-fsb-body">
+        <div class="empty-state">
+          <div class="empty-icon"><i class="fas fa-university"></i></div>
+          <h5>Aucun département</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

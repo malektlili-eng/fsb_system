@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% block title %}{{ dept.get_nom_display }} — FSB{% endblock %}
+{% block page_icon %}<i class="fas fa-sitemap"></i>{% endblock %}
+{% block page_title %}Département {{ dept.get_nom_display }}{% endblock %}
+
+{% block content %}
+
+<!-- Breadcrumb -->
+<nav style="margin-bottom:18px;font-size:0.83rem;color:#94a3b8">
+  <a href="{% url 'administration:dashboard' %}"
+     style="color:#2563eb;text-decoration:none;font-weight:600">
+    <i class="fas fa-home me-1"></i>Accueil
+  </a>
+  <span style="margin:0 8px">›</span>
+  <a href="{% url 'administration:formation_detail' type_formation %}"
+     style="color:#2563eb;text-decoration:none;font-weight:600">
+    {{ type_formation|capfirst }}
+  </a>
+  <span style="margin:0 8px">›</span>
+  <span style="color:#0b1e3d;font-weight:700">{{ dept.get_nom_display }}</span>
+</nav>
+
+<div class="page-header">
+  <div>
+    <h1>
+      {% if dept.nom == 'informatique' %}💻
+      {% elif dept.nom == 'mathematiques' %}📐
+      {% elif dept.nom == 'physique' %}🔭
+      {% elif dept.nom == 'chimie' %}⚗️
+      {% elif dept.nom == 'biologie' %}🔬
+      {% else %}🌍{% endif %}
+      Département {{ dept.get_nom_display }}
+    </h1>
+    <p class="sub">{{ type_formation|capfirst }} — Faculté des Sciences de Bizerte</p>
+  </div>
+  <a href="{% url 'administration:formation_detail' type_formation %}"
+     class="btn-ghost-fsb btn-sm">
+    <i class="fas fa-arrow-left"></i> Retour
+  </a>
+</div>
+
+<!-- Stat cards du département -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3 fu fu1">
+    <div class="stat-card sc-blue">
+      <div class="stat-num">{{ nb_etudiants }}</div>
+      <div class="stat-label">Étudiants Inscrits</div>
+      <i class="fas fa-user-graduate stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 fu fu2">
+    <div class="stat-card sc-cyan">
+      <div class="stat-num">{{ nb_enseignants }}</div>
+      <div class="stat-label">Enseignants</div>
+      <i class="fas fa-chalkboard-teacher stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 fu fu3">
+    <div class="stat-card sc-violet">
+      <div class="stat-num">{{ filieres.count }}</div>
+      <div class="stat-label">Filières</div>
+      <i class="fas fa-graduation-cap stat-icon"></i>
+    </div>
+  </div>
+  <div class="col-md-3 fu fu4">
+    <div class="stat-card sc-emerald">
+      <div class="stat-num">{{ enseignants.count }}</div>
+      <div class="stat-label">Corps Enseignant</div>
+      <i class="fas fa-users stat-icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+
+  <!-- Filières -->
+  <div class="col-lg-7 fu fu1">
+    <div class="card-fsb">
+      <div class="card-fsb-header">
+        <div class="header-left"><i class="fas fa-list"></i> Filières du Département</div>
+        <span class="badge-pill b-blue">{{ filieres.count }}</span>
+      </div>
+      <div class="card-fsb-body" style="padding:14px">
+        {% for filiere in filieres %}
+        <a href="{% url 'administration:filiere_detail' type_formation dept.pk filiere.pk %}"
+           style="display:flex;align-items:center;justify-content:space-between;
+                  padding:14px 16px;border-radius:12px;margin-bottom:10px;
+                  background:#f8faff;border:1.5px solid #e2eaf6;
+                  text-decoration:none;transition:all 0.22s"
+           onmouseover="this.style.borderColor='#2563eb';this.style.background='#eff6ff'"
+           onmouseout="this.style.borderColor='#e2eaf6';this.style.background='#f8faff'">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;border-radius:10px;
+                        background:linear-gradient(135deg,#1e3a8a,#2563eb);
+                        display:flex;align-items:center;justify-content:center;
+                        color:white;font-size:1rem;flex-shrink:0">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:0.9rem;color:#0b1e3d">
+                {{ filiere.nom }}
+              </div>
+              <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px">
+                Code : {{ filiere.code }} &nbsp;|&nbsp;
+                Niveau : {{ filiere.get_niveau_display }}
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="text-align:right">
+              <div style="font-size:1.1rem;font-weight:800;color:#2563eb">
+                {{ filiere.nb_etudiants }}
+              </div>
+              <div style="font-size:0.68rem;color:#94a3b8">étudiants</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#bfdbfe;font-size:0.8rem"></i>
+          </div>
+        </a>
+        {% empty %}
+        <div class="empty-state" style="padding:24px">
+          <div class="empty-icon"><i class="fas fa-graduation-cap"></i></div>
+          <p>Aucune filière dans ce département.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Enseignants du département -->
+  <div class="col-lg-5 fu fu2">
+    <div class="card-fsb">
+      <div class="card-fsb-header">
+        <div class="header-left">
+          <i class="fas fa-chalkboard-teacher"></i> Corps Enseignant
+        </div>
+        <a href="{% url 'administration:liste_enseignants' %}?dept={{ dept.pk }}"
+           class="btn-primary-fsb btn-xs" style="color:white">
+          Voir tout
+        </a>
+      </div>
+      <div class="card-fsb-body" style="padding:0">
+        <div class="table-responsive">
+          <table class="table-fsb">
+            <thead>
+              <tr><th>Enseignant</th><th>Grade</th></tr>
+            </thead>
+            <tbody>
+              {% for ens in enseignants %}
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="width:30px;height:30px;border-radius:7px;
+                                background:linear-gradient(135deg,#0c4a6e,#0284c7);
+                                display:flex;align-items:center;justify-content:center;
+                                color:white;font-weight:700;font-size:0.72rem;flex-shrink:0">
+                      {{ ens.prenom|first|upper }}{{ ens.nom|first|upper }}
+                    </div>
+                    <div>
+                      <div style="font-weight:700;font-size:0.82rem;color:#0b1e3d">
+                        {{ ens.prenom }} {{ ens.nom }}
+                      </div>
+                      <div style="font-size:0.69rem;color:#94a3b8">{{ ens.specialite }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge-pill
+                    {% if ens.grade == 'professeur' %}b-purple
+                    {% elif ens.grade == 'maitre_conf' %}b-blue
+                    {% elif ens.grade == 'maitre_assistant' %}b-cyan
+                    {% else %}b-gray{% endif %}"
+                    style="font-size:0.65rem">
+                    {{ ens.get_grade_display }}
+                  </span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="2">
+                <div class="empty-state" style="padding:16px">
+                  <p>Aucun enseignant.</p>
+                </div>
+              </td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
