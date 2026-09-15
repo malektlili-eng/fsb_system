@@ -20,6 +20,7 @@ from django.conf import settings
 
 from .models import ConversationChat, MessageChat
 from .orchestrator import FSBOrchestrator
+from .llm.providers import groq_is_usable
 
 logger = logging.getLogger(__name__)
 
@@ -60,11 +61,20 @@ def chat_interface(request):
         except ConversationChat.DoesNotExist:
             pass
 
+    _groq_ok, _groq_reason = groq_is_usable()
+    _fallback = getattr(settings, 'LLM_FALLBACK_OFFLINE', True)
+
     return render(request, 'ai_agents/chat.html', {
         'conversations': conversations,
         'current_conv': current_conv,
         'conv_messages': conv_messages,
-        'has_api_key': bool(settings.GROQ_API_KEY),
+        'has_api_key': _groq_ok,
+        # Mode déterministe actif : ce n'est pas une panne mais le repli
+        # prévu. Le RAG, la sélection d'outils et le streaming tournent
+        # normalement ; seule la rédaction est générée sans LLM.
+        'offline_mode': (not _groq_ok) and _fallback,
+        'provider_unusable': (not _groq_ok) and not _fallback,
+        'provider_reason': _groq_reason,
         'model_name': settings.GROQ_MODEL,
     })
 
@@ -91,10 +101,25 @@ def send_message_stream(request):
         if not user_msg:
             return JsonResponse({'error': 'Message vide'}, status=400)
 
-        if not settings.GROQ_API_KEY:
+        # Le fournisseur est-il utilisable ? On ne teste PAS GROQ_API_KEY
+        # directement : la question n'est pas « la clé existe-t-elle »
+        # mais « peut-on servir une réponse ». Sans clé, le repli
+        # déterministe prend le relais (cf. LLM_FALLBACK_OFFLINE), et le
+        # retrieval, le tool calling et le streaming restent actifs.
+        # On n'échoue que si le repli est explicitement désactivé.
+        usable, reason = groq_is_usable()
+        fallback = getattr(settings, 'LLM_FALLBACK_OFFLINE', True)
+        if not usable and not fallback:
             return JsonResponse(
-                {'error': 'Clé API Groq non configurée. Ajoutez GROQ_API_KEY dans votre .env'},
-                status=503
+                {
+                    'error': (
+                        f"Fournisseur LLM indisponible : {reason}. "
+                        "Renseignez GROQ_API_KEY, ou activez "
+                        "LLM_FALLBACK_OFFLINE pour servir le fournisseur "
+                        "déterministe hors-ligne."
+                    )
+                },
+                status=503,
             )
 
         # Créer/récupérer la conversation

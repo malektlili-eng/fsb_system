@@ -15,7 +15,7 @@ from unittest.mock import MagicMock, patch
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from tests.support import requires_groq_sdk
@@ -68,14 +68,32 @@ class AgentSecondaryViewsTest(TestCase):
         response = self.client.get(reverse("ai_agent:metrics"))
         self.assertEqual(response.status_code, 403)
 
-    def test_send_message_sans_cle_api_retourne_503(self):
-        with self.settings(GROQ_API_KEY=""):
+    def test_send_message_sans_cle_api_retourne_503_si_repli_desactive(self):
+        """
+        503 UNIQUEMENT quand le repli est explicitement désactivé.
+
+        Ce test affirmait auparavant qu'une clé absente devait toujours
+        produire un 503 — il verrouillait le bug qu'il était censé
+        prévenir : la vue refusait de répondre alors que le repli
+        déterministe était disponible. Le contrat correct distingue les
+        deux cas.
+        """
+        with self.settings(GROQ_API_KEY="", LLM_FALLBACK_OFFLINE=False):
             response = self.client.post(
                 reverse("ai_agent:send"),
                 json.dumps({"message": "Bonjour", "conversation_id": None}),
                 content_type="application/json",
             )
         self.assertEqual(response.status_code, 503)
+
+    def test_send_message_sans_cle_api_repond_si_repli_actif(self):
+        with self.settings(GROQ_API_KEY="", LLM_FALLBACK_OFFLINE=True):
+            response = self.client.post(
+                reverse("ai_agent:send"),
+                json.dumps({"message": "Bonjour", "conversation_id": None}),
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, 200)
 
     def test_send_message_json_invalide_retourne_400(self):
         response = self.client.post(
@@ -394,3 +412,63 @@ class GroqStreamParsingTest(TestCase):
         self.assertEqual(result, "Résumé fictif")
         called_with = MockGroq.return_value.chat.completions.create.call_args
         self.assertEqual(called_with.kwargs["model"], provider.summary_model)
+
+
+class ChatViewWithoutApiKeyTest(TestCase):
+    """
+    Régression : la vue de chat court-circuitait la requête dès que
+    GROQ_API_KEY était vide, en renvoyant « Clé API Groq non
+    configurée » — AVANT que l'orchestrateur, et donc le repli
+    déterministe, ne soient atteints.
+
+    Le repli existait pourtant dans `get_provider()`. Le bug a survécu
+    parce que les tests appelaient l'orchestrateur directement et ne
+    passaient jamais par la vue. Il ne s'est manifesté que sur
+    l'instance déployée, sans clé — exactement le scénario que le repli
+    est censé couvrir.
+
+    Ces tests parcourent la vue HTTP de bout en bout.
+    """
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="chat_demo", password="pwd", role="super_admin"
+        )
+        self.client = Client()
+        self.client.login(username="chat_demo", password="pwd")
+
+    @override_settings(GROQ_API_KEY="", LLM_FALLBACK_OFFLINE=True)
+    def test_sans_cle_la_vue_repond_au_lieu_de_refuser(self):
+        response = self.client.post(
+            "/ai/chat/send/",
+            data=json.dumps({"message": "Comment se passe la session de rattrapage ?"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        body = b"".join(response.streaming_content).decode()
+        self.assertNotIn("non configurée", body)
+        # Le RAG s'est bien déclenché : c'est la preuve que le pipeline
+        # a tourné, pas seulement qu'une erreur a été évitée.
+        self.assertIn('"type": "rag"', body)
+
+    @override_settings(GROQ_API_KEY="", LLM_FALLBACK_OFFLINE=False)
+    def test_sans_cle_et_sans_repli_la_vue_echoue_explicitement(self):
+        """Repli désactivé = erreur claire, jamais de silence."""
+        response = self.client.post(
+            "/ai/chat/send/",
+            data=json.dumps({"message": "Bonjour"}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("indisponible", response.json()["error"])
+
+    @override_settings(GROQ_API_KEY="", LLM_FALLBACK_OFFLINE=True)
+    def test_la_banniere_annonce_le_mode_deterministe(self):
+        """
+        L'interface ne doit pas crier à la panne : le mode déterministe
+        est le comportement prévu d'une démo sans secret.
+        """
+        response = self.client.get("/ai/chat/")
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["offline_mode"])
+        self.assertNotContains(response, "GROQ_API_KEY manquante")

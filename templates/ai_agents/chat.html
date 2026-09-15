@@ -38,8 +38,17 @@
       <div class="agent-avatar admin-av">🤖<span class="agent-status"></span></div>
       <div class="agent-name" style="font-size:.9rem;font-weight:700;margin-top:8px">Assistant FSB</div>
       <div style="font-size:.75rem;color:#64748b;margin-top:4px;text-align:center">Agent multi-rôles · accès BD temps réel</div>
-      {% if not has_api_key %}
-      <div class="alert alert-warning mt-2" style="font-size:.75rem;padding:6px 10px">⚠️ GROQ_API_KEY manquante dans .env</div>
+      {% if offline_mode %}
+      <div class="alert alert-info mt-2" style="font-size:.72rem;padding:6px 10px;line-height:1.35">
+        <strong>Mode déterministe</strong><br>
+        Aucune clé LLM configurée : les réponses sont générées hors-ligne.
+        Le retrieval RAG, la sélection d'outils et le streaming
+        fonctionnent normalement.
+      </div>
+      {% elif provider_unusable %}
+      <div class="alert alert-warning mt-2" style="font-size:.72rem;padding:6px 10px">
+        ⚠️ Fournisseur LLM indisponible : {{ provider_reason }}
+      </div>
       {% endif %}
       <div class="agents-grid">
         <div class="agent-chip chip-admin"><span class="chip-dot"></span>Admin</div>
