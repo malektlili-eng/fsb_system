@@ -5,12 +5,13 @@ Le projet est **prêt à déployer** : la configuration de production
 complète et vérifiée par le job `deploy-check` de la CI
 (`python manage.py check --deploy` + `collectstatic`).
 
-> **URL de démonstration** : `https://fsb-system.onrender.com`
+> **URL de démonstration** :
+> **[https://fsb-system.onrender.com](https://fsb-system.onrender.com)**
 >
-> ⚠️ **Espace réservé — à remplacer par l'URL réelle après le premier
-> déploiement.** Tant que cette ligne n'a pas été remplacée, considérer
-> qu'il n'y a pas de démo en ligne : ce dépôt fournit l'infrastructure
-> d'un déploiement en un clic, pas une instance déjà en service.
+> Déployée depuis ce blueprint, sans aucune intervention manuelle ni
+> secret : migrations, données de démonstration et index vectoriel sont
+> construits par la phase de build. Offre gratuite Render, donc mise en
+> veille après ~15 min d'inactivité (premier chargement ~50 s).
 
 ### Ce que le déploiement produit, sans intervention manuelle
 

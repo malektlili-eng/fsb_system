@@ -59,16 +59,11 @@ charge d'un fournisseur externe.
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/malektlili-eng/fsb_system)
 
-**URL** : `https://fsb-system.onrender.com` — *espace réservé, à
-remplacer après le premier déploiement. Tant que cette ligne n'a pas
-été modifiée, considérer qu'aucune instance n'est en service.*
+**→ [https://fsb-system.onrender.com](https://fsb-system.onrender.com)** — instance en service.
 
-Une fois déployé, reporter l'URL partout en une commande :
-
-```bash
-python set_demo_url.py https://votre-url.onrender.com
-python set_demo_url.py          # sans argument : affiche l'état courant
-```
+> L'instance tourne sur l'offre gratuite Render et **se met en veille
+> après ~15 min d'inactivité** : le tout premier chargement peut
+> demander ~50 s. Ce n'est pas une panne.
 
 Le blueprint est **autonome** : la phase de build enchaîne
 `migrate` → `init_data` → `build_rag_index`, donc l'instance déployée
