@@ -227,4 +227,4 @@ jobs:
 
 
   # ─── 5. Badge de statut (affiché dans le README) ─────────────────
-  # [![CI](https://github.com/malektlili/fsb_system/actions/workflows/ci.yml/badge.svg)](https://github.com/malektlili/fsb_system/actions)
+  # [![CI](https://github.com/malektlili-eng/fsb_system/actions/workflows/ci.yml/badge.svg)](https://github.com/malektlili-eng/fsb_system/actions)

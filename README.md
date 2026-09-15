@@ -1,6 +1,6 @@
 # FSB System V2 — Plateforme de gestion universitaire avec agent IA testable
 
-[![CI/CD](https://github.com/malektlili/fsb_system/actions/workflows/ci.yml/badge.svg)](https://github.com/malektlili/fsb_system/actions)
+[![CI/CD](https://github.com/malektlili-eng/fsb_system/actions/workflows/ci.yml/badge.svg)](https://github.com/malektlili-eng/fsb_system/actions)
 [![Coverage AI/RAG](https://img.shields.io/badge/coverage%20AI%2FRAG-94%25-brightgreen.svg)](reports/coverage_split.md)
 [![Coverage applicatif](https://img.shields.io/badge/coverage%20applicatif-70%25-yellow.svg)](reports/coverage_split.md)
 [![Tests](https://img.shields.io/badge/tests-162%20passing-brightgreen.svg)](tests/)
@@ -57,7 +57,7 @@ charge d'un fournisseur externe.
 
 ## Démo en ligne
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/malektlili/fsb_system)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/malektlili-eng/fsb_system)
 
 **URL** : `https://fsb-system.onrender.com` — *espace réservé, à
 remplacer après le premier déploiement. Tant que cette ligne n'a pas
@@ -239,7 +239,7 @@ python manage.py run_benchmarks       # → reports/benchmark_results_offline.js
 - Clé API Groq **facultative** (gratuite sur [console.groq.com](https://console.groq.com))
 
 ```bash
-git clone https://github.com/malektlili/fsb_system.git
+git clone https://github.com/malektlili-eng/fsb_system.git
 cd fsb_system
 python -m venv venv && source venv/bin/activate
 pip install -r requirements/development.txt
