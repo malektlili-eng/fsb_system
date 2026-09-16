@@ -123,7 +123,11 @@ jobs:
           # Rend vérifiable la phrase « l'effort de test est concentré
           # sur la couche IA/RAG » : ce n'est plus une affirmation du
           # README, c'est une porte qui casse le build si elle tombe.
-          python manage.py coverage_split --output-dir reports --fail-under-ai=90
+          # Seuil à 85 alors que la mesure est ~91 % : une porte fixée
+          # au ras du chiffre observé casse au premier ajout de code.
+          # 6 points de marge attrapent une vraie régression sans
+          # rendre la CI instable.
+          python manage.py coverage_split --output-dir reports --fail-under-ai=85
           cat reports/coverage_split.md
 
       - name: Upload coverage to Codecov

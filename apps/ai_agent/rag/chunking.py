@@ -81,7 +81,15 @@ def split_sentences(text: str) -> list[str]:
 
 
 def _make_chunk_id(source_doc: str, position: int, content: str) -> str:
-    digest = hashlib.sha1(content.encode("utf-8")).hexdigest()[:10]
+    # sha1 sert ici d'EMPREINTE DE CONTENU, pas de primitive de sécurité :
+    # elle rend l'identifiant d'un chunk stable et reproductible d'une
+    # indexation à l'autre. `usedforsecurity=False` déclare cette
+    # intention — à la bibliothèque crypto comme à bandit (B324) — plutôt
+    # que de masquer l'alerte avec un `# nosec`. Un identifiant n'a besoin
+    # que d'être stable et peu collisionnant, pas résistant à un attaquant.
+    digest = hashlib.sha1(
+        content.encode("utf-8"), usedforsecurity=False
+    ).hexdigest()[:10]
     return f"{source_doc}::{position:03d}::{digest}"
 
 

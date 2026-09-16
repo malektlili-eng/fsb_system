@@ -458,14 +458,26 @@ def write_reports(
         lines.append(_format_metric_row(row["config"], row))
 
     _a4_rows = [r for r in ablation_rows if r["ablation"] == "A4_backend"]
-    lines += [
-        "",
-        f"**État de l'ablation A4** : exécutée — {len(_a4_rows)} "
-        "configurations sémantiques mesurées "
-        "(spaCy FR seul et hybride dense+lexical, chacune au seuil par "
-        "défaut et au seuil recalibré). Le compromis "
-        "sémantique/rejet est donc tranché empiriquement, pas supposé.",
-    ]
+    if _a4_rows:
+        lines += [
+            "",
+            f"**État de l'ablation A4** : exécutée — {len(_a4_rows)} "
+            "configurations sémantiques mesurées "
+            "(spaCy FR seul et hybride dense+lexical, chacune au seuil par "
+            "défaut et au seuil recalibré). Le compromis "
+            "sémantique/rejet est donc tranché empiriquement, pas supposé.",
+        ]
+    else:
+        lines += [
+            "",
+            "**État de l'ablation A4** : non exécutée dans cet "
+            "environnement — aucun backend sémantique n'a pu être "
+            "instancié (voir la note ci-dessous). Les conclusions de ce "
+            "rapport sur le compromis sémantique/rejet proviennent d'une "
+            "exécution antérieure et ne sont pas reproduites ici. "
+            "Installer `spacy` et le modèle `fr_core_news_md`, puis "
+            "relancer `run_rag_eval`, régénère les lignes manquantes.",
+        ]
     if unavailable_backends:
         lines += [
             "",

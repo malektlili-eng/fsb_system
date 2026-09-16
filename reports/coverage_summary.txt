@@ -28,7 +28,7 @@ apps/ai_agent/benchmarks/queries.py                        1      0   100%
 apps/ai_agent/evaluation/__init__.py                       0      0   100%
 apps/ai_agent/evaluation/gold_set.py                       9      0   100%
 apps/ai_agent/evaluation/metrics.py                       33      5    85%
-apps/ai_agent/evaluation/runner.py                       136      1    99%
+apps/ai_agent/evaluation/runner.py                       138     16    88%
 apps/ai_agent/evaluation/scaling.py                      105      2    98%
 apps/ai_agent/llm/__init__.py                              0      0   100%
 apps/ai_agent/llm/providers.py                           138      4    97%
@@ -39,15 +39,15 @@ apps/ai_agent/management/commands/coverage_split.py      123      8    93%
 apps/ai_agent/management/commands/run_benchmarks.py       26      2    92%
 apps/ai_agent/management/commands/run_rag_eval.py         11      0   100%
 apps/ai_agent/models.py                                   55      6    89%
-apps/ai_agent/orchestrator.py                            199     22    89%
+apps/ai_agent/orchestrator.py                            199     19    90%
 apps/ai_agent/rag/__init__.py                              0      0   100%
 apps/ai_agent/rag/chunking.py                             98      2    98%
-apps/ai_agent/rag/embeddings.py                          130      9    93%
+apps/ai_agent/rag/embeddings.py                          130     47    64%
 apps/ai_agent/rag/knowledge.py                            50      8    84%
 apps/ai_agent/rag/retriever.py                            96      5    95%
 apps/ai_agent/rag/vector_store.py                         85      3    96%
 apps/ai_agent/urls.py                                      4      0   100%
-apps/ai_agent/views.py                                    82     15    82%
+apps/ai_agent/views.py                                    87     12    86%
 apps/examens/__init__.py                                   0      0   100%
 apps/examens/apps.py                                       5      0   100%
 apps/examens/models.py                                    54     12    78%
@@ -76,5 +76,6 @@ config/settings/production.py                             28     28     0%
 config/urls.py                                            12      5    58%
 core/__init__.py                                           0      0   100%
 core/permissions.py                                       49     12    76%
+set_demo_url.py                                           57     57     0%
 --------------------------------------------------------------------------
-TOTAL                                                   3549   1053    70%
+TOTAL                                                   3613   1157    68%

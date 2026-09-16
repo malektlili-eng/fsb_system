@@ -6,15 +6,15 @@ Un chiffre global unique serait trompeur : l'effort de test est délibérément 
 
 | Sous-système | Instructions | Couvertes | Couverture |
 |---|---|---|---|
-| **Agent IA & RAG** | 1460 | 1367 | **94 %** |
+| **Agent IA & RAG** | 1467 | 1327 | **90 %** |
 | **Logique métier (services, forms, models)** | 733 | 572 | **78 %** |
 | **Vues CRUD (legacy)** | 783 | 196 | **25 %** |
-| _Divers (settings, URLs, apps.py, serializers…)_ | 573 | 361 | _63 %_ |
-| **Total — code applicatif** | **3549** | **2496** | **70 %** |
+| _Divers (settings, URLs, apps.py, serializers…)_ | 630 | 361 | _57 %_ |
+| **Total — code applicatif** | **3613** | **2456** | **68 %** |
 
 ## Ce que ce total mesure exactement
 
-**70 % du code applicatif** (2496 / 3549 instructions). Les lignes du tableau se somment exactement à ce total : le poste « Divers » existe précisément pour qu'aucune instruction ne reste hors du décompte.
+**68 % du code applicatif** (2456 / 3613 instructions). Les lignes du tableau se somment exactement à ce total : le poste « Divers » existe précisément pour qu'aucune instruction ne reste hors du décompte.
 
 Ce chiffre est **le même** que celui de `coverage report` et des badges du README. Il n'existe pas deux mesures concurrentes de la couverture dans ce dépôt.
 
@@ -25,10 +25,10 @@ Ce chiffre est **le même** que celui de `coverage report` et des badges du READ
 
 ## Lecture
 
-- **Agent IA & RAG — 94 %** : Cœur du projet : chunking, embeddings, index, retrieval, évaluation, orchestrateur.
+- **Agent IA & RAG — 90 %** : Cœur du projet : chunking, embeddings, index, retrieval, évaluation, orchestrateur.
 - **Logique métier (services, forms, models) — 78 %** : Règles métier, seeding et permissions RBAC.
 - **Vues CRUD (legacy) — 25 %** : Écrans Django classiques, testés indirectement. Couverture assumée comme plus faible : priorité donnée à la couche IA/RAG.
-- **Divers (settings, URLs, apps.py, serializers…) — 63 %** : Câblage et configuration. Présent pour que les lignes ci-dessus se somment exactement au total : aucune instruction applicative n'est laissée hors du tableau.
+- **Divers (settings, URLs, apps.py, serializers…) — 57 %** : Câblage et configuration. Présent pour que les lignes ci-dessus se somment exactement au total : aucune instruction applicative n'est laissée hors du tableau.
 
 ## Détail par fichier
 
@@ -42,7 +42,7 @@ Ce chiffre est **le même** que celui de `coverage report` et des badges du READ
 | `apps/ai_agent/evaluation/__init__.py` | 0 | 0 | 100 % |
 | `apps/ai_agent/evaluation/gold_set.py` | 9 | 0 | 100 % |
 | `apps/ai_agent/evaluation/metrics.py` | 33 | 5 | 85 % |
-| `apps/ai_agent/evaluation/runner.py` | 136 | 1 | 99 % |
+| `apps/ai_agent/evaluation/runner.py` | 138 | 16 | 88 % |
 | `apps/ai_agent/evaluation/scaling.py` | 105 | 2 | 98 % |
 | `apps/ai_agent/llm/__init__.py` | 0 | 0 | 100 % |
 | `apps/ai_agent/llm/providers.py` | 138 | 4 | 97 % |
@@ -53,14 +53,14 @@ Ce chiffre est **le même** que celui de `coverage report` et des badges du READ
 | `apps/ai_agent/management/commands/run_benchmarks.py` | 26 | 2 | 92 % |
 | `apps/ai_agent/management/commands/run_rag_eval.py` | 11 | 0 | 100 % |
 | `apps/ai_agent/models.py` | 55 | 6 | 89 % |
-| `apps/ai_agent/orchestrator.py` | 199 | 22 | 89 % |
+| `apps/ai_agent/orchestrator.py` | 199 | 19 | 90 % |
 | `apps/ai_agent/rag/__init__.py` | 0 | 0 | 100 % |
 | `apps/ai_agent/rag/chunking.py` | 98 | 2 | 98 % |
-| `apps/ai_agent/rag/embeddings.py` | 130 | 9 | 93 % |
+| `apps/ai_agent/rag/embeddings.py` | 130 | 47 | 64 % |
 | `apps/ai_agent/rag/knowledge.py` | 50 | 8 | 84 % |
 | `apps/ai_agent/rag/retriever.py` | 96 | 5 | 95 % |
 | `apps/ai_agent/rag/vector_store.py` | 85 | 3 | 96 % |
-| `apps/ai_agent/views.py` | 82 | 15 | 82 % |
+| `apps/ai_agent/views.py` | 87 | 12 | 86 % |
 
 ### Logique métier (services, forms, models)
 
@@ -127,4 +127,5 @@ Ce chiffre est **le même** que celui de `coverage report` et des badges du READ
 | `config/settings/development.py` | 10 | 0 | 100 % |
 | `config/settings/production.py` | 28 | 28 | 0 % |
 | `config/urls.py` | 12 | 5 | 58 % |
+| `set_demo_url.py` | 57 | 57 | 0 % |
 

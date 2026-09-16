@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-14 19:20:36",
+  "generated_at": "2026-09-16 08:53:24",
   "main": {
     "backend": "tfidf-char35",
     "n_chunks": 34,
@@ -13,8 +13,8 @@
     },
     "correct_rejection_rate": 0.6667,
     "latency_ms": {
-      "p50": 0.99,
-      "p95": 1.07
+      "p50": 0.87,
+      "p95": 1.11
     },
     "details": [
       {
@@ -857,15 +857,15 @@
         {
           "n_chunks": 34,
           "n_distractors": 0,
-          "build_ms": 28.3,
+          "build_ms": 24.2,
           "index_mb": 0.15,
           "index_dim": 6449,
           "sparse": true,
           "latency_ms": {
-            "p50": 1.02,
-            "p95": 1.117,
-            "p99": 1.146,
-            "max": 1.232
+            "p50": 0.885,
+            "p95": 0.999,
+            "p99": 1.038,
+            "max": 1.045
           },
           "quality": {
             "hit@4": 0.7778,
@@ -878,15 +878,15 @@
         {
           "n_chunks": 500,
           "n_distractors": 466,
-          "build_ms": 283.5,
+          "build_ms": 254.6,
           "index_mb": 0.92,
           "index_dim": 7145,
           "sparse": true,
           "latency_ms": {
-            "p50": 1.369,
-            "p95": 1.463,
-            "p99": 1.504,
-            "max": 1.611
+            "p50": 1.239,
+            "p95": 1.321,
+            "p99": 1.335,
+            "max": 1.53
           },
           "quality": {
             "hit@4": 0.8148,
@@ -899,15 +899,15 @@
         {
           "n_chunks": 2000,
           "n_distractors": 1966,
-          "build_ms": 1126.9,
+          "build_ms": 1018.6,
           "index_mb": 3.38,
           "index_dim": 7958,
           "sparse": true,
           "latency_ms": {
-            "p50": 2.286,
-            "p95": 2.486,
-            "p99": 2.596,
-            "max": 2.858
+            "p50": 2.9,
+            "p95": 3.368,
+            "p99": 3.43,
+            "max": 3.596
           },
           "quality": {
             "hit@4": 0.8148,
@@ -920,15 +920,15 @@
         {
           "n_chunks": 5000,
           "n_distractors": 4966,
-          "build_ms": 2752.6,
+          "build_ms": 2550.8,
           "index_mb": 8.31,
           "index_dim": 9490,
           "sparse": true,
           "latency_ms": {
-            "p50": 3.977,
-            "p95": 4.354,
-            "p99": 4.837,
-            "max": 11.33
+            "p50": 3.485,
+            "p95": 3.903,
+            "p99": 4.02,
+            "max": 4.238
           },
           "quality": {
             "hit@4": 0.8148,
@@ -941,15 +941,15 @@
         {
           "n_chunks": 10000,
           "n_distractors": 9966,
-          "build_ms": 5534.3,
+          "build_ms": 5215.9,
           "index_mb": 16.51,
           "index_dim": 12045,
           "sparse": true,
           "latency_ms": {
-            "p50": 6.754,
-            "p95": 7.371,
-            "p99": 7.568,
-            "max": 7.777
+            "p50": 6.05,
+            "p95": 6.917,
+            "p99": 7.191,
+            "max": 7.627
           },
           "quality": {
             "hit@4": 0.8148,
@@ -962,15 +962,15 @@
         {
           "n_chunks": 20000,
           "n_distractors": 19966,
-          "build_ms": 11595.8,
+          "build_ms": 9907.2,
           "index_mb": 32.93,
           "index_dim": 15159,
           "sparse": true,
           "latency_ms": {
-            "p50": 11.882,
-            "p95": 12.58,
-            "p99": 12.917,
-            "max": 13.12
+            "p50": 10.783,
+            "p95": 12.608,
+            "p99": 13.474,
+            "max": 14.031
           },
           "quality": {
             "hit@4": 0.8148,
@@ -985,15 +985,15 @@
         {
           "n_chunks": 34,
           "n_distractors": 0,
-          "build_ms": 35.2,
+          "build_ms": 35.5,
           "index_mb": 0.15,
           "index_dim": 6449,
           "sparse": true,
           "latency_ms": {
-            "p50": 0.898,
-            "p95": 0.993,
-            "p99": 1.076,
-            "max": 1.239
+            "p50": 0.883,
+            "p95": 0.994,
+            "p99": 1.127,
+            "max": 1.176
           },
           "quality": {
             "hit@4": 0.7778,
@@ -1006,15 +1006,15 @@
         {
           "n_chunks": 500,
           "n_distractors": 466,
-          "build_ms": 322.6,
+          "build_ms": 307.9,
           "index_mb": 2.75,
           "index_dim": 6785,
           "sparse": true,
           "latency_ms": {
-            "p50": 2.416,
-            "p95": 3.116,
-            "p99": 3.832,
-            "max": 4.001
+            "p50": 2.037,
+            "p95": 2.3,
+            "p99": 2.442,
+            "max": 2.554
           },
           "quality": {
             "hit@4": 0.6296,
@@ -1027,15 +1027,15 @@
         {
           "n_chunks": 2000,
           "n_distractors": 1966,
-          "build_ms": 1316.5,
+          "build_ms": 1212.4,
           "index_mb": 11.09,
           "index_dim": 7598,
           "sparse": true,
           "latency_ms": {
-            "p50": 6.084,
-            "p95": 7.189,
-            "p99": 7.586,
-            "max": 7.667
+            "p50": 5.188,
+            "p95": 5.713,
+            "p99": 6.052,
+            "max": 6.19
           },
           "quality": {
             "hit@4": 0.4074,
@@ -1048,15 +1048,15 @@
         {
           "n_chunks": 5000,
           "n_distractors": 4966,
-          "build_ms": 3290.8,
+          "build_ms": 2901.8,
           "index_mb": 27.77,
           "index_dim": 9130,
           "sparse": true,
           "latency_ms": {
-            "p50": 13.117,
-            "p95": 14.697,
-            "p99": 15.053,
-            "max": 15.811
+            "p50": 11.533,
+            "p95": 13.08,
+            "p99": 14.35,
+            "max": 16.145
           },
           "quality": {
             "hit@4": 0.3333,
@@ -1069,15 +1069,15 @@
         {
           "n_chunks": 10000,
           "n_distractors": 9966,
-          "build_ms": 7560.0,
+          "build_ms": 6203.8,
           "index_mb": 55.52,
           "index_dim": 11685,
           "sparse": true,
           "latency_ms": {
-            "p50": 26.186,
-            "p95": 30.513,
-            "p99": 32.837,
-            "max": 33.732
+            "p50": 22.105,
+            "p95": 25.764,
+            "p99": 28.388,
+            "max": 29.297
           },
           "quality": {
             "hit@4": 0.2593,
@@ -1090,15 +1090,15 @@
         {
           "n_chunks": 20000,
           "n_distractors": 19966,
-          "build_ms": 16187.3,
+          "build_ms": 11952.3,
           "index_mb": 111.06,
           "index_dim": 14799,
           "sparse": true,
           "latency_ms": {
-            "p50": 52.451,
-            "p95": 61.695,
-            "p99": 69.715,
-            "max": 82.089
+            "p50": 45.569,
+            "p95": 57.912,
+            "p99": 63.75,
+            "max": 65.107
           },
           "quality": {
             "hit@4": 0.1481,
