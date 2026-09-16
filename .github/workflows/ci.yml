@@ -33,6 +33,10 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
+          # Les dépendances vivent dans requirements/, pas à la racine.
+          # Sans ce chemin, setup-python ne trouve ni requirements.txt
+          # ni pyproject.toml et FAIT ÉCHOUER l'étape.
+          cache-dependency-path: requirements/*.txt
 
       - name: Install linting tools
         run: |
@@ -81,6 +85,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
+          # Les dépendances vivent dans requirements/, pas à la racine.
+          # Sans ce chemin, setup-python ne trouve ni requirements.txt
+          # ni pyproject.toml et FAIT ÉCHOUER l'étape.
+          cache-dependency-path: requirements/*.txt
 
       - name: Install dependencies
         run: |
@@ -151,6 +159,10 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
+          # Les dépendances vivent dans requirements/, pas à la racine.
+          # Sans ce chemin, setup-python ne trouve ni requirements.txt
+          # ni pyproject.toml et FAIT ÉCHOUER l'étape.
+          cache-dependency-path: requirements/*.txt
 
       - name: Install dependencies
         run: pip install -r requirements/development.txt
@@ -213,6 +225,10 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
+          # Les dépendances vivent dans requirements/, pas à la racine.
+          # Sans ce chemin, setup-python ne trouve ni requirements.txt
+          # ni pyproject.toml et FAIT ÉCHOUER l'étape.
+          cache-dependency-path: requirements/*.txt
 
       - name: Install production dependencies
         run: pip install -r requirements/production.txt
