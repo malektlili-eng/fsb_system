@@ -472,3 +472,41 @@ class ChatViewWithoutApiKeyTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context["offline_mode"])
         self.assertNotContains(response, "GROQ_API_KEY manquante")
+
+
+class InitDataPasswordRealignTest(TestCase):
+    """
+    Régression : `init_data` ne créait les comptes que s'ils n'existaient
+    pas, sans jamais mettre leur mot de passe à jour.
+
+    Conséquence observée en production : changer `DEMO_ADMIN_PASSWORD`
+    puis redéployer n'avait aucun effet sur une base déjà semée, et
+    personne ne pouvait se connecter à la démonstration — ni avec
+    l'ancien mot de passe, ni avec le nouveau. Une commande annoncée
+    « idempotente » l'était au sens faible : elle ne dupliquait rien,
+    mais elle ne convergeait pas non plus vers l'état demandé.
+    """
+
+    def test_le_mot_de_passe_est_realigne_sur_une_base_deja_semee(self):
+        call_command("init_data", "--admin-password=premier", "--quiet",
+                     stdout=StringIO())
+        admin = User.objects.get(username="admin")
+        self.assertTrue(admin.check_password("premier"))
+
+        call_command("init_data", "--admin-password=second", "--quiet",
+                     stdout=StringIO())
+        admin.refresh_from_db()
+        self.assertTrue(
+            admin.check_password("second"),
+            "init_data doit converger vers le mot de passe demandé.",
+        )
+        self.assertFalse(admin.check_password("premier"))
+
+    def test_reste_idempotente_sur_les_donnees(self):
+        """Le réalignement ne doit pas dupliquer d'entités."""
+        from apps.administration.models import Etudiant
+
+        call_command("init_data", "--quiet", stdout=StringIO())
+        premier = Etudiant.objects.count()
+        call_command("init_data", "--quiet", stdout=StringIO())
+        self.assertEqual(Etudiant.objects.count(), premier)

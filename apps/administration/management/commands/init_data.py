@@ -76,13 +76,25 @@ class Command(BaseCommand):
             ('doyen',       'doyen123',     'doyen',       'Fatma',    'Bouchenak'),
         ]
         for username, pwd, role, first, last in users_data:
-            if not CustomUser.objects.filter(username=username).exists():
+            u = CustomUser.objects.filter(username=username).first()
+            if u is None:
                 u = CustomUser.objects.create_user(
                     username=username, password=pwd, role=role,
                     first_name=first, last_name=last,
                     email=f'{username}@fsb.tn',
                 )
                 echo(f"  ✓ Utilisateur : {username} / {pwd} [{role}]")
+            elif not u.check_password(pwd):
+                # Le compte existe mais son mot de passe ne correspond plus
+                # à celui attendu — typiquement après un changement de
+                # DEMO_ADMIN_PASSWORD. Sans ce réalignement, la variable
+                # d'environnement serait ignorée sur toute base déjà semée,
+                # et personne ne pourrait se connecter à la démonstration.
+                # Ce sont des comptes de démonstration : leur mot de passe
+                # est une donnée de seed, pas un secret d'utilisateur.
+                u.set_password(pwd)
+                u.save(update_fields=['password'])
+                echo(f"  ↻ Mot de passe réaligné : {username} [{role}]")
 
         # ─── Départements ─────────────────────────────────────────────
         depts = {}
