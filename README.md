@@ -357,7 +357,7 @@ Endpoints : `/api/etudiants/`, `/api/etudiants/{id}/notes/`,
 | `DATABASE_URL` | URL de connexion à la base | SQLite |
 | `REDIS_URL` | URL Redis pour le cache | — |
 | `GROQ_API_KEY` | Clé API Groq (**facultative**, cf. repli) | — |
-| `GROQ_MODEL` | Modèle de génération | `llama-3.3-70b-versatile` |
+| `GROQ_MODEL` | Modèle de génération | `openai/gpt-oss-120b` |
 | `LLM_PROVIDER` | `groq` ou `offline` | `groq` |
 | `LLM_FALLBACK_OFFLINE` | Repli déterministe si Groq indisponible | `True` |
 | `RAG_EMBEDDING_BACKEND` | `tfidf`, `spacy`, `hybrid`, `sentence-transformers` | `tfidf` |

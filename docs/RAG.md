@@ -258,7 +258,7 @@ Implémentation : `apps/ai_agent/llm/providers.py`.
 
 La génération est isolée derrière l'interface `LLMProvider` :
 
-- `GroqProvider` — production (llama-3.3-70b via Groq).
+- `GroqProvider` — production (modèle Groq défini par `GROQ_MODEL`).
 - `OfflineProvider` — générateur **déterministe sans réseau**, qui
   simule le streaming **et** le tool calling. Il permet de tester le
   pipeline complet de l'orchestrateur et d'exécuter les benchmarks de

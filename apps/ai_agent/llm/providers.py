@@ -9,7 +9,7 @@ index, ranking, évaluation — voir apps/ai_agent/rag/) et traite la
 GÉNÉRATION comme un composant interchangeable derrière cette
 interface. Conséquences concrètes :
 
- • GroqProvider     : production (llama-3.3-70b via Groq).
+ • GroqProvider     : production (modèle Groq configurable).
  • OfflineProvider  : générateur déterministe SANS réseau, utilisé
    par les tests et le mode offline des benchmarks. Il simule le
    protocole de streaming ET le tool calling (déclenchement piloté
@@ -90,7 +90,7 @@ class LLMProvider(ABC):
 
 
 class GroqProvider(LLMProvider):
-    """Fournisseur de production : Groq (llama-3.3-70b-versatile)."""
+    """Fournisseur de production : Groq (modèle via settings.GROQ_MODEL)."""
 
     name = "groq"
 

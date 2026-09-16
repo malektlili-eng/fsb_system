@@ -136,7 +136,13 @@ SPECTACULAR_SETTINGS = {
 
 # ─── API Keys IA ─────────────────────────────────────────────────────
 GROQ_API_KEY = config('GROQ_API_KEY', default='')
-GROQ_MODEL = config('GROQ_MODEL', default='llama-3.3-70b-versatile')
+# Modèle de génération. llama-3.3-70b-versatile a basculé en offre
+# Enterprise chez Groq (août 2026) : une clé gratuite reçoit un 404.
+# Les modèles de production ouverts sont openai/gpt-oss-120b et
+# openai/gpt-oss-20b (deux fois plus rapide, un peu moins fiable
+# sur le tool calling). Le catalogue Groq bouge : vérifier sur
+# https://console.groq.com/docs/models si un 404 réapparaît.
+GROQ_MODEL = config('GROQ_MODEL', default='openai/gpt-oss-120b')
 
 # ─── Logging ─────────────────────────────────────────────────────────
 LOGGING = {

@@ -130,7 +130,7 @@ reconstruit les deux prompts pour chaque requête et compte les tokens.
 ## 4. Mode live (LLM réel)
 
 Le mode `--live` réexécute les 20 requêtes avec `GroqProvider`
-(llama-3.3-70b-versatile) et **ajoute** les colonnes suivantes au
+(modèle défini par `GROQ_MODEL`) et **ajoute** les colonnes suivantes au
 journal, non déterministes car dépendantes de l'API :
 
 | Métrique | Définition | Où |
