@@ -1,36 +1,41 @@
 # render.yaml — Déploiement en un clic sur Render (https://render.com)
 # ═══════════════════════════════════════════════════════════════════
-# Provisionne l'application FSB (web + PostgreSQL + Key Value/Redis).
-#
 # DÉPLOIEMENT EN UN CLIC
 #   Bouton « Deploy to Render » du README, ou :
 #   render.com → New → Blueprint → sélectionner ce dépôt.
 #
-# CE QUE CE BLUEPRINT GARANTIT
-#   Le déploiement est AUTONOME : il migre, sème les données de
-#   démonstration ET construit l'index vectoriel dans la même phase de
-#   build. Un examinateur qui ouvre l'URL trouve une application peuplée
-#   sur laquelle il peut se connecter immédiatement — pas un formulaire
-#   de connexion vide.
+# ─── POURQUOI CETTE DÉMO EST « SANS ÉTAT » ─────────────────────────
 #
-#   AUCUN SECRET N'EST REQUIS pour que la démo fonctionne. Sans
-#   GROQ_API_KEY, LLM_FALLBACK_OFFLINE fait basculer la génération sur
-#   OfflineProvider (déterministe, sans réseau) : le retrieval, la
-#   sélection d'outils, le contrôle RBAC et le streaming SSE — tout ce
-#   que ce dépôt implémente réellement — restent observables.
+# L'instance de démonstration tourne sur SQLite, reconstruite à chaque
+# démarrage par `init_data`. Ce n'est pas un raccourci, c'est une
+# décision assumée, pour deux raisons.
 #
-# NOTE SUR LES OFFRES GRATUITES
-#   Les instances gratuites s'endorment après ~15 min d'inactivité : le
-#   premier chargement peut prendre ~50 s. Les bases gratuites expirent
-#   après 30 jours. Pour une URL destinée à être cliquée pendant des
-#   mois, prévoir le plan payant le plus bas.
+# 1. DURÉE DE VIE. Une base PostgreSQL gratuite Render expire 30 jours
+#    après sa création, puis est supprimée. Un lien de démonstration
+#    placé dans une candidature doit rester vivant plusieurs mois : une
+#    base à renouveler est un lien mort programmé.
+#
+# 2. INTÉGRITÉ. Cette démo est publique et l'agent sait écrire en base
+#    (créer un étudiant, planifier un examen). Avec un stockage
+#    persistant, le premier visiteur qui teste ces fonctions laisse ses
+#    traces à tous les suivants. Sans état, la démo se répare seule.
+#
+# Les écritures faites pendant une session fonctionnent normalement et
+# sont visibles ; elles disparaissent à la mise en veille.
+#
+# ─── REPASSER SUR POSTGRESQL ───────────────────────────────────────
+# La configuration PostgreSQL reste la configuration de production :
+# `config/settings/production.py` l'utilise dès que DATABASE_URL est
+# fournie, et `docker-compose.yml` l'utilise en local. Pour la rétablir
+# ici, décommenter le bloc `databases:` ci-dessous ET la variable
+# DATABASE_URL dans `envVars`. Aucune modification de code.
 # ═══════════════════════════════════════════════════════════════════
 
-databases:
-  - name: fsb-postgres
-    plan: free
-    databaseName: fsb_db
-    user: fsb_user
+# databases:
+#   - name: fsb-postgres
+#     plan: free            # expire après 30 jours — cf. note ci-dessus
+#     databaseName: fsb_db
+#     user: fsb_user
 
 services:
   # ─── Application web (Django + Gunicorn) ──────────────────────────
@@ -38,16 +43,23 @@ services:
     name: fsb-system
     runtime: python
     plan: free
-    # migrate → seed → index : l'ordre compte. L'index est construit
-    # après le seeding car il peut indexer des fiches d'entités issues
-    # de la base en plus du corpus documentaire.
+    # La base est semée À LA CONSTRUCTION : les fichiers produits ici
+    # font partie de l'image déployée et survivent donc aux redémarrages,
+    # contrairement aux écritures faites à l'exécution.
     buildCommand: >-
       pip install -r requirements/production.txt &&
       python manage.py collectstatic --noinput &&
       python manage.py migrate --no-input &&
       python manage.py init_data --quiet &&
       python manage.py build_rag_index
-    startCommand: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120
+    # Filet de sécurité : si le conteneur redémarre sans son système de
+    # fichiers, migrate et init_data (idempotents) reconstruisent la base
+    # avant que Gunicorn n'accepte la première requête. Quelques secondes,
+    # mais jamais de page de connexion sur une base vide.
+    startCommand: >-
+      python manage.py migrate --no-input &&
+      python manage.py init_data --quiet &&
+      gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 3 --timeout 120
     healthCheckPath: /accounts/login/
     envVars:
       - key: DJANGO_SETTINGS_MODULE
@@ -58,32 +70,33 @@ services:
         value: "False"
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
-      - key: DATABASE_URL
-        fromDatabase:
-          name: fsb-postgres
-          property: connectionString
+      # Décommenter avec le bloc `databases:` pour repasser sur PostgreSQL.
+      # - key: DATABASE_URL
+      #   fromDatabase:
+      #     name: fsb-postgres
+      #     property: connectionString
       - key: REDIS_URL
         fromService:
           type: redis
           name: fsb-redis
           property: connectionString
-      # Clé LLM facultative : la démo fonctionne sans.
+      # Clé LLM facultative : sans elle, LLM_FALLBACK_OFFLINE sert le
+      # fournisseur déterministe et la démo reste utilisable.
       - key: GROQ_API_KEY
         sync: false
+      # Catalogue Groq mouvant : llama-3.3-70b-versatile est passé en
+      # offre Enterprise (août 2026) et renvoie 404 sur une clé gratuite.
       - key: GROQ_MODEL
         value: openai/gpt-oss-120b
       - key: LLM_PROVIDER
         value: groq
-      # Repli déterministe si GROQ_API_KEY est absente. Mettre "False"
-      # en production réelle : mieux vaut échouer bruyamment que servir
-      # du déterministe sans que ça se voie.
       - key: LLM_FALLBACK_OFFLINE
         value: "True"
-      # Mot de passe du compte de démonstration, généré par Render : une
-      # instance publique ne doit pas exposer un mot de passe en clair
-      # dans le dépôt. Le relever dans le dashboard après déploiement.
+      # Mot de passe PUBLIC et volontairement lisible : cette instance
+      # ne contient que des données fictives, et un examinateur qui ne
+      # peut pas se connecter ne voit rien. Il est publié dans le README.
       - key: DEMO_ADMIN_PASSWORD
-        generateValue: true
+        value: demo-fsb-2026
       - key: RAG_EMBEDDING_BACKEND
         value: tfidf
       - key: PYTHON_VERSION

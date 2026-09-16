@@ -28,11 +28,25 @@ observables. Seule la fluidité rédactionnelle des réponses est
 dégradée. Renseigner la clé Groq dans le dashboard active la
 génération complète.
 
-**Identifiants de démonstration** : utilisateur `admin`. Le mot de
-passe est **généré par Render** (variable `DEMO_ADMIN_PASSWORD`,
-`generateValue: true`) et se relève dans le dashboard du service — une
-instance publique ne doit pas exposer un mot de passe inscrit en clair
-dans le dépôt. En local, le défaut reste `admin123`.
+**Identifiants de démonstration** : `admin` / `demo-fsb-2026`.
+
+Ce mot de passe est **volontairement public**. L'instance ne contient
+que des données fictives, et un examinateur qui ne peut pas se connecter
+ne voit rien du travail. Le compromis penche donc nettement du côté de
+l'accessibilité. En local, le défaut reste `admin123` ; il se surcharge
+par `--admin-password` ou `DEMO_ADMIN_PASSWORD`.
+
+**Stockage sans état** : l'instance tourne sur SQLite, reconstruite à
+chaque démarrage par `init_data`. Deux raisons. D'abord, une base
+PostgreSQL gratuite Render expire après 30 jours puis est supprimée :
+un lien destiné à rester vivant plusieurs mois ne peut pas en dépendre.
+Ensuite, cette démo est publique et l'agent sait écrire en base — sans
+état, les modifications d'un visiteur ne pénalisent pas les suivants.
+
+Pour rétablir PostgreSQL : décommenter le bloc `databases:` et la
+variable `DATABASE_URL` dans `render.yaml`. Aucune modification de code
+— `config/settings/production.py` bascule selon la présence de
+`DATABASE_URL`.
 
 ### Limites des offres gratuites, à connaître avant de partager l'URL
 

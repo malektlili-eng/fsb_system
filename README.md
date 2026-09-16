@@ -61,9 +61,21 @@ charge d'un fournisseur externe.
 
 **→ [https://fsb-system.onrender.com](https://fsb-system.onrender.com)** — instance en service.
 
+**Identifiants** : `admin` / `demo-fsb-2026`
+
 > L'instance tourne sur l'offre gratuite Render et **se met en veille
 > après ~15 min d'inactivité** : le tout premier chargement peut
 > demander ~50 s. Ce n'est pas une panne.
+>
+> Elle est aussi **sans état** : la base SQLite est reconstruite à chaque
+> démarrage par `init_data`. Les données créées pendant une session sont
+> bien réelles et visibles, mais disparaissent à la mise en veille.
+> C'est délibéré — une base PostgreSQL gratuite expire après 30 jours, et
+> cette démo publique laisse l'agent écrire en base. Sans état, le lien
+> ne meurt pas et la démo se répare seule. La configuration PostgreSQL
+> reste celle de la production : `config/settings/production.py` l'active
+> dès que `DATABASE_URL` est fournie, et `docker-compose.yml` l'utilise
+> en local.
 
 Le blueprint est **autonome** : la phase de build enchaîne
 `migrate` → `init_data` → `build_rag_index`, donc l'instance déployée
@@ -74,9 +86,7 @@ manuellement dans un shell.
 `LLM_FALLBACK_OFFLINE` bascule la génération sur `OfflineProvider` : le
 retrieval, la sélection d'outils, le RBAC et le streaming SSE restent
 tous observables. Ajouter la clé active la génération Groq complète.
-Identifiants : `admin`, mot de passe généré par Render
-(`DEMO_ADMIN_PASSWORD`, à relever dans le dashboard). Détails et
-limites des offres gratuites : [`DEPLOYMENT.md`](DEPLOYMENT.md).
+Détails du déploiement : [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ---
 
@@ -89,8 +99,9 @@ limites des offres gratuites : [`DEPLOYMENT.md`](DEPLOYMENT.md).
 - **API REST DRF** avec ViewSets, serializers et schéma OpenAPI généré
 - **RBAC centralisé** (`core/permissions.py`), 5 rôles, appliqué
   aussi bien aux vues qu'aux outils de l'agent
-- **PostgreSQL** en production, **Redis** pour le cache, **WhiteNoise**
-  pour les statiques
+- **PostgreSQL** en production (`DATABASE_URL`), repli SQLite pour la
+  démo sans état, **Redis** pour le cache, **WhiteNoise** pour les
+  statiques
 - Settings segmentés `base` / `development` / `production`
 
 ### 2. CI/CD réellement contraignante

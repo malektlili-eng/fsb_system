@@ -28,14 +28,39 @@ MIDDLEWARE.insert(
     _security_idx + 1, 'whitenoise.middleware.WhiteNoiseMiddleware'
 )
 
-# ─── Base de données PostgreSQL ──────────────────────────────────────
-DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True,
-    )
-}
+# ─── Base de données ─────────────────────────────────────────────────
+# PostgreSQL dès que DATABASE_URL est fournie — c'est la configuration
+# de production, et celle du docker-compose.
+#
+# Sans DATABASE_URL, repli sur SQLite. Ce n'est pas un raccourci : c'est
+# le mode "démonstration sans état". Sur un hébergement gratuit, le
+# système de fichiers est éphémère, donc la base se reconstruit à chaque
+# démarrage à partir de `init_data`. Deux conséquences voulues :
+#   - aucune base à renouveler, donc aucun lien qui meurt en silence ;
+#   - la démo se répare seule si un visiteur modifie les données.
+# ssl_require ne s'applique qu'à une vraie connexion distante.
+_DATABASE_URL = config('DATABASE_URL', default='')
+
+if _DATABASE_URL and not _DATABASE_URL.startswith('sqlite'):
+    # Base distante (PostgreSQL) : connexions persistantes et SSL exigé.
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=_DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True,
+        )
+    }
+elif _DATABASE_URL:
+    # URL SQLite fournie explicitement : surtout pas ssl_require, qui
+    # injecterait une option `sslmode` que le pilote SQLite refuse.
+    DATABASES = {'default': dj_database_url.config(default=_DATABASE_URL)}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'demo.sqlite3',
+        }
+    }
 
 # ─── Cache Redis ─────────────────────────────────────────────────────
 REDIS_URL = config('REDIS_URL', default='redis://localhost:6379/0')
